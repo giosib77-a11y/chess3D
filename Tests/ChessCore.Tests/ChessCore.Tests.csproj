@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="../ChessCore.Build/ChessCore.Build.csproj" />
     <ProjectReference Include="../ChessAI.Build/ChessAI.Build.csproj" />
+    <ProjectReference Include="../ChessCampaign.Build/ChessCampaign.Build.csproj" />
   </ItemGroup>
 
 </Project>

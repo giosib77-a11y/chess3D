@@ -11,6 +11,7 @@ namespace Chess.Tests
         [Theory]
         [InlineData("Chess.Core")]
         [InlineData("Chess.AI")]
+        [InlineData("Chess.Campaign")]
         public void AssemblyTargetsNetStandard21(string assemblyName)
         {
             Assembly assembly = Assembly.Load(assemblyName);
@@ -18,6 +19,16 @@ namespace Chess.Tests
 
             Assert.NotNull(attribute);
             Assert.Equal(NetStandard21, attribute.FrameworkName);
+        }
+
+        [Fact]
+        public void CampaignReferencesOnlyCore()
+        {
+            string[] allowed = { "Chess.Core", "netstandard" };
+            foreach (AssemblyName reference in Assembly.Load("Chess.Campaign").GetReferencedAssemblies())
+            {
+                Assert.Contains(reference.Name, allowed);
+            }
         }
 
         [Fact]
