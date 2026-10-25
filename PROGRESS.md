@@ -179,7 +179,7 @@ Stage 1 — MVP
     7. სარდლის ხედშიც შეგიძლია ფიგურაზე დაჭერა და სვლა.
     8. გააჩერე. **Human Side** = `Black` → Play: კამერა შავი მეფის (e8) უკანაა და თეთრისკენ იყურება. დააბრუნე `White`. **Ctrl+S**.
 
-- [ ] 15. Game: AI-ის რიგი, StatusHud, Stockfish-ის fallback, restart — owner: task-executor — files: Assets/Scripts/Game/StatusHud.cs, Assets/Scripts/Game/GameController.cs (extends task 13) — depends: 7, 13 — done when:
+- [x] 15. Game: AI-ის რიგი, StatusHud, Stockfish-ის fallback, restart — owner: task-executor — files: Assets/Scripts/Game/StatusHud.cs, Assets/Scripts/Game/GameController.cs (extends task 13) — depends: 7, 13 — done when:
   - `GameController`-ს დაემატა `hud`, `playAgainstAI`, `difficulty`, `stockfishRelativePath`, `stockfishPathOverride` და მისი ნაკადი ზუსტად API Contract → „GameController-ის ნაკადი“-ის მიხედვით: generation მთვლელი, `CancellationTokenSource`, input-ის დაბლოკვა AI-ის სვლისას, try/catch ყოველ async void-ში.
   - `StockfishNotFoundException`/`ChessAIException` → HUD-ის შეცდომის ხაზი + `Debug.LogException` + hot-seat.
   - `OnDestroy` → Cancel + Dispose AI.
