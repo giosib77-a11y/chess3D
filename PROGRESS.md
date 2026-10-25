@@ -9,7 +9,7 @@ Stage 1 — MVP
      ყოველი Game task (9, 11, 13, 15) საბოლოოდ მოწმდება მომდევნო USER task-ით (Console = 0 შეცდომა + Play-mode შემოწმება).
      API-ს, ველების სახელების და ქცევის ერთადერთი წყარო: PROJECT.md → ## API Contract. -->
 
-- [ ] 1. Test infrastructure, .gitignore, asmdef skeleton — owner: task-executor — files: .gitignore, Tests/ChessCore.Build/ChessCore.Build.csproj, Tests/ChessAI.Build/ChessAI.Build.csproj, Tests/ChessCore.Tests/ChessCore.Tests.csproj, Tests/ChessCore.Tests/BuildTargetTests.cs, Assets/Scripts/Core/Chess.Core.asmdef, Assets/Scripts/AI/Chess.AI.asmdef, Assets/Scripts/Game/Chess.Game.asmdef, Assets/StreamingAssets/Stockfish/README.md — depends: — — done when:
+- [x] 1. Test infrastructure, .gitignore, asmdef skeleton — owner: task-executor — files: .gitignore, Tests/ChessCore.Build/ChessCore.Build.csproj, Tests/ChessAI.Build/ChessAI.Build.csproj, Tests/ChessCore.Tests/ChessCore.Tests.csproj, Tests/ChessCore.Tests/BuildTargetTests.cs, Assets/Scripts/Core/Chess.Core.asmdef, Assets/Scripts/AI/Chess.AI.asmdef, Assets/Scripts/Game/Chess.Game.asmdef, Assets/StreamingAssets/Stockfish/README.md — depends: — — done when:
   - `dotnet build Tests/ChessCore.Tests` და `dotnet test Tests/ChessCore.Tests` წარმატებით სრულდება; ტესტი `BuildTargetTests.CoreAndAiTargetNetStandard21` გადის (`Assembly.Load("Chess.Core")` და `"Chess.AI"` → `TargetFrameworkAttribute` = `.NETStandard,Version=v2.1`).
   - Build პროექტები ზუსტად PROJECT.md-ის Decision Log-ის მიხედვით: netstandard2.1, LangVersion 9.0, Nullable disable, ImplicitUsings disable, EnableDefaultCompileItems false, Compile Include `../../Assets/Scripts/Core/**/*.cs` / `../../Assets/Scripts/AI/**/*.cs`; ChessAI.Build → ProjectReference ChessCore.Build; ChessCore.Tests: net10.0, xUnit 2.x + xunit.runner.visualstudio + Microsoft.NET.Test.Sdk (ზუსტი ვერსიებით), ProjectReference ორივეზე.
   - asmdef-ები: `Chess.Core` (rootNamespace Chess.Core, noEngineReferences true, references []); `Chess.AI` (noEngineReferences true, references ["Chess.Core"]); `Chess.Game` (references ["Chess.Core","Chess.AI","Unity.InputSystem"]).
@@ -227,9 +227,10 @@ Stage 1 — MVP
 - კამერის orbit/zoom მარჯვენა ღილაკით; hot-seat-ში კამერის მობრუნება მოთამაშის მიხედვით.
 - Runtime მენიუ: სირთულის და ფერის არჩევა თამაშიდან (ახლა მხოლოდ inspector-ით); Stockfish full-strength preset.
 - Unity Test Framework / Play-mode ავტომატური ტესტები.
+- nit: `EnsureNonEmptyCompile` target-ის მოშორება `Tests/ChessCore.Build` და `Tests/ChessAI.Build` csproj-ებიდან, როცა Core-სა და AI-ში რეალური `.cs` ფაილებია (ცარიელი Compile set-ის დროს SDK `TargetFrameworkAttribute`-ს არ აგენერირებს).
 
 ## Blockers
-- მომხმარებელმა თავად უნდა დაამატოს `.claude/settings.json` → `permissions.allow`-ში: `"Bash(dotnet build:*)"` და `"Bash(dotnet test:*)"` (გუნდის წესით აგენტები `.claude/`-ს არ ეხებიან). ამის გარეშე `dotnet build/test` ყოველ ჯერზე ნებართვას ითხოვს.
+- (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
 
 ## Run State
 - Stage: Stage 1 — MVP

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AssemblyName>Chess.AI</AssemblyName>
+    <RootNamespace>Chess.AI</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../Assets/Scripts/AI/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../ChessCore.Build/ChessCore.Build.csproj" />
+  </ItemGroup>
+
+  <!-- MSBuild skips TargetFrameworkAttribute generation when the Compile set is empty (no sources yet).
+       This guarantees a non-empty Compile set so the attribute is always emitted. Harmless once sources exist. -->
+  <Target Name="EnsureNonEmptyCompile" BeforeTargets="PrepareForBuild">
+    <WriteLinesToFile File="$(IntermediateOutputPath)EnsureNonEmptyCompile.g.cs" Lines="// intentionally empty" Overwrite="true" />
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)EnsureNonEmptyCompile.g.cs" />
+    </ItemGroup>
+  </Target>
+
+</Project>

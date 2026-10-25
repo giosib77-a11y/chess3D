@@ -108,3 +108,19 @@ InitTestScene*.unity*
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
 .vscode/
+
+# --- Test infrastructure (Tests/) ---
+# Keep the dotnet test/build projects (the global *.csproj ignore above would hide them)
+!Tests/**/*.csproj
+# dotnet build output
+Tests/**/bin/
+Tests/**/obj/
+
+# --- Secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Stockfish binary (large, GPLv3; see Assets/StreamingAssets/Stockfish/README.md) ---
+/Assets/StreamingAssets/Stockfish/*.exe
+/Assets/StreamingAssets/Stockfish/*.exe.meta
