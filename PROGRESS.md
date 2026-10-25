@@ -106,7 +106,7 @@ Stage 1 — MVP
        შედეგი: `Passed` და არცერთი `SKIPPED` ხაზი.
     9. ახსნა: `.exe` git-ში არ მიდის (`.gitignore` გამორიცხავს), რადგან დიდია და GPLv3 ლიცენზიისაა. ყველა კომპიუტერზე ეს ნაბიჯი ხელით კეთდება.
 
-- [ ] 9. Game: ველი, ბადე, ფიგურები, GameController-ის ჩონჩხი — owner: task-executor — files: Assets/Scripts/Game/BoardCoordinates.cs, Assets/Scripts/Game/SquareRef.cs, Assets/Scripts/Game/BoardView.cs, Assets/Scripts/Game/PiecesView.cs, Assets/Scripts/Game/GameController.cs, Assets/Scripts/ChessSmokeTest.cs (delete), Assets/Scripts/ChessSmokeTest.cs.meta (delete), Tests/GameCompileCheck/GameCompileCheck.csproj — depends: 2, 5 — done when:
+- [x] 9. Game: ველი, ბადე, ფიგურები, GameController-ის ჩონჩხი — owner: task-executor — files: Assets/Scripts/Game/BoardCoordinates.cs, Assets/Scripts/Game/SquareRef.cs, Assets/Scripts/Game/BoardView.cs, Assets/Scripts/Game/PiecesView.cs, Assets/Scripts/Game/GameController.cs, Assets/Scripts/ChessSmokeTest.cs (delete), Assets/Scripts/ChessSmokeTest.cs.meta (delete), Tests/GameCompileCheck/GameCompileCheck.csproj — depends: 2, 5 — done when:
   - `dotnet build Tests/GameCompileCheck` გადის 0 შეცდომით (Game სკრიპტების კომპილაცია Unity-ის DLL-ებით, Unity Editor-ის გარეშე; იხ. Decision Log „Game-ის კომპილაციის შემოწმება“).
   - კოდი API Contract → Chess.Game-ის მიხედვით: coordinate mapping, ფიგურების ფორმები, inspector ველების ზუსტი სახელები.
   - `BoardView.Awake` ქმნის ველს და 64 tile-ს (`Tile_a1` … `Tile_h8`, SquareRef-ით); `ShowSelection`/`ClearHighlights` მზადაა.
