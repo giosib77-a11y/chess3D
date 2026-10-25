@@ -142,7 +142,7 @@ Stage 2 — Campaign
     - debug FEN აქტიურია → ერთხელ `Start`-ში `Debug.LogWarning("[GameController] DEBUG FEN active: " + fen)` და `UpdateHud`-ში სტატუსს ბოლოში `"  [DEBUG FEN]"` (შედეგის პანელის ტექსტში — არა); შედეგი ჩვეულებრივ ითვლება.
   - Stage 1-ის Inspector ველები და Mode None-ის ქცევა უცვლელია.
   - `dotnet build Tests/GameCompileCheck` 0/0 (UNITY_EDITOR-ის გარეშე = build-ის ვარიანტი) **და** `dotnet build Tests/GameCompileCheck -p:DefineConstants=UNITY_EDITOR` 0 შეცდომა (Editor-ის ვარიანტი; ბოლოს ისევ ჩვეულებრივი build); `dotnet build Tests/EditorCompileCheck` 0/0; legacy Input grep → 0. საბოლოო შემოწმება: USER task 29.
-- [ ] 34. Editor: CampaignMap-ის სათაური რუკის ზემოთ, რეგიონის ტექსტი უფრო დიდი — owner: task-executor — files: Assets/Editor/CampaignScenesSetup.cs — depends: 32 — done when:
+- [x] 34. Editor: CampaignMap-ის სათაური რუკის ზემოთ, რეგიონის ტექსტი უფრო დიდი — owner: task-executor — files: Assets/Editor/CampaignScenesSetup.cs — depends: 32 — done when:
   - ზუსტად PROJECT.md → „UI სტილი (Stage 2)“ (განახლებული) და Business Rules → Stage 2 რეგიონების ცხრილის anchor-ები: `MapArea` 1500×660 center (0, -50); `TitleText` (Top, center y -70, სიმაღლე 90) იქმნება `MapArea`-ს შემდეგ; რეგიონის ღილაკი 400×190; label Bold, best fit min 22 / max 28, Wrap, Truncate, 8px inset; anchor-ები kartli (0.47, 0.42), kakheti (0.80, 0.38), imereti (0.17, 0.45), svaneti (0.30, 0.78), khevsureti (0.66, 0.74).
   - report-ში გამოთვლა: 5 ღილაკის rect-ები `MapArea`-ში ერთმანეთს არ ფარავს და `MapArea`-ს არ სცდება; `TitleText`, `StatusText`, `BackButton` არ ფარავს `MapArea`-ს 1920×1080-ზე.
   - სხვა სცენები/ღილაკები უცვლელია. `dotnet build Tests/EditorCompileCheck` და `Tests/GameCompileCheck` 0/0. საბოლოო შემოწმება: USER task 29 (ნაბიჯი 1–2).

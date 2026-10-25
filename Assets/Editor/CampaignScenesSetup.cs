@@ -237,11 +237,11 @@ namespace Chess.Editor
         {
             switch (id)
             {
-                case "kartli": return new Vector2(0.50f, 0.42f);
-                case "kakheti": return new Vector2(0.78f, 0.38f);
-                case "imereti": return new Vector2(0.24f, 0.45f);
+                case "kartli": return new Vector2(0.47f, 0.42f);
+                case "kakheti": return new Vector2(0.80f, 0.38f);
+                case "imereti": return new Vector2(0.17f, 0.45f);
                 case "svaneti": return new Vector2(0.30f, 0.78f);
-                case "khevsureti": return new Vector2(0.64f, 0.74f);
+                case "khevsureti": return new Vector2(0.66f, 0.74f);
                 default: return null;
             }
         }
@@ -253,13 +253,16 @@ namespace Chess.Editor
             Created.Add("CampaignMapCanvas");
             var controller = canvas.AddComponent<CampaignMapController>();
 
-            MakeText("TitleText", canvas.transform, "Campaign Map", 64,
-                Top(new Vector2(0f, -80f), new Vector2(1400f, 100f)), TextAnchor.MiddleCenter, Color.white);
-
-            GameObject map = NewRect("MapArea", canvas.transform, Center(new Vector2(0f, -20f), new Vector2(1500f, 720f)));
+            GameObject map = NewRect("MapArea", canvas.transform, Center(new Vector2(0f, -50f), new Vector2(1500f, 660f)));
             Image mapImage = map.AddComponent<Image>();
             mapImage.color = MapColor;
             mapImage.raycastTarget = false;
+
+            // Created after MapArea so it draws on top. Center is 70 from the top edge.
+            var topMid = new Vector2(0.5f, 1f);
+            MakeText("TitleText", canvas.transform, "Campaign Map", 64,
+                new Placement(topMid, topMid, new Vector2(0.5f, 0.5f), new Vector2(0f, -70f), new Vector2(1400f, 90f)),
+                TextAnchor.MiddleCenter, Color.white);
 
             var buttons = new List<RegionButton>();
             foreach (Region region in CampaignRegions.All)
@@ -271,10 +274,11 @@ namespace Chess.Editor
                     Debug.LogError(Tag + "No map anchor defined for region '" + region.Id + "'");
                     continue;
                 }
-                Button button = MakeButton("Region_" + region.Id, map.transform, region.Name, Anchored(anchor.Value, new Vector2(380f, 170f)), 24, out Text label);
+                Button button = MakeButton("Region_" + region.Id, map.transform, region.Name, Anchored(anchor.Value, new Vector2(400f, 190f)), 28, out Text label);
+                label.fontStyle = FontStyle.Bold;
                 label.resizeTextForBestFit = true;
-                label.resizeTextMinSize = 14;
-                label.resizeTextMaxSize = 24;
+                label.resizeTextMinSize = 22;
+                label.resizeTextMaxSize = 28;
                 label.horizontalOverflow = HorizontalWrapMode.Wrap;
                 label.verticalOverflow = VerticalWrapMode.Truncate;
                 label.rectTransform.offsetMin = new Vector2(8f, 8f);
@@ -295,7 +299,8 @@ namespace Chess.Editor
             }
 
             Text status = MakeText("StatusText", canvas.transform, "", 28,
-                Bottom(new Vector2(0f, 100f), new Vector2(1000f, 90f)), TextAnchor.MiddleCenter, Color.white);
+                new Placement(new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0.5f), new Vector2(0f, 100f), new Vector2(1000f, 90f)),
+                TextAnchor.MiddleCenter, Color.white);
             Button back = MakeButton("BackButton", canvas.transform, "Back to menu",
                 new Placement(Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(40f, 40f), new Vector2(400f, 80f)), 32, out _);
 
