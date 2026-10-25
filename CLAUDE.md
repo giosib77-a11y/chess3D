@@ -4,25 +4,28 @@
 
 ## Stack
 - Unity 6000.6.7f1, URP 17.6.0, Input System 1.20.1 (მხოლოდ ახალი Input System)
-- C# 9 / netstandard2.1: `Chess.Core` (წესები) და `Chess.AI` (Stockfish UCI); `Chess.Game` = Unity MonoBehaviour-ები
+- C# 9 / netstandard2.1: `Chess.Core` (წესები), `Chess.AI` (Stockfish UCI), `Chess.Campaign` (რეგიონები, პროგრესი, JSON შენახვა); `Chess.Game` = Unity MonoBehaviour-ები + uGUI (legacy `Text`, TMP არა)
 - ტესტები: xUnit 2.x, net10.0 (`Tests/`, Assets-ის გარეთ); Stockfish (UCI, ცალკე პროცესი, binary git-ში არ ინახება)
 
 ## Commands
-- dev: Unity Hub-ში გახსენი პროექტი → `Assets/Scenes/MainScene` → Play (USER)
+- dev: Unity Hub-ში გახსენი პროექტი → `Assets/Scenes/MainMenu` → Play (USER); `MainScene` პირდაპირაც (Stage 1-ის ქცევა)
+- scene setup (USER, Editor): Tools → Setup Chess Scene, შემდეგ Tools → Setup Campaign Scenes (Stage 2-დან)
 - lint: — (none)
 - typecheck: `dotnet build Tests/ChessCore.Tests`
 - test: `dotnet test Tests/ChessCore.Tests`
 - typecheck (Game, Unity-ის DLL-ებით): `dotnet build Tests/GameCompileCheck` (task 9-დან)
 - typecheck (Editor სკრიპტები): `dotnet build Tests/EditorCompileCheck` (task 19-დან)
-- build: Unity Editor → File → Build Profiles (ხელით, USER; Stage 1-ში არ არის საჭირო)
+- build: Unity Editor → File → Build Profiles (ხელით, USER; Stage 1–2-ში არ არის საჭირო)
 - migrations: —
 - integration (არასავალდებულო): `$env:STOCKFISH_PATH="<abs path to stockfish.exe>"` და შემდეგ test ბრძანება
 
 ## Conventions
-- Namespace-ები: `Chess.Core`, `Chess.AI`, `Chess.Game`. დამოკიდებულება მხოლოდ ამ მიმართულებით: Core ← AI ← Game.
-- Core/AI-ში არ გამოიყენება `UnityEngine`, NuGet და netstandard2.1-ს გარეთ არსებული API (მაგ. `System.Threading.Channels`, `Process.Kill(bool)`).
+- Namespace-ები: `Chess.Core`, `Chess.AI`, `Chess.Campaign`, `Chess.Game`, `Chess.Editor`. დამოკიდებულება მხოლოდ ასე: Core ← AI ← Game და Core ← Campaign ← Game; AI და Campaign ერთმანეთს არ მიმართავენ (Elo → AI = `AIDifficulty.FromElo`, Game აერთებს).
+- Core/AI/Campaign-ში არ გამოიყენება `UnityEngine`, NuGet (მათ შორის `System.Text.Json`) და netstandard2.1-ს გარეთ არსებული API (მაგ. `System.Threading.Channels`, `Process.Kill(bool)`). ახალი Campaign ფაილი ავტომატურად შედის `Tests/ChessCampaign.Build`-ში.
 - `record` და `init` აკრძალულია (Unity-ს არ აქვს `IsExternalInit`). გამოიყენე `readonly struct` ან კლასი get-only property-ებით.
-- Core/AI-ში ყოველი `using` ცალსახად იწერება (Unity-ში implicit usings არ არის).
+- Core/AI/Campaign-ში ყოველი `using` ცალსახად იწერება (Unity-ში implicit usings არ არის).
+- Domain reload Play-ზე გათიშულია: ყოველი static მდგომარეობა Game-ში ნულდება `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]`-ით.
+- `ProjectSettings/EditorBuildSettings.asset` და `Assets/Scenes/*.unity`-ს მხოლოდ Editor ბრძანებები ცვლის (USER-ის გაშვებით), აგენტი — არასდროს. UI ტექსტები მხოლოდ PROJECT.md-ის API Contract-იდან.
 - `.meta` ფაილებს ხელით არასდროს ქმნი, მათ Unity ქმნის. ფაილის წაშლისას მისი `.meta`-ც იშლება.
 - არ შეეხო `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `ProjectSettings/`, `.claude/`-ს, Unity-ს მიერ გენერირებულ root `*.csproj`-ს და `chess3D.slnx`-ს.
 - `Assets/`-ში არ ჩაწერო build-ის შედეგები ან დროებითი ფაილები (Unity ყველაფერს იმპორტირებს).
