@@ -201,7 +201,7 @@ Stage 1 — MVP
   - `dotnet test Tests/ChessCore.Tests` გადის.
 
 ### მომხმარებლის მოთხოვნით დამატებული (2026-10-25)
-- [ ] 19. Editor: სცენის ავტომატური აწყობა (Tools → Setup Chess Scene) — owner: task-executor — files: Assets/Editor/ChessSceneSetup.cs, Assets/Editor/Chess.Editor.asmdef, Tests/EditorCompileCheck/EditorCompileCheck.csproj — depends: 15, 17 — done when:
+- [x] 19. Editor: სცენის ავტომატური აწყობა (Tools → Setup Chess Scene) — owner: task-executor — files: Assets/Editor/ChessSceneSetup.cs, Assets/Editor/Chess.Editor.asmdef, Tests/EditorCompileCheck/EditorCompileCheck.csproj — depends: 15, 17 — done when:
   - Editor-only asmdef `Chess.Editor` (includePlatforms ["Editor"], references Chess.Core, Chess.AI, Chess.Game); namespace `Chess.Editor`.
   - მენიუ **Tools → Setup Chess Scene** (`[MenuItem("Tools/Setup Chess Scene")]`): ჯერ `EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()` (უარზე — გაუქმება), შემდეგ ხსნის `Assets/Scenes/MainScene.unity`-ს და აკეთებს:
     - `Assets/Materials/` + 6 მასალა URP/Lit-ით (task 10-ის ცხრილი): `M_Ground` 8A9A5B opaque; `M_Tile` FFFFFF α40 transparent; `M_TileLegal` 3CDC3C α160 transparent; `M_TileSelected` FFD700 α180 transparent; `M_WhitePiece` EDE6D6 opaque; `M_BlackPiece` 2B2B2B opaque. არსებული მასალა ხელახლა არ იქმნება — ფერი/პარამეტრები ახლდება. Transparent სწორად: `_Surface`=1, blend SrcAlpha/OneMinusSrcAlpha, `_ZWrite`=0, keyword `_SURFACE_TYPE_TRANSPARENT`, RenderType tag Transparent, renderQueue 3000 (Inspector-ში Surface Type = Transparent ჩანს).
@@ -253,8 +253,9 @@ Stage 1 — MVP
 
 ## Blockers
 - (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
-- USER task-ები 2, 8, 10, 12, 14, 16 მომხმარებლის შესასრულებელია (Unity Editor, Stockfish-ის ჩამოტვირთვა). აგენტის ყველა task (1, 3–7, 9, 11, 13, 15, 17, 18) დასრულებულია. Stage Done გახდება USER task 16-ის წარმატებით გავლის შემდეგ.
-- Unity-მ ჯერ არ შექმნა `.meta` ფაილები `Assets/Scripts/Game/{CameraRig,PromotionPrompt,SelectionController,SquarePicker,StatusHud}.cs`-ისთვის (Unity-ის ფანჯარა უნდა გააქტიურდეს). ისინი სცენასთან ერთად უნდა დაა-commit-ო, თორემ სხვა კომპიუტერზე სცენის სკრიპტების GUID-ები გაფუჭდება.
+- USER task-ები 10, 12, 14, 16 მომხმარებლის შესასრულებელია (2 და 8 დადასტურდა). აგენტის ყველა task (1, 3–7, 9, 11, 13, 15, 17, 18, 19) დასრულებულია. Stage Done გახდება USER task 16-ის წარმატებით გავლის შემდეგ.
+- (მოგვარდა `de73a20`-ში) Game სკრიპტების `.meta` ფაილები.
+- **Tools → Setup Chess Scene**-ის შემდეგ დაა-commit-ე `Assets/Scenes/MainScene.unity`, `Assets/Materials/**` (+ `.meta`).
 
 ## Run State
 - Stage: Stage 1 — MVP
@@ -264,7 +265,7 @@ Stage 1 — MVP
 
 ## Last Session
 - Date: 2026-10-25
-- Done: აგენტის task-ები 1, 3–7, 9, 11, 13, 15; finish-check (code-reviewer + security-auditor) → should-fix task-ები 17, 18 გასწორდა (fix round 1), მიზნობრივმა re-review-მ დაადასტურა; nit-ები Backlog-შია.
-- Verification: `dotnet build Tests/ChessCore.Tests` 0 warn/0 err; `dotnet test Tests/ChessCore.Tests` 284/284 (integration ტესტი SKIPPED — STOCKFISH_PATH არ არის); `dotnet build Tests/GameCompileCheck` 0 warn/0 err; legacy Input grep 0. Unity-მ Core/AI/Game (T9-ის მდგომარეობით) დააკომპილირა 0 `error CS`-ით (Editor.log).
-- Known issues / blockers: Unity Play-mode და რეალური Stockfish შეუმოწმებელია (USER task-ები).
-- Next: USER task 2 → 8 → 10 → 12 → 14 → 16 (თანმიმდევრობით, ინსტრუქციები task-ების ქვეშ).
+- Done: USER task 2 და 8 მომხმარებელმა დაადასტურა (Console 0 შეცდომა; Stockfish integration ტესტი Passed, skipped 0). task 19 — Editor-ის ბრძანება Tools → Setup Chess Scene; USER task-ები 10/12/14/16 გამარტივდა (აწყობა = ერთი ბრძანება, Play-შემოწმებები უცვლელი; task 12-ს დაემატა Play Against AI-ის დროებით მოხსნა).
+- Verification: `dotnet test Tests/ChessCore.Tests` 284/284; `dotnet build Tests/GameCompileCheck` და `Tests/EditorCompileCheck` 0 warn/0 err; Unity-მ დააკომპილირა Chess.Core/AI/Game/Editor 0 `error CS`-ით (Editor.log, 15:18).
+- Known issues / blockers: Setup ბრძანების გაშვება და Play-mode შეუმოწმებელია (USER task 10).
+- Next: USER task 10 → 12 → 14 → 16.

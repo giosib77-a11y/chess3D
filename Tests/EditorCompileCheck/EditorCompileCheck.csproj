@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Verification-only project: compiles Assets/Editor against Unity DLLs without the Editor running. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AssemblyName>Chess.Editor</AssemblyName>
+    <RootNamespace>Chess.Editor</RootNamespace>
+    <NoWarn>$(NoWarn);CS0649</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <UnityEditorDataDir Condition="'$(UnityEditorDataDir)' == ''">C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Data</UnityEditorDataDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../Assets/Editor/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="$(UnityEditorDataDir)\Managed\UnityEngine\UnityEngine.dll" Private="false" />
+    <Reference Include="$(UnityEditorDataDir)\Managed\UnityEngine\UnityEngine.*Module.dll" Private="false" />
+    <Reference Include="$(UnityEditorDataDir)\Managed\UnityEngine\UnityEditor.dll" Private="false" />
+    <Reference Include="$(UnityEditorDataDir)\Managed\UnityEngine\UnityEditor.CoreModule.dll" Private="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../GameCompileCheck/GameCompileCheck.csproj" />
+    <ProjectReference Include="../ChessCore.Build/ChessCore.Build.csproj" />
+    <ProjectReference Include="../ChessAI.Build/ChessAI.Build.csproj" />
+  </ItemGroup>
+
+</Project>
