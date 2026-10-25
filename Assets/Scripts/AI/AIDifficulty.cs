@@ -35,6 +35,23 @@ namespace Chess.AI
         public int? Elo { get; }
         public bool LimitStrength => Elo.HasValue;
 
+        /// <summary>Stockfish's UCI_Elo minimum; below this, strength is limited by Skill Level and depth only.</summary>
+        public const int MinUciElo = 1320;
+
+        /// <summary>Maps an approximate Elo (500..3500) to AI parameters.</summary>
+        public static AIDifficulty FromElo(int elo)
+        {
+            if (elo < 500 || elo > 3500)
+                throw new ArgumentOutOfRangeException(nameof(elo), elo, "Elo must be 500..3500.");
+
+            if (elo < 1000) return new AIDifficulty(0, 1, 100, null);
+            if (elo < 1200) return new AIDifficulty(3, 2, 100, null);
+            if (elo < MinUciElo) return new AIDifficulty(6, 4, 100, null);
+            if (elo < 1600) return new AIDifficulty(20, null, 300, elo);
+            if (elo < 2000) return new AIDifficulty(20, null, 500, elo);
+            return new AIDifficulty(20, null, 1000, elo);
+        }
+
         public static AIDifficulty FromPreset(DifficultyPreset preset)
         {
             switch (preset)

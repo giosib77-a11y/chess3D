@@ -57,7 +57,7 @@ Stage 2 — Campaign
     - `Constructor_InvalidDirectory_Throws`; `Save_Null_ThrowsArgumentNull`.
   - Grep `Assets/Scripts/Campaign`-ში: `UnityEngine|System\.Text\.Json|Newtonsoft|\brecord\b` → 0.
 
-- [ ] 23. AI: `AIDifficulty.FromElo` (Elo → Skill Level/depth ან UCI_Elo) — owner: task-executor — files: Assets/Scripts/AI/AIDifficulty.cs, Tests/ChessCore.Tests/AI/AIDifficultyEloTests.cs — depends: — — done when:
+- [x] 23. AI: `AIDifficulty.FromElo` (Elo → Skill Level/depth ან UCI_Elo) — owner: task-executor — files: Assets/Scripts/AI/AIDifficulty.cs, Tests/ChessCore.Tests/AI/AIDifficultyEloTests.cs — depends: — — done when:
   - `dotnet test Tests/ChessCore.Tests` გადის; არსებული `AIDifficultyTests`, `UciProtocolTests`, `StockfishAITests` უცვლელია და გადის.
   - `AIDifficulty`-ს დაემატა მხოლოდ `public const int MinUciElo = 1320;` და `public static AIDifficulty FromElo(int elo)` — ცხრილი Business Rules → „Elo → AI პარამეტრები“. კონსტრუქტორი, property-ები და `FromPreset` უცვლელია.
   - `AIDifficultyEloTests`:
