@@ -20,7 +20,7 @@ Stage 2 — Campaign
   - `CampaignRegionsTests`: `All_HasFiveRegionsInCampaignOrder` (id-ები `kartli, kakheti, imereti, svaneti, khevsureti`); `All_MatchContractTable` (Name, Era, Elo ზუსტად ცხრილიდან); `Get_UnknownOrNull_Throws`; `TryGet_And_IndexOf`; `Region_InvalidArguments_Throw` (`""`, `"Kartli"`, `"kartli1"`, ცარიელი name/era, elo 499 და 3501).
   - Grep `Assets/Scripts/Campaign`-ში: `UnityEngine|\brecord\b|\binit;` → 0. `.meta` ხელით არ შექმნილა.
 
-- [ ] 21. Campaign: პროგრესის წესები, ბრძოლის შედეგი, ტექსტები — owner: task-executor — files: Assets/Scripts/Campaign/CampaignProgress.cs, Assets/Scripts/Campaign/BattleRules.cs, Assets/Scripts/Campaign/CampaignText.cs, Tests/ChessCore.Tests/Campaign/CampaignProgressTests.cs, Tests/ChessCore.Tests/Campaign/BattleRulesTests.cs, Tests/ChessCore.Tests/Campaign/CampaignTextTests.cs — depends: 20 — done when:
+- [x] 21. Campaign: პროგრესის წესები, ბრძოლის შედეგი, ტექსტები — owner: task-executor — files: Assets/Scripts/Campaign/CampaignProgress.cs, Assets/Scripts/Campaign/BattleRules.cs, Assets/Scripts/Campaign/CampaignText.cs, Tests/ChessCore.Tests/Campaign/CampaignProgressTests.cs, Tests/ChessCore.Tests/Campaign/BattleRulesTests.cs, Tests/ChessCore.Tests/Campaign/CampaignTextTests.cs — depends: 20 — done when:
   - `dotnet test Tests/ChessCore.Tests` გადის. ტიპები: `RegionState` + `CampaignProgress` → CampaignProgress.cs; `BattleOutcome`, `BattleRules`, `BattleSummary` → BattleRules.cs; `CampaignText` → CampaignText.cs. ხელმოწერები და ტექსტები ზუსტად API Contract-ის და Business Rules → `RecordBattle` ცხრილის მიხედვით.
   - `CampaignProgressTests`:
     - `NewCampaign_OnlyFirstRegionAvailable` (kartli Available, დანარჩენი Locked, LiberatedCount 0, IsComplete false);
