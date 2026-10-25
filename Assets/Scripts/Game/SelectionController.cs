@@ -99,8 +99,16 @@ namespace Chess.Game
                 return;
             }
 
-            if (promotion && promotionPrompt != null)
+            if (promotion)
             {
+                // Never choose the promotion piece silently (no automatic queen).
+                if (promotionPrompt == null)
+                {
+                    Debug.LogError("PromotionPrompt is not assigned on SelectionController");
+                    ClearSelection();
+                    return;
+                }
+
                 promotionPrompt.Open(
                     _state.SideToMove,
                     type => MoveChosen?.Invoke(new Move(from, square, type)),

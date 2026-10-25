@@ -203,7 +203,7 @@ Stage 1 — MVP
     12. თუ ყველაფერი გავიდა, MVP მზადაა. გაუშვი `/finish-check`.
 
 ### Finish-check-ის task-ები (2026-10-25)
-- [ ] 17. [should-fix] Game: გარდაქმნა ჩუმი არჩევის გარეშე + Stockfish-ის Dispose domain reload-ზე — owner: task-executor — files: Assets/Scripts/Game/GameController.cs, Assets/Scripts/Game/SelectionController.cs — depends: 15 — done when:
+- [x] 17. [should-fix] Game: გარდაქმნა ჩუმი არჩევის გარეშე + Stockfish-ის Dispose domain reload-ზე — owner: task-executor — files: Assets/Scripts/Game/GameController.cs, Assets/Scripts/Game/SelectionController.cs — depends: 15 — done when:
   - `SelectionController`: თუ გარდაქმნის სვლაა და `promotionPrompt` მიბმული არ არის → `Debug.LogError("PromotionPrompt is not assigned on SelectionController")`, სვლა არ იგზავნება, მონიშვნა იხსნება (ჩუმად მხედრის/დედოფლის არჩევა აღარ ხდება — API Contract: „ავტომატური დედოფალი არ არის“).
   - `GameController.OnDisable`: AI-ის გაუქმება + Dispose (`_cts.Cancel()`, `_ai?.Dispose()`, `_ai = null`), რომ Play-ის დროს სკრიპტის recompile-ზე (domain reload: OnDisable იძახება, OnDestroy — არა) `stockfish.exe` ობლად არ დარჩეს; `OnDestroy` იგივეს უსაფრთხოდ (idempotent) აკეთებს. reload-ის შემდეგ თამაში hot-seat-ში გრძელდება ან R-ზე თავიდან იწყება NRE-ს გარეშე (`_state == null` შემთხვევები დაცულია: Update/OnMoveChosen/Refresh).
   - Restart-ის comment გასწორებულია: AI იცვლება, რადგან გაუქმებული ძებნა (`stop` + ≤ 2 s) ჯერ კიდევ `_busy`-ს იკავებს და ახალი `GetBestMoveAsync` `InvalidOperationException`-ს მიიღებდა.

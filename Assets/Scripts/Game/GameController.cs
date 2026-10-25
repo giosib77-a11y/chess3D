@@ -46,6 +46,38 @@ namespace Chess.Game
         {
             if (selection != null)
                 selection.MoveChosen -= OnMoveChosen;
+            // A domain reload (script recompile during Play) calls OnDisable but NOT OnDestroy, so the
+            // engine must be stopped here or stockfish.exe is orphaned. Disposed synchronously on the
+            // main thread (blocks <= ~1-3 s at teardown): a Task.Run might not finish before the domain
+            // unloads. Side effect: disabling/enabling this component in the inspector during Play
+            // loses the AI and the game continues as hot-seat.
+            StopAi();
+        }
+
+        private void StopAi()
+        {
+            try
+            {
+                _cts.Cancel();
+            }
+            finally
+            {
+                _generation++;
+                _thinking = false;
+                IChessAI ai = _ai;
+                _ai = null;
+                try
+                {
+                    ai?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
+                // Fresh token source so OnDestroy / a later OnEnable never touches a disposed one.
+                _cts.Dispose();
+                _cts = new CancellationTokenSource();
+            }
         }
 
         private void Start()
@@ -56,6 +88,11 @@ namespace Chess.Game
 
         private void Update()
         {
+            // After a domain reload non-serialized fields are reset (_state and _ai are null, Start is
+            // not called again): start a fresh game once; with no AI it continues as hot-seat.
+            if (_state == null)
+                ResetGame();
+
             if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame
                 && (selection == null || !selection.IsPromotionOpen))
                 Restart();
@@ -63,17 +100,9 @@ namespace Chess.Game
 
         private void OnDestroy()
         {
-            // Must kill the Stockfish process when Play stops.
-            try
-            {
-                _cts.Cancel();
-            }
-            finally
-            {
-                _ai?.Dispose();
-                _ai = null;
-                _cts.Dispose();
-            }
+            // Must kill the Stockfish process when Play stops. Idempotent: OnDisable already ran StopAi.
+            StopAi();
+            _cts.Dispose();
         }
 
         private void OnMoveChosen(Move move)
@@ -105,14 +134,15 @@ namespace Chess.Game
             _generation++;
             _thinking = false;
 
-            // A cancelled search leaves the engine in an unknown state (StockfishAI may fault itself),
-            // so after an interrupted search the instance is replaced by a fresh one. The old one is
-            // disposed off the main thread because Dispose can wait up to a second for the process.
+            // A cancelled search (stop + waiting up to 2 s for bestmove) still occupies the instance
+            // (busy), so an immediate new GetBestMoveAsync would throw InvalidOperationException.
+            // The instance is therefore replaced by a fresh one; the old one is disposed off the main
+            // thread because Dispose can wait up to a second for the process.
             if (wasThinking && _ai != null)
             {
                 IChessAI old = _ai;
                 _ai = null;
-                Task.Run(() => old.Dispose());
+                DisposeInBackground(old);
                 CreateAi();
             }
 
@@ -188,7 +218,7 @@ namespace Chess.Game
 
         private void StartAiTurnIfNeeded()
         {
-            if (AiActive && !_thinking && !_state.IsGameOver && _state.SideToMove != humanSide)
+            if (_state != null && AiActive && !_thinking && !_state.IsGameOver && _state.SideToMove != humanSide)
                 RunAiTurnAsync();
         }
 
@@ -230,16 +260,24 @@ namespace Chess.Game
             ReportAiFailure(ex);
             _ai = null;
             _thinking = false;
-            try
-            {
-                failed.Dispose();
-            }
-            catch (Exception disposeEx)
-            {
-                Debug.LogException(disposeEx);
-            }
+            DisposeInBackground(failed);
             UpdateHud();
             UpdateInteractable();
+        }
+
+        private static void DisposeInBackground(IChessAI ai)
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    ai.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex); // thread-safe
+                }
+            });
         }
 
         private void ReportAiFailure(Exception ex)
@@ -247,12 +285,13 @@ namespace Chess.Game
             Debug.LogException(ex);
             _error = ex is StockfishNotFoundException notFound
                 ? "Stockfish not found: " + notFound.Path + ". Human vs human mode."
-                : "AI error: " + ex.Message + ". Human vs human mode.";
+                : "AI error: " + ex.Message.TrimEnd('.') + ". Human vs human mode.";
         }
 
         private void Refresh()
         {
-            piecesView.Sync(_state.Position);
+            if (piecesView != null)
+                piecesView.Sync(_state.Position);
             if (selection != null)
                 selection.Bind(_state);
             if (cameraRig != null)
