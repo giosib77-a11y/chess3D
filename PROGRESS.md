@@ -100,7 +100,21 @@ Stage 2 — Campaign
   - `git status --porcelain` აჩვენებს მხოლოდ ამ task-ის 3 ფაილს (აგენტს `Assets/Scenes/**` და `ProjectSettings/**` არ შეუცვლია — მათ USER-ის მიერ გაშვებული ბრძანება ცვლის).
   - საბოლოო შემოწმება: USER task 28.
 
-- [ ] 28. USER: სცენების აწყობა ერთი ბრძანებით + მენიუ და Quick Game — owner: USER — files: Assets/Scenes/MainMenu.unity, Assets/Scenes/CampaignMap.unity, Assets/Scenes/MainScene.unity, ProjectSettings/EditorBuildSettings.asset (ქმნის/ცვლის Tools → Setup Campaign Scenes) — depends: 27 — done when: ყველა შემოწმება გადის; Console = 0 შეცდომა; Play-ის შემდეგ `stockfish.exe` არ რჩება
+### Finish-check-ის task-ები (Stage 2, 2026-10-25)
+- [ ] 30. (should-fix) შენახვა: ჩაწერის ჩავარდნისას ორივე ასლი არ უნდა დაიკარგოს — owner: task-executor — files: Assets/Scripts/Campaign/CampaignSaveStore.cs, Tests/ChessCore.Tests/Campaign/CampaignSaveStoreTests.cs — depends: 22 — done when:
+  - პრობლემა: `Save`-ში fallback (`File.Delete` + `File.Move`) ეშვება `IOException`-ზეც (contract: მხოლოდ `PlatformNotSupportedException`); თუ Delete-ის შემდეგ Move ჩავარდება, გარე catch შლის tmp-საც → დისკზე აღარც ძველი, აღარც ახალი შენახვა (code-reviewer + security-auditor). იგივე ხდება Win32 `ReplaceFile` 1176-ზე (`IOException`, ჩანაცვლებული ფაილი უკვე აღარ არსებობს).
+  - ქცევა ზუსტად PROJECT.md → Business Rules → Stage 2 → „შენახვა“ (განახლებული): fallback მხოლოდ `PlatformNotSupportedException`-ზე; ჩავარდნისას tmp იშლება მხოლოდ თუ `campaign.json` არსებობს; `Load`: `campaign.json` არ არის, `campaign.json.tmp` არის → `File.Move(tmp, campaign.json)` და შემდეგ ჩვეულებრივი წაკითხვა (აღდგენის შეცდომა → NoSave/Corrupted წესით, exception არ გადის); ფაილი > 64 KB → Corrupted (წაკითხვის გარეშე); BOM-ის შემოწმება `'﻿'` escape-ით (უხილავი ლიტერალის ნაცვლად).
+  - ახალი ტესტები (ჯერ ვარდება ძველ კოდზე, სადაც შესაძლებელია): `Save_TargetLocked_ThrowsAndKeepsOldSave` (`campaign.json` გახსნილია `FileShare.None`-ით → `Save` აგდებს `IOException`-ს; ბლოკის მოხსნის შემდეგ `Load` → Loaded ძველი შინაარსით; tmp არ რჩება); `Load_OnlyTempFileExists_RecoversIt` (მხოლოდ ვალიდური `campaign.json.tmp` → Status Loaded, `campaign.json` არსებობს, tmp აღარ არის); `Load_OnlyCorruptTempFile_IsCorrupted`; `Load_FileOver64KB_IsCorrupted`; `Load_LockedFile_...` დამატებით ამოწმებს, რომ ორიგინალი ფაილის შინაარსი უცვლელია.
+  - `dotnet test Tests/ChessCore.Tests` გადის (ყველა ძველი + ახალი); `dotnet build Tests/GameCompileCheck` 0/0.
+- [ ] 31. (should-fix) `Continue` უნდა იმალებოდეს და არა ითიშებოდეს — owner: task-executor — files: Assets/Scripts/Game/UI/MainMenuController.cs — depends: 25 — done when:
+  - `Start`-ში `continueButton.gameObject.SetActive(GameSession.Campaign != null)` (`interactable` აღარ გამოიყენება), PROJECT.md → „MainMenuController-ის ნაკადი“ (განახლებული) და Core Flow 6. მომხმარებლის მოთხოვნა: „Continue (ჩანს მხოლოდ შენახვისას)“.
+  - `dotnet build Tests/GameCompileCheck` 0 შეცდომა / 0 warning; legacy Input grep → 0. საბოლოო შემოწმება: USER task 28 (ნაბიჯი 7, 14), 29 (ნაბიჯი 14).
+- [ ] 32. (should-fix, სავარაუდო) რეგიონის ღილაკის label-ში მდგომარეობის ხაზი არ უნდა ჩამოიჭრას — owner: task-executor — files: Assets/Editor/CampaignScenesSetup.cs — depends: 27 — done when:
+  - პრობლემა: `RegionLabel` 4 ხაზია (ეპოქის ხაზი 280px-ში იკეცება → 5 ხაზი ≈150px), ღილაკი 280×130, font 26, Truncate → ბოლო ხაზი (`Available`/`Locked`/`Liberated`) არ ჩანს (code-reviewer, font metrics-ით; Unity-ში არ დადასტურებულა).
+  - ღილაკი 380×170, label: `resizeTextForBestFit = true`, `resizeTextMinSize = 14`, `resizeTextMaxSize = 24`, horizontal Wrap — PROJECT.md → „UI სტილი (Stage 2)“ (განახლებული) და Editor ნაბიჯი 5. anchor-ები უცვლელია (MapArea 1500×720-ში 380×170 ღილაკები ერთმანეთს არ ფარავს — შეამოწმე გამოთვლით და report-ში ჩაწერე).
+  - `dotnet build Tests/EditorCompileCheck` და `Tests/GameCompileCheck` 0/0. საბოლოო შემოწმება: USER task 28 (ნაბიჯი 13).
+
+- [ ] 28. USER: სცენების აწყობა ერთი ბრძანებით + მენიუ და Quick Game — owner: USER — files: Assets/Scenes/MainMenu.unity, Assets/Scenes/CampaignMap.unity, Assets/Scenes/MainScene.unity, ProjectSettings/EditorBuildSettings.asset (ქმნის/ცვლის Tools → Setup Campaign Scenes) — depends: 27, 30, 31, 32 — done when: ყველა შემოწმება გადის; Console = 0 შეცდომა; Play-ის შემდეგ `stockfish.exe` არ რჩება
     1. გადადი Unity-ის ფანჯარაზე (ან Unity Hub → **Projects** → **chess3D**). დაელოდე, სანამ ქვედა მარჯვენა კუთხის პროგრესის ზოლი (compiling) გაქრება. Console (**Window → General → Console**) → **Clear** → წითელი შეცდომების მთვლელი = **0**.
     2. **Project** ფანჯარაში გახსენი `Assets/Scripts/Campaign`. დააჭირე `Chess.Campaign`-ს (ფაზლის ხატულა) → Inspector-ში **No Engine References** მონიშნულია, ხოლო **Assembly Definition References**-ში მხოლოდ `Chess.Core` წერია.
     3. ზედა მენიუ: **Tools → Setup Campaign Scenes**. თუ Unity გკითხავს შენახვას — **Save**. ბრძანება თავად შექმნის `MainMenu` და `CampaignMap` სცენებს, MainScene-ში დაამატებს ბრძოლის პანელს და Build Settings-ში ჩაწერს სცენების სიას.
@@ -118,7 +132,7 @@ Stage 2 — Campaign
     15. გააჩერე Play (▶) და ისევ დააჭირე Play: `Continue` კვლავ ჩანს (შენახვა დისკზეა). დააჭირე `Continue` → იგივე რუკა.
     16. `Back to menu` → `New Campaign` → ჩნდება კითხვა `Start a new campaign? Current progress will be lost.` → დააჭირე `Cancel` → მთავარი მენიუ.
     17. გააჩერე Play. გახსენი Task Manager (Ctrl+Shift+Esc) → **Details** → `stockfish.exe` სიაში არ არის.
-    18. ბრძანებამ შექმნა/შეცვალა ფაილები `Assets/Scenes/MainMenu.unity`, `Assets/Scenes/CampaignMap.unity`, `Assets/Scenes/MainScene.unity` და `ProjectSettings/EditorBuildSettings.asset` (+ `.meta`-ები). უთხარი გუნდს, რომ ისინი დაკომიტდეს. თუ რამე არ ემთხვევა — screenshot და Console-ის ტექსტი გადაეცი გუნდს.
+    18. ბრძანებამ შექმნა/შეცვალა ფაილები `Assets/Scenes/MainMenu.unity`, `Assets/Scenes/CampaignMap.unity`, `Assets/Scenes/MainScene.unity` და `ProjectSettings/EditorBuildSettings.asset` (+ `.meta`-ები). Unity-მ ასევე შექმნა ახალი სკრიპტების `.meta` ფაილები: `Assets/Scripts/Campaign/*.meta` (+ `Assets/Scripts/Campaign.meta`), `Assets/Scripts/Game/UI.meta` და `Assets/Scripts/Game/UI/*.meta`, `Assets/Scripts/Game/Session.meta` და `Assets/Scripts/Game/Session/*.meta`, `Assets/Editor/CampaignScenesSetup.cs.meta`. უთხარი გუნდს, რომ **ყველა** ეს ფაილი სცენებთან ერთად დაკომიტდეს (`.meta`-ს გარეშე სხვა კომპიუტერზე UI კომპონენტები „Missing Script“ გახდება). თუ რამე არ ემთხვევა — screenshot და Console-ის ტექსტი გადაეცი გუნდს.
 
 - [ ] 29. USER: კამპანიის ბრძოლები, შენახვა, დაზიანებული ფაილი, MainScene ცალკე — owner: USER — files: Assets/Scenes/MainScene.unity (მხოლოდ Start Fen / Stockfish Path Override დროებით; ბოლოს ცარიელი) — depends: 28 — done when: ყველა შემოწმება გადის; Console = 0 წითელი შეცდომა; ბოლოს Start Fen და Stockfish Path Override ცარიელია
     1. Project → `Assets/Scenes` → ორჯერ დააჭირე `MainScene`-ს. Hierarchy → `ChessGame` → Inspector → **Game Controller**: ველი **Battle Panel**-ში წერია `BattleCanvas` (ბრძანებამ მიაბა). **Start Fen**-ში ჩაწერე `6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1` (მატი ერთ სვლაში) → **Ctrl+S**.
@@ -177,6 +191,9 @@ Stage 2 — Campaign
 ### Stage 2-ის გარეთ დარჩენილი (გადაწყვეტილება საჭიროა)
 - `SquarePicker` არ ამოწმებს, UI-ზე ხომ არ არის მაუსი (`EventSystem.IsPointerOverGameObject`) — `Back to map`-ზე დაჭერა დაფაზეც „დააჭერს“ (სცენა მაშინვე იცვლება, ზიანი არ არის).
 - ფერის არჩევა კამპანიაში; რამდენიმე save slot; კამპანიის დასრულების ეკრანი.
+- nit (finish-check Stage 2, ორივე reviewer): `CampaignSaveStore.Load` — თუ ფაილი გაშვებისას სხვა პროცესს უჭირავს, წაკითხვაც და backup-ის გადატანაც ჩავარდება (ჩუმად), გაფრთხილება მაინც წერს „It was kept as campaign.corrupt.json“, ხოლო შემდეგი `New Campaign` (დადასტურების გარეშე, რადგან `Campaign == null`) ვალიდურ ფაილს გადააწერს. გამოსწორება: `TryBackUpCorruptFile` → bool; ჩავარდნისას სხვა გაფრთხილება / ჩაწერის დაბლოკვა. ძალიან იშვიათია.
+- nit (finish-check Stage 2): `CampaignMapController.Start` — `regionButtons == null`-ზე ბრუნდება `backButton`-ის მიბმამდე (მხოლოდ არასწორად აწყობილ სცენაზე).
+- nit (finish-check Stage 2, შესამოწმებელი): `InputSystemUIInputModule.AssignDefaultActions()` Editor-ში ქმნის არამუდმივ actions asset-ს — სცენის ფაილში reference შეიძლება null იყოს; runtime-ზე `OnEnable` აღადგენს. USER task 28-ის შემდეგ სცენის ფაილი გადასახედია.
 
 ## Blockers
 - (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
@@ -186,8 +203,8 @@ Stage 2 — Campaign
 
 ## Run State
 - Stage: Stage 2 — Campaign
-- Finish-check this stage: not run
-- Fix rounds this stage: 0/2
+- Finish-check this stage: done
+- Fix rounds this stage: 1/2
 - Failed attempts: —
 
 ## Last Session

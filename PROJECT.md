@@ -141,7 +141,7 @@ Stage 2 — Campaign
 
 **შენახვა:**
 - schema version = 1. ფაილი იწერება: New Campaign-ზე და ყოველ `ProgressChanged == true`-ზე.
-- ჩაწერა ატომურია: `campaign.json.tmp` → `File.Replace(tmp, campaign.json, null)` (თუ ფაილი არსებობს) ან `File.Move` (თუ არ არსებობს); თუ `File.Replace` აგდებს `PlatformNotSupportedException`-ს → `File.Delete` + `File.Move`.
+- ჩაწერა ატომურია: `campaign.json.tmp` → `File.Replace(tmp, campaign.json, null)` (თუ ფაილი არსებობს) ან `File.Move` (თუ არ არსებობს); თუ `File.Replace` აგდებს `PlatformNotSupportedException`-ს → `File.Delete` + `File.Move`. ნებისმიერი ჩაწერის შეცდომისას `campaign.json.tmp` იშლება მხოლოდ მაშინ, თუ `campaign.json` ჯერ კიდევ არსებობს (ერთი ასლი ყოველთვის რჩება დისკზე). `Load`: თუ `campaign.json` არ არსებობს, მაგრამ `campaign.json.tmp` არსებობს → ჯერ `File.Move(tmp, campaign.json)` (წინა ჩაწერის აღდგენა), შემდეგ ჩვეულებრივი წაკითხვა. ფაილი > 64 KB → დაზიანებულად ითვლება (წაკითხვის გარეშე).
 - დაზიანებული ფაილი = ნებისმიერი JSON/schema შეცდომა ან კითხვის I/O შეცდომა → `campaign.corrupt.json`-ად გადატანა (არსებული backup იცვლება; გადატანის შეცდომა იგნორირდება) → ახალი (ცარიელი) პროგრესი → გაფრთხილება: `The saved campaign was damaged and could not be loaded. It was kept as campaign.corrupt.json. Start a new campaign.` თამაში არასდროს ვარდება შენახვის გამო.
 - ჩაწერის შეცდომა (`IOException` / `UnauthorizedAccessException`) → `Debug.LogException` + ტექსტი `Warning: progress could not be saved.` (პროგრესი მეხსიერებაში რჩება).
 
@@ -704,12 +704,12 @@ public static class GameSession
   - ტექსტი `#FFFFFF`; `warningText` `#FFB347`; რეგიონის ღილაკები — ზემოთ.
 - ზომები:
   - მენიუს ღილაკი 400×80; ვერტიკალური სვეტი ცენტრში, დაშორება 20;
-  - რეგიონის ღილაკი 280×130 (ორხაზიანი label);
+  - რეგიონის ღილაკი 380×170; label 4-ხაზიანია (`CampaignText.RegionLabel`: სახელი, ეპოქა, Elo, მდგომარეობა), `resizeTextForBestFit` = true, min 14, max 24, `verticalOverflow` Truncate;
   - BattleCanvas-ის ღილაკი (`LeaveButton`, `RetryButton`, `BackButton`) 260×70; `LeaveButton` ზედა-მარჯვნივ, დაშორება კიდიდან 24;
   - პანელები: Confirm 800×300, QuickGame 600×520, Result 700×360 — ცენტრში.
-- ტექსტის ზომა (font size): სათაური 64; პანელის სათაური 40; ღილაკი 32; რეგიონის label 26; info/status/warning/message 28. ყველა ტექსტი LegacyRuntime.ttf, `alignment` MiddleCenter (`InfoText` UpperCenter), `horizontalOverflow` Wrap.
+- ტექსტის ზომა (font size): სათაური 64; პანელის სათაური 40; ღილაკი 32; რეგიონის label best fit 14–24; info/status/warning/message 28. ყველა ტექსტი LegacyRuntime.ttf, `alignment` MiddleCenter (`InfoText` UpperCenter), `horizontalOverflow` Wrap.
 
-**MainMenuController-ის ნაკადი:** `Start` → `GameSession.EnsureLoaded()` → `continueButton` აქტიურია მხოლოდ თუ `Campaign != null`; ჩანს `mainPanel`, დამალულია `confirmPanel`, `quickGamePanel`; Quick Game-ის ნაგულისხმევი: White, Medium.
+**MainMenuController-ის ნაკადი:** `Start` → `GameSession.EnsureLoaded()` → `continueButton` ჩანს (`gameObject.SetActive`) მხოლოდ თუ `Campaign != null`, სხვა შემთხვევაში დამალულია; ჩანს `mainPanel`, დამალულია `confirmPanel`, `quickGamePanel`; Quick Game-ის ნაგულისხმევი: White, Medium.
 - `New Campaign`: `Campaign != null` → `confirmPanel` (`mainPanel` იმალება); სხვა შემთხვევაში `StartNewCampaign()` → `GoToCampaignMap()`. `Start new` → იგივე. `Cancel` → `mainPanel`.
 - `Continue` → `GoToCampaignMap()`. `Quick Game` → `quickGamePanel`; `colorButton` ცვლის White↔Black; `difficultyButton` ციკლავს; `Start` → `StartQuickGame(side, preset)`; `Back` → `mainPanel`.
 
@@ -734,7 +734,7 @@ public static class GameSession
 2. ყოველი სცენა: თუ ფაილი არ არსებობს → `EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single)` + `SaveScene(scene, path)`; სხვა შემთხვევაში `OpenScene(path, Single)`. `.meta`-ს Unity ქმნის.
 3. MainMenu და CampaignMap: `Main Camera` (Camera, Clear Flags = Solid Color `#1C1C22`, tag MainCamera, AudioListener) — თუ არ არის; `EventSystem` (EventSystem + `InputSystemUIInputModule` + `AssignDefaultActions()`; `StandaloneInputModule` იშლება, თუ არის) — ერთი.
 4. გენერირებული UI root (`MainMenuCanvas`, `CampaignMapCanvas`, `BattleCanvas`) ყოველ გაშვებაზე **იშლება და თავიდან იქმნება** (ხელით ცვლილებები ამ ობიექტებში იკარგება). Canvas: Screen Space - Overlay, `CanvasScaler` Scale With Screen Size 1920×1080, match 0.5, `GraphicRaycaster`. ტექსტი: `UnityEngine.UI.Text`, font `Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")`, ცენტრში, თეთრი. ობიექტების სახელები = Inspector ველის სახელები PascalCase-ით (მაგ. `NewCampaignButton`, `ConfirmPanel`, `Region_kartli`). `ConfirmPanel`, `QuickGamePanel`, `ResultPanel` იქმნება inactive.
-5. CampaignMap: `MapArea` (Image `#2F3A2A`) და მასში 5 `Region_<id>` ღილაკი (280×130) anchor-ებით Business Rules-ის ცხრილიდან (`CampaignRegions.All`-ის რიგით), თითოზე `RegionButton` (`regionId`, `button`, `label`, `background`); `regionButtons` მასივი იმავე რიგით.
+5. CampaignMap: `MapArea` (Image `#2F3A2A`) და მასში 5 `Region_<id>` ღილაკი (380×170, label best fit — იხ. „UI სტილი“) anchor-ებით Business Rules-ის ცხრილიდან (`CampaignRegions.All`-ის რიგით), თითოზე `RegionButton` (`regionId`, `button`, `label`, `background`); `regionButtons` მასივი იმავე რიგით.
 6. MainScene: root `ChessGame` + `GameController` უნდა არსებობდეს; თუ არა → `Debug.LogError("[CampaignScenesSetup] ChessGame not found in MainScene. Run Tools > Setup Chess Scene first.")`, MainScene-ის ნაწილი გამოტოვდება (დანარჩენი გრძელდება, შედეგი „WITH ERRORS“). სხვა შემთხვევაში: `EventSystem` (როგორც 3) + `BattleCanvas` (sortingOrder 10; `InfoText` ზედა ცენტრში, `LeaveButton` ზედა-მარჯვნივ, `ResultPanel` ცენტრში: `TitleText`, `MessageText`, `RetryButton`, `BackButton`) + `GameController.battlePanel` მიბმა `SerializedObject`-ით. GameController-ის სხვა ველებს არ ეხება.
 7. ყოველი ველი `SerializedObject.FindProperty`-ით; ვერ ნაპოვნი → `Debug.LogError` სახელით (როგორც `ChessSceneSetup`).
 8. `EditorBuildSettings.scenes` = ზუსტად `[MainMenu, CampaignMap, MainScene]`, სამივე enabled.
@@ -989,6 +989,16 @@ public static class GameSession
 - Decision: Stage 2-ის ყველა agent task-ის owner = `task-executor` (Campaign, AI, Game, UI, Editor), როგორც Stage 1-ში. designer/DESIGN.md არ გამოიყენება — UI-ის ფერები, Canvas Scaler და ზომები მოკლედ ჩაწერილია API Contract-ში („UI სტილი (Stage 2)“). browser-tester/Playwright არ გამოიყენება; Play-mode შემოწმება = USER task-ები 28, 29.
 - Reason: მომხმარებლის მითითება — Unity C# არ არის web UI; სქემატური UI დროებითია (რუკის art და ქართული font — Stage 3).
 - How to change: Stage 3-ში რეალური art-ისთვის შეიძლება DESIGN.md-ის შექმნა.
+
+### 2026-10-25 — Setup Campaign Scenes: განლაგების დეტალები (T27)
+- Decision: ConfirmPanel-ის ორი ღილაკი (`Start new` / `Cancel`) 350×80-ია (x = ±185), არა 400×80; სათაურის, სტატუსის და პანელების შიგნით ღილაკების ზუსტი პოზიციები Editor სკრიპტშია (contract მათ არ აკონკრეტებს). რეგიონის ღილაკების anchor-ები სკრიპტშია id-ის მიხედვით (`Region`-ს anchor არ აქვს).
+- Reason: ორი 400 სიგანის ღილაკი 800 სიგანის პანელში არ ეტევა.
+- How to change: `Assets/Editor/CampaignScenesSetup.cs` → ხელახლა Tools → Setup Campaign Scenes.
+
+### 2026-10-25 — Finish-check Stage 2: შენახვის დაცვა, Continue დამალულია, რეგიონის label
+- Decision: (1) ჩაწერის ჩავარდნისას tmp იშლება მხოლოდ თუ `campaign.json` არსებობს; `Load` აღადგენს დარჩენილ tmp-ს; fallback მხოლოდ `PlatformNotSupportedException`-ზე; > 64 KB ფაილი = დაზიანებული. (2) `Continue` იმალება (`SetActive`), არ ითიშება. (3) რეგიონის ღილაკი 380×170, label best fit 14–24.
+- Reason: (1) წინა კოდში I/O ჩავარდნამ შეიძლება ძველი და ახალი შენახვა ერთად წაშალოს; (2) მომხმარებლის მოთხოვნა „ჩანს მხოლოდ შენახვისას“; (3) 4-ხაზიანი label 280×130-ში მდგომარეობის ხაზს კვეთდა.
+- How to change: `CampaignSaveStore`, `MainMenuController`, `CampaignScenesSetup`.
 
 ## Open Questions
 - ვარაუდი: პლატფორმა მხოლოდ Windows PC (x86-64). Stockfish-ის binary მხოლოდ Windows-ისთვის.
