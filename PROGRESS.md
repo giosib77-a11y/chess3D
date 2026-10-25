@@ -37,7 +37,7 @@ Stage 1 — MVP
     - `FenTests`: round-trip startpos-ზე, Kiwipete-ზე, pos3, pos4, pos5 (PROJECT.md → Testing Strategy); ცალკე `FormatException` თითოეულ არასწორ შემთხვევაზე, რომელიც FEN rules-შია ჩამოთვლილი (არასწორი ველების რაოდენობა, რიგის სიგრძე, უცნობი სიმბოლო, მეფის გარეშე ან ორი მეფე, პაიკი 1/8 რიგზე, სვლის რიგი, როქის სტრიქონი / უფლება მეფის ან ეტლის გარეშე, en passant-ის რიგი, უარყოფითი halfmove, fullmove 0).
   - `using UnityEngine` / `record` / `init` არ გამოიყენება.
 
-- [ ] 4. Core: სვლების გენერაცია + perft — owner: task-executor — files: Assets/Scripts/Core/Position.Moves.cs, Assets/Scripts/Core/Perft.cs, Tests/ChessCore.Tests/Core/MoveGenerationTests.cs, Tests/ChessCore.Tests/Core/PerftTests.cs — depends: 3 — done when:
+- [x] 4. Core: სვლების გენერაცია + perft — owner: task-executor — files: Assets/Scripts/Core/Position.Moves.cs, Assets/Scripts/Core/Perft.cs, Tests/ChessCore.Tests/Core/MoveGenerationTests.cs, Tests/ChessCore.Tests/Core/PerftTests.cs — depends: 3 — done when:
   - `dotnet test Tests/ChessCore.Tests` გადის.
   - `PerftTests` (xUnit Theory) ამოწმებს PROJECT.md → Testing Strategy-ის ყველა რიცხვს: startpos d1–4, Kiwipete d1–3, pos3 d1–4, pos4 d1–3, pos5 d1–3. startpos d5 ჩართულია მხოლოდ მაშინ, თუ < 5 s.
   - `MoveGenerationTests`:
