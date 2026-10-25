@@ -28,7 +28,7 @@ Stage 1 — MVP
     7. თუ წითელი შეცდომაა: დააჭირე მას, დააკოპირე ტექსტი (Ctrl+C ქვედა ნაწილში) და გადაეცი გუნდს. თავად არაფერი შეცვალო.
     8. ახსნა: Unity ყოველ ახალ ფაილს და საქაღალდეს უქმნის `.meta` ფაილს (მისი „პირადობის მოწმობა“, GUID). ეს ფაილები git-ში აუცილებლად უნდა მოხვდეს და ხელით არასდროს იქმნება.
 
-- [ ] 3. Core: Square, Piece, Move, Position + FEN — owner: task-executor — files: Assets/Scripts/Core/Side.cs, Assets/Scripts/Core/Piece.cs, Assets/Scripts/Core/Square.cs, Assets/Scripts/Core/Move.cs, Assets/Scripts/Core/CastlingRights.cs, Assets/Scripts/Core/Position.cs, Tests/ChessCore.Tests/Core/SquareTests.cs, Tests/ChessCore.Tests/Core/MoveTests.cs, Tests/ChessCore.Tests/Core/FenTests.cs — depends: 1 — done when:
+- [x] 3. Core: Square, Piece, Move, Position + FEN — owner: task-executor — files: Assets/Scripts/Core/Side.cs, Assets/Scripts/Core/Piece.cs, Assets/Scripts/Core/Square.cs, Assets/Scripts/Core/Move.cs, Assets/Scripts/Core/CastlingRights.cs, Assets/Scripts/Core/Position.cs, Tests/ChessCore.Tests/Core/SquareTests.cs, Tests/ChessCore.Tests/Core/MoveTests.cs, Tests/ChessCore.Tests/Core/FenTests.cs — depends: 1 — done when:
   - `dotnet build Tests/ChessCore.Tests` და `dotnet test Tests/ChessCore.Tests` გადის.
   - ტიპები და ხელმოწერები ზუსტად API Contract-ის მიხედვით. `Position` არის `public sealed partial class`, public API მხოლოდ კითხვისთვის; `PieceType`/`Piece` → Piece.cs, `MoveFlags` → Move.cs, `Side`+`SideExtensions` → Side.cs.
   - ტესტები:
