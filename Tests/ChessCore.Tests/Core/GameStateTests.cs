@@ -116,12 +116,40 @@ namespace ChessCore.Tests.Core
         }
 
         [Fact]
-        public void UsableEnPassantSquare_DistinguishesPositions()
+        public void UsableEnPassantSquare_FirstOccurrenceCountsAsDifferentPosition()
         {
-            // Black pawn on d4 can capture e3 after e2e4, so that position differs from the same one without the right.
+            // After e2e4 the black pawn on d4 can really capture e3, so that position differs from the same one without the right.
             var game = new GameState("4k3/8/8/8/3p4/8/4P3/4K3 w - - 0 1");
-            Play(game, "e2e4 e8e7 e1e2 e7e8 e2e1 e8e7"); // none of these repeat the ep position
+            Play(game, "e2e4");
+            Assert.Contains(game.LegalMoves, m => m.Flags == MoveFlags.EnPassant);
+
+            Play(game, "e8e7 e1e2 e7e8 e2e1"); // placement/side/castling repeated, no ep right: occurrence 1
+            Assert.DoesNotContain(game.LegalMoves, m => m.Flags == MoveFlags.EnPassant);
             Assert.Equal(GameStatus.InProgress, game.Status);
+
+            Play(game, "e8e7 e1e2 e7e8 e2e1"); // occurrence 2 (would be 3 if the ep position were counted as equal)
+            Assert.Equal(GameStatus.InProgress, game.Status);
+
+            // A third lap would make the ep-less position's 3rd occurrence (4th overall); its first move
+            // already completes the 3rd occurrence of the intermediate position (black king on e7).
+            Play(game, "e8e7");
+            Assert.Equal(GameStatus.ThreefoldRepetition, game.Status);
+        }
+
+        [Fact]
+        public void PinnedEnPassantCapture_DoesNotChangeRepetitionKey()
+        {
+            // After e2e4 the ep square e3 exists, but d4xe3 would expose the black king on a4 to the rook on h4.
+            var game = new GameState("8/8/8/8/k2p3R/8/4P3/4K3 w - - 0 1");
+            Play(game, "e2e4");
+            Assert.Contains(" e3 ", game.ToFen());
+            Assert.DoesNotContain(game.LegalMoves, m => m.Flags == MoveFlags.EnPassant);
+
+            Play(game, "a4a5 e1e2 a5a4 e2e1"); // same position, occurrence 2
+            Assert.Equal(GameStatus.InProgress, game.Status);
+
+            Play(game, "a4a5 e1e2 a5a4 e2e1"); // occurrence 3
+            Assert.Equal(GameStatus.ThreefoldRepetition, game.Status);
         }
 
         [Fact]

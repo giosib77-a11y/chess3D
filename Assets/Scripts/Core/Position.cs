@@ -70,7 +70,7 @@ namespace Chess.Core
             else throw Invalid("side to move must be 'w' or 'b'", fen);
 
             pos._castlingRights = ParseCastling(pos, fields[2], fen);
-            pos._enPassantSquare = ParseEnPassant(pos._sideToMove, fields[3], fen);
+            pos._enPassantSquare = ParseEnPassant(pos, pos._sideToMove, fields[3], fen);
 
             if (!int.TryParse(fields[4], NumberStyles.Integer, CultureInfo.InvariantCulture, out int half) || half < 0)
                 throw Invalid("halfmove clock must be a non-negative integer", fen);
@@ -201,7 +201,7 @@ namespace Chess.Core
             return rights;
         }
 
-        private static Square? ParseEnPassant(Side sideToMove, string text, string fen)
+        private static Square? ParseEnPassant(Position pos, Side sideToMove, string text, string fen)
         {
             if (text == "-")
                 return null;
@@ -210,6 +210,17 @@ namespace Chess.Core
             int expectedRank = sideToMove == Side.White ? 5 : 2;
             if (sq.Rank != expectedRank)
                 throw Invalid("en passant square '" + text + "' is on the wrong rank", fen);
+
+            // The opponent just double-pushed: ep square and the square behind it are empty,
+            // and the pushed pawn stands in front of the ep square.
+            int step = sideToMove == Side.White ? 8 : -8;
+            int behind = sq.Index + step;
+            int front = sq.Index - step;
+            Side pusher = sideToMove == Side.White ? Side.Black : Side.White;
+            if (!pos._board[sq.Index].IsNone
+                || !pos._board[behind].IsNone
+                || pos._board[front] != new Piece(PieceType.Pawn, pusher))
+                throw Invalid("en passant square '" + text + "' is inconsistent with the position", fen);
             return sq;
         }
     }

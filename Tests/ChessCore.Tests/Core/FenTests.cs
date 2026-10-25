@@ -19,6 +19,24 @@ namespace ChessCore.Tests.Core
             Assert.Equal(fen, Position.FromFen(fen).ToFen());
         }
 
+        [Theory]
+        [InlineData("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1")]
+        [InlineData("4k3/8/8/3PpP2/8/8/8/4K3 w - e6 0 1")]
+        [InlineData("4k3/8/8/8/3pP3/8/8/4K3 b - e3 0 1")]
+        [InlineData("4k3/8/8/8/8/8/8/4K3 w - - 0 1")]
+        public void ConsistentEnPassant_IsAccepted(string fen)
+        {
+            Assert.Equal(fen, Position.FromFen(fen).ToFen());
+        }
+
+        [Fact]
+        public void InconsistentEnPassant_MessageNamesSquareAndFen()
+        {
+            const string fen = "4k3/8/8/3PN3/8/8/8/4K3 w - e6 0 1";
+            var ex = Assert.Throws<FormatException>(() => Position.FromFen(fen));
+            Assert.Equal("Invalid FEN: en passant square 'e6' is inconsistent with the position. FEN: '" + fen + "'", ex.Message);
+        }
+
         [Fact]
         public void CreateStart_HasExpectedState()
         {
@@ -137,6 +155,18 @@ namespace ChessCore.Tests.Core
         [InlineData("4k3/8/8/3pP3/8/8/8/4K3 w - D6 0 1")]
         [InlineData("4k3/8/8/3pP3/8/8/8/4K3 w - z9 0 1")]
         [InlineData("4k3/8/8/3pP3/8/8/8/4K3 w - d 0 1")]
+        // en passant square inconsistent with the position (white to move)
+        [InlineData("4k3/8/8/3PN3/8/8/8/4K3 w - e6 0 1")] // white knight on e5, not a black pawn
+        [InlineData("4k3/4n3/8/3Pp3/8/8/8/4K3 w - e6 0 1")] // piece behind the ep square (e7)
+        [InlineData("4k3/8/8/3P4/8/8/8/4K3 w - e6 0 1")] // nothing on e5
+        [InlineData("4k3/8/4n3/3Pp3/8/8/8/4K3 w - e6 0 1")] // ep square itself occupied
+        [InlineData("4k3/8/8/3PP3/8/8/8/4K3 w - e6 0 1")] // white pawn on e5
+        // en passant square inconsistent with the position (black to move)
+        [InlineData("4k3/8/8/8/3pN3/8/8/4K3 b - e3 0 1")] // white knight on e4
+        [InlineData("4k3/8/8/8/3pP3/8/4N3/4K3 b - e3 0 1")] // piece behind the ep square (e2)
+        [InlineData("4k3/8/8/8/3p4/8/8/4K3 b - e3 0 1")] // nothing on e4
+        [InlineData("4k3/8/8/8/3pp3/8/8/4K3 b - e3 0 1")] // black pawn on e4
+        [InlineData("4k3/8/8/8/3pP3/4N3/8/4K3 b - e3 0 1")] // ep square itself occupied
         // negative halfmove, fullmove 0, non-integer counters
         [InlineData("4k3/8/8/8/8/8/8/4K3 w - - -1 1")]
         [InlineData("4k3/8/8/8/8/8/8/4K3 w - - 0 0")]
