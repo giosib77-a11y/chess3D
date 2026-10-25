@@ -14,6 +14,9 @@ namespace Chess.Game
 
         [SerializeField] private SelectionController selection;
 
+        [SerializeField] private CameraRig cameraRig;
+        [SerializeField] private Side humanSide = Side.White;
+
         private GameState _state;
 
         private void OnEnable()
@@ -49,6 +52,8 @@ namespace Chess.Game
                 if (boardView != null)
                     boardView.ClearHighlights();
                 Refresh();
+                if (cameraRig != null)
+                    cameraRig.NotifyHumanMoveMade();
             }
             else
             {
@@ -91,6 +96,8 @@ namespace Chess.Game
             piecesView.Sync(_state.Position);
             if (selection != null)
                 selection.Bind(_state);
+            if (cameraRig != null)
+                cameraRig.SetCommander(_state.Position.FindKing(humanSide), humanSide);
         }
     }
 }

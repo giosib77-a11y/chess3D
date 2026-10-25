@@ -163,7 +163,7 @@ Stage 1 — MVP
     10. გააჩერე. Start Fen = `4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1` → Play → e5 → d6: შავი პაიკი d5-დან ქრება (en passant).
     11. გააჩერე და **Start Fen** გაასუფთავე (ცარიელი). **Ctrl+S**.
 
-- [ ] 13. Game: CameraRig — სარდლის და ტაქტიკური ხედი (TAB) — owner: task-executor — files: Assets/Scripts/Game/CameraRig.cs, Assets/Scripts/Game/GameController.cs (extends task 11) — depends: 11 — done when:
+- [x] 13. Game: CameraRig — სარდლის და ტაქტიკური ხედი (TAB) — owner: task-executor — files: Assets/Scripts/Game/CameraRig.cs, Assets/Scripts/Game/GameController.cs (extends task 11) — depends: 11 — done when:
   - `CameraRig` API Contract-ის და Decision Log-ის („კამერა“) მიხედვით: ველების სახელები და ნაგულისხმევი მნიშვნელობები, TAB (`Keyboard.current.tabKey`), exponential lerp, `returnToCommanderAfterMove`.
   - `GameController`-ს დაემატა `cameraRig` და `humanSide`; ყოველი Sync-ის შემდეგ `SetCommander(state.Position.FindKing(humanSide), humanSide)`; ადამიანის სვლის შემდეგ `NotifyHumanMoveMade()`.
   - Grep legacy Input → 0 შედეგი. `dotnet test` გადის.
