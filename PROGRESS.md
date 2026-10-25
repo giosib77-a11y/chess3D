@@ -64,7 +64,7 @@ Stage 1 — MVP
     - `GameState(fen)`, სადაც იმ მხარის მეფე, რომლის სვლაც არ არის, შახშია → FormatException.
   - `DrawRulesTests`: K v K, KB v K, KN v K, KB v KB ერთ ფერზე → InsufficientMaterial; KB v KB სხვადასხვა ფერზე, KNN v K, K+P v K → InProgress.
 
-- [ ] 6. AI: IChessAI, AIDifficulty, UCI პროტოკოლი (binary-ს გარეშე) — owner: task-executor — files: Assets/Scripts/AI/IChessAI.cs, Assets/Scripts/AI/AIDifficulty.cs, Assets/Scripts/AI/UciProtocol.cs, Assets/Scripts/AI/IUciTransport.cs, Assets/Scripts/AI/ChessAIException.cs, Tests/ChessCore.Tests/AI/UciProtocolTests.cs, Tests/ChessCore.Tests/AI/AIDifficultyTests.cs — depends: 3 — done when:
+- [x] 6. AI: IChessAI, AIDifficulty, UCI პროტოკოლი (binary-ს გარეშე) — owner: task-executor — files: Assets/Scripts/AI/IChessAI.cs, Assets/Scripts/AI/AIDifficulty.cs, Assets/Scripts/AI/UciProtocol.cs, Assets/Scripts/AI/IUciTransport.cs, Assets/Scripts/AI/ChessAIException.cs, Tests/ChessCore.Tests/AI/UciProtocolTests.cs, Tests/ChessCore.Tests/AI/AIDifficultyTests.cs — depends: 3 — done when:
   - `dotnet test Tests/ChessCore.Tests` გადის. ტიპები ზუსტად API Contract-ის მიხედვით: `DifficultyPreset` → AIDifficulty.cs, `UciOption` → UciProtocol.cs, `StockfishNotFoundException` → ChessAIException.cs.
   - `UciProtocolTests`:
     - `TryParseBestMove`: `bestmove e2e4 ponder e7e5`, `bestmove e7e8q`, `bestmove (none)`, `info depth 5 ...` → false;
