@@ -545,6 +545,12 @@ collider-ები ბავშვ primitive-ებზე რჩება; root-
 - Reason: გაუქმებული ძებნა (`stop` + `bestmove`-ის მოლოდინი ≤ 2 s) ჯერ კიდევ იკავებს instance-ს; humanSide = Black-ის დროს AI-ის ახალი სვლა მაშინვე `InvalidOperationException`-ს მიიღებდა და თამაში არასწორად გადავიდოდა hot-seat-ზე. (finish-check-მა აღმოაჩინა კონტრაქტთან შეუსაბამობა; კოდის ქცევა სწორია, კონტრაქტი განახლდა.)
 - How to change: StockfishAI-ს გაუქმების ასინქრონული დასრულების API, რის შემდეგაც instance-ის ხელახლა გამოყენება შეიძლება.
 
+### 2026-10-25 — სცენის ავტომატური აწყობა Editor-ის სკრიპტით
+- Decision: `Assets/Editor/ChessSceneSetup.cs` (asmdef `Chess.Editor`, მხოლოდ Editor) — მენიუ **Tools → Setup Chess Scene** ქმნის/აახლებს მასალებს, Main Camera-ს CameraRig-ს და `ChessGame`-ს ყველა კომპონენტით და კავშირით, idempotent-ად. ველები `SerializedObject.FindProperty`-ით ივსება (Game-ის `[SerializeField] private` ველები უცვლელია). Editor კოდის კომპილაცია მოწმდება `dotnet build Tests/EditorCompileCheck`-ით. USER task-ებში 10/12/14/16 აწყობის ნაბიჯები ჩანაცვლდა ამ ბრძანებით; Play-ის შემოწმებები უცვლელია.
+- Reason: მომხმარებლის მოთხოვნა — ხელით აწყობა დამწყებისთვის შეცდომების წყაროა.
+- Note: ბრძანება GameController-ს აყენებს Play Against AI ✓-ზე, ამიტომ task 12-ის hot-seat შემოწმებას დაემატა ერთი ნაბიჯი: შემოწმების დროს Play Against AI მოხსნა და ბოლოს დაბრუნება (თვითონ შემოწმებები უცვლელია).
+- How to change: მნიშვნელობები `ChessSceneSetup.cs`-ში; ხელახლა გაშვება ხელით შეცვლილ ველებს (playAgainstAI, difficulty, humanSide, stockfish path, startFen) ნაგულისხმევზე აბრუნებს.
+
 ## Open Questions
 - ვარაუდი: პლატფორმა მხოლოდ Windows PC (x86-64). Stockfish-ის binary მხოლოდ Windows-ისთვის.
 - ვარაუდი: ადამიანი ნაგულისხმევად თეთრია (`humanSide` inspector-ში იცვლება); ნაგულისხმევი სირთულე = Medium.

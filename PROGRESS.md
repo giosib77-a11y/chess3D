@@ -18,7 +18,7 @@ Stage 1 — MVP
   - დეველოპერმა ერთხელ შეამოწმა დაცვა **რეპოზიტორიის გარეთ** (დროებით საქაღალდეში, მაგ. `%TEMP%`-ში; Assets-ში ფაილი არ იქმნება, რომ Unity-მ `.meta` არ შექმნას): ChessCore.Build.csproj-ის იგივე პარამეტრებით (netstandard2.1, LangVersion 9.0, ImplicitUsings disable) და ფაილით `public record R(int X);` build ჩავარდა CS0518-ით. დროებითი საქაღალდე წაიშალა. შედეგი report-შია.
   - `.meta` ფაილები ხელით არ შექმნილა.
 
-- [ ] 2. USER: Unity-ის პირველი გახსნა ახალი საქაღალდეების შემდეგ — owner: USER — files: (Unity თავად ქმნის .meta ფაილებს) — depends: 1 — done when: Console-ში 0 წითელი შეცდომაა და ახალ საქაღალდეებს/asmdef-ებს .meta აქვთ
+- [x] 2. USER: Unity-ის პირველი გახსნა ახალი საქაღალდეების შემდეგ — owner: USER — files: (Unity თავად ქმნის .meta ფაილებს) — depends: 1 — done when: Console-ში 0 წითელი შეცდომაა და ახალ საქაღალდეებს/asmdef-ებს .meta აქვთ
     1. გახსენი **Unity Hub** → მარცხნივ **Projects** → დააჭირე პროექტს **chess3D** (ვერსია 6000.6.7f1). თუ სიაში არ ჩანს: **Add** → **Add project from disk** → აირჩიე `D:\yvelaperi\saitebi\chess\chess3D\chess3D`.
     2. დაელოდე, სანამ ქვედა მარჯვენა კუთხეში პროგრესის ზოლი (import / compiling) გაქრება. პირველ ჯერზე რამდენიმე წუთი შეიძლება დასჭირდეს.
     3. გახსენი Console: ზედა მენიუ **Window → General → Console** (ან Ctrl+Shift+C). Console-ის ფანჯარაში დააჭირე **Clear**-ს.
@@ -91,7 +91,7 @@ Stage 1 — MVP
     - როცა არ არის დაყენებული: იწერება `SKIPPED: STOCKFISH_PATH not set` და ტესტი ბრუნდება. report-ში ეს ტესტი მოინიშნება როგორც „შეუმოწმებელი“.
   - `System.Threading.Channels` და `Process.Kill(bool)` არ გამოიყენება (netstandard2.1-ში არ არის).
 
-- [ ] 8. USER: Stockfish-ის ჩამოტვირთვა და დადება — owner: USER — files: Assets/StreamingAssets/Stockfish/stockfish.exe (git-ში არ ინახება) — depends: 7 — done when: ფაილი სწორ ადგილასაა და integration ტესტი გადის SKIPPED-ის გარეშე
+- [x] 8. USER: Stockfish-ის ჩამოტვირთვა და დადება — owner: USER — files: Assets/StreamingAssets/Stockfish/stockfish.exe (git-ში არ ინახება) — depends: 7 — done when: ფაილი სწორ ადგილასაა და integration ტესტი გადის SKIPPED-ის გარეშე
     1. ბრაუზერში გახსენი ოფიციალური საიტი **https://stockfishchess.org/download/** (სხვა საიტიდან არ ჩამოტვირთო).
     2. აირჩიე **Windows** და ჩამოტვირთე **x86-64-avx2** ვერსია (თანამედროვე პროცესორების უმეტესობაზე მუშაობს). თუ მოგვიანებით თამაში იტყვის, რომ engine ვერ გაეშვა ან გაითიშა, ჩამოტვირთე უბრალო **x86-64** ვერსია.
     3. ჩამოტვირთულ `.zip`-ზე: მარჯვენა click → **Extract All** → **Extract**.
@@ -118,28 +118,15 @@ Stage 1 — MVP
   - `dotnet test Tests/ChessCore.Tests` კვლავ გადის.
   - საბოლოო შემოწმება: USER task 10.
 
-- [ ] 10. USER: სცენის აწყობა 1 — მასალები, ChessGame, ველი და ფიგურები — owner: USER — files: Assets/Scenes/MainScene.unity, Assets/Materials/** — depends: 9 — done when: Play-ში ჩანს ველი, ბადე და 32 ფიგურა სწორ ადგილებზე; Console = 0 შეცდომა
-    1. გახსენი Unity (თუ ღიაა, უბრალოდ გადადი მის ფანჯარაზე; სკრიპტები ავტომატურად დაკომპილირდება). Console → **Clear** → 0 წითელი შეცდომა.
-    2. **Project** ფანჯარაში: `Assets/Scenes/MainScene` → ორჯერ დააჭირე (სცენა გაიხსნება).
-    3. **Hierarchy**-ში (მარცხნივ) დააჭირე **Main Camera**-ს. **Inspector**-ში იქნება კომპონენტი „Missing (Mono Script)“ ან „The associated script can not be loaded“ (ძველი ChessSmokeTest). მის სათაურზე დააჭირე სამ წერტილს **⋮** → **Remove Component**.
-    4. Main Camera-ს **Transform**-ში დროებით ჩაწერე: Position X `3.5` Y `9` Z `-5`; Rotation X `50` Y `0` Z `0`. (task 14-ის შემდეგ კამერას CameraRig მართავს.)
-    5. **Project**-ში: მარჯვენა click `Assets`-ზე → **Create → Folder** → სახელი `Materials`.
-    6. შექმენი 6 მასალა: მარჯვენა click `Materials`-ზე → **Create → Material** (Unity 6-ის ზოგ ვერსიაში: **Create → Rendering → Material**). სახელი ჩაწერე და Enter. Inspector-ში Shader უნდა იყოს `Universal Render Pipeline/Lit`. ფერისთვის დააჭირე ფერის ველს **Base Map**-ის გვერდით → ფანჯარაში ველი **Hexadecimal** → ჩაწერე კოდი; **A** = გამჭვირვალობა (0–255).
-       - `M_Ground`: Hex `8A9A5B`.
-       - `M_Tile`: ჯერ **Surface Options → Surface Type → Transparent**, შემდეგ Hex `FFFFFF`, A = `40`.
-       - `M_TileLegal`: Transparent, Hex `3CDC3C`, A = `160`.
-       - `M_TileSelected`: Transparent, Hex `FFD700`, A = `180`.
-       - `M_WhitePiece`: Hex `EDE6D6` (Surface Type რჩება Opaque).
-       - `M_BlackPiece`: Hex `2B2B2B` (Opaque).
-    7. **Hierarchy**-ში ცარიელ ადგილზე მარჯვენა click → **Create Empty**. დააჭირე F2-ს და დაარქვი `ChessGame`. Inspector → **Transform**-ის ⋮ → **Reset** (პოზიცია 0,0,0).
-    8. როცა `ChessGame` მონიშნულია: Inspector-ის ბოლოში **Add Component** → ჩაწერე `BoardView` → Enter. ველებში გადაათრიე მასალები Project-იდან: **Ground Material** ← `M_Ground`, **Tile Material** ← `M_Tile`, **Legal Target Material** ← `M_TileLegal`, **Selected Material** ← `M_TileSelected`. **Ground Size** დატოვე `30`.
-    9. **Add Component** → `PiecesView`. **White Material** ← `M_WhitePiece`, **Black Material** ← `M_BlackPiece`.
-    10. **Add Component** → `GameController`. **Board View** ველში გადაათრიე `ChessGame` თვითონ Hierarchy-დან (Unity თავად აიღებს BoardView კომპონენტს). **Pieces View** ← ისევ `ChessGame`. **Start Fen** დატოვე ცარიელი.
-    11. შეინახე სცენა: **Ctrl+S**.
-    12. დააჭირე **Play**-ს (▶ ზედა ცენტრში). უნდა ჩანდეს: მწვანე ველი, ოდნავ შესამჩნევი 8x8 ბადე და 32 ფიგურა. თეთრი ფიგურები კამერასთან ახლოსაა; თეთრი დედოფალი (cylinder + sphere) d1-ზეა, მეფის (ყველაზე მაღალი, „ჯვრით“) მარცხნივ.
-    13. Play-ში დააჭირე **R**-ს: ფიგურები თავიდან ჩნდება, Console-ში შეცდომა არ ჩნდება.
-    14. ისევ დააჭირე ▶-ს Play-ის გასაჩერებლად. მნიშვნელოვანი: Play-ის დროს Inspector-ში გაკეთებული ცვლილებები გაჩერებისას იკარგება. აწყობა ყოველთვის Play-ს გარეშე გააკეთე.
-    15. თუ რამე არ ემთხვევა, გადაუღე screenshot-ი და Console-ის ტექსტი გადაეცი გუნდს.
+- [ ] 10. USER: სცენის აწყობა (ერთი ბრძანებით) + ველი და ფიგურები — owner: USER — files: Assets/Scenes/MainScene.unity, Assets/Materials/** (ქმნის Tools → Setup Chess Scene) — depends: 9, 19 — done when: Play-ში ჩანს ველი, ბადე და 32 ფიგურა სწორ ადგილებზე; Console = 0 შეცდომა
+    1. გადადი Unity-ის ფანჯარაზე და დაელოდე, სანამ სკრიპტები დაკომპილირდება (ქვედა მარჯვენა კუთხის პროგრესის ზოლი ქრება). Console → **Clear** → 0 წითელი შეცდომა.
+    2. ზედა მენიუ: **Tools → Setup Chess Scene**. თუ სხვა სცენაში შენახული ცვლილებები გაქვს, Unity შეგეკითხება შენახვას — დააჭირე **Save**. ბრძანება თავად გახსნის `MainScene`-ს და გააკეთებს task 10, 12, 14, 16-ის მთელ აწყობას (მასალები, Main Camera + CameraRig, `ChessGame` ყველა კომპონენტით და კავშირით, GameController-ის პარამეტრები) და შეინახავს სცენას.
+    3. Console-ში გამოჩნდება ჩანაწერი `[ChessSceneSetup] ...` სიით, რა შეიქმნა და რა განახლდა. ბრძანება შეგიძლია მეორედაც გაუშვა — დუბლიკატებს არ ქმნის, მხოლოდ აახლებს.
+    4. (დამწყებისთვის) დააჭირე Hierarchy-ში `ChessGame`-ს და Inspector-ში ნახე კომპონენტები: BoardView, PiecesView, SquarePicker, PromotionPrompt, SelectionController, StatusHud, GameController — ველები უკვე შევსებულია. **Main Camera**-ზე დევს CameraRig.
+    5. დააჭირე **Play**-ს (▶ ზედა ცენტრში). უნდა ჩანდეს: მწვანე ველი, ოდნავ შესამჩნევი 8x8 ბადე და 32 ფიგურა. თეთრი ფიგურები კამერასთან ახლოსაა; თეთრი დედოფალი (cylinder + sphere) d1-ზეა, მეფის (ყველაზე მაღალი, „ჯვრით“) მარცხნივ.
+    6. Play-ში დააჭირე **R**-ს: ფიგურები თავიდან ჩნდება, Console-ში შეცდომა არ ჩნდება.
+    7. ისევ დააჭირე ▶-ს Play-ის გასაჩერებლად. მნიშვნელოვანი: Play-ის დროს Inspector-ში გაკეთებული ცვლილებები გაჩერებისას იკარგება. აწყობა ყოველთვის Play-ს გარეშე გააკეთე.
+    8. თუ რამე არ ემთხვევა, გადაუღე screenshot-ი და Console-ის ტექსტი გადაეცი გუნდს.
 
 - [x] 11. Game: მონიშვნა, განათება, სვლა, გარდაქმნა (hot-seat) — owner: task-executor — files: Assets/Scripts/Game/SquarePicker.cs, Assets/Scripts/Game/SelectionController.cs, Assets/Scripts/Game/PromotionPrompt.cs, Assets/Scripts/Game/GameController.cs (extends task 9) — depends: 9 — done when:
   - კოდი API Contract-ის მიხედვით.
@@ -150,18 +137,15 @@ Stage 1 — MVP
   - Grep legacy Input → 0 შედეგი. `dotnet test` გადის.
   - საბოლოო შემოწმება: USER task 12.
 
-- [ ] 12. USER: სცენის აწყობა 2 და სვლების შემოწმება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 10, 11 — done when: ყველა ქვემოთ ჩამოთვლილი შემოწმება გადის; Console = 0 შეცდომა
-    1. Unity → Console **Clear** → 0 შეცდომა. Hierarchy → `ChessGame` მონიშნე.
-    2. **Add Component** → `SquarePicker`. **Raycast Camera** ← გადაათრიე **Main Camera** Hierarchy-დან.
-    3. **Add Component** → `PromotionPrompt`.
-    4. **Add Component** → `SelectionController`. **Board View** ← `ChessGame`, **Picker** ← `ChessGame`, **Promotion Prompt** ← `ChessGame`.
-    5. **GameController**-ში **Selection** ← `ChessGame`. **Ctrl+S**.
-    6. Play → დააჭირე თეთრ პაიკს e2-ზე: e2 გაყვითლდება, e3 და e4 გამწვანდება. დააჭირე e4-ს: პაიკი გადავა. ახლა შავის სვლაა (ორივე მხარეს შენ თამაშობ): დააჭირე e7-ს, შემდეგ e5-ს.
-    7. დააჭირე საკუთარ ფიგურას, შემდეგ სხვა საკუთარ ფიგურას: მონიშვნა გადადის. დააჭირე ცარიელ ველს (დაფის გარეთ): მონიშვნა ქრება. მოწინააღმდეგის ფიგურაზე დაჭერით არაფერი ხდება.
-    8. გააჩერე Play. **Start Fen**-ში ჩაწერე `r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1` → Play → დააჭირე მეფეს e1-ზე: g1 და c1 მწვანეა → დააჭირე g1-ს: მეფე g1-ზე, ეტლი f1-ზე (როქი).
-    9. გააჩერე. Start Fen = `8/P6k/8/8/8/8/8/K7 w - - 0 1` → Play → a7 → a8: ჩნდება ფანჯარა 4 ღილაკით → **Knight** → a8-ზე მხედარია. გაიმეორე და დააჭირე **Cancel**-ს: პაიკი a7-ზე რჩება.
-    10. გააჩერე. Start Fen = `4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1` → Play → e5 → d6: შავი პაიკი d5-დან ქრება (en passant).
-    11. გააჩერე და **Start Fen** გაასუფთავე (ცარიელი). **Ctrl+S**.
+- [ ] 12. USER: სვლების შემოწმება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 10, 11 — done when: ყველა ქვემოთ ჩამოთვლილი შემოწმება გადის; Console = 0 შეცდომა
+    1. აწყობა უკვე გაკეთებულია (task 10 → **Tools → Setup Chess Scene**). Console **Clear** → 0 შეცდომა.
+    2. ამ task-ში ორივე მხარეს შენ თამაშობ: Hierarchy → `ChessGame` → **GameController** → მოხსენი მონიშვნა **Play Against AI**-ს (Play-ს გარეშე). task-ის ბოლოს (ნაბიჯი 8) დააბრუნე ✓.
+    3. Play → დააჭირე თეთრ პაიკს e2-ზე: e2 გაყვითლდება, e3 და e4 გამწვანდება. დააჭირე e4-ს: პაიკი გადავა. ახლა შავის სვლაა (ორივე მხარეს შენ თამაშობ): დააჭირე e7-ს, შემდეგ e5-ს.
+    4. დააჭირე საკუთარ ფიგურას, შემდეგ სხვა საკუთარ ფიგურას: მონიშვნა გადადის. დააჭირე ცარიელ ველს (დაფის გარეთ): მონიშვნა ქრება. მოწინააღმდეგის ფიგურაზე დაჭერით არაფერი ხდება.
+    5. გააჩერე Play. **Start Fen**-ში ჩაწერე `r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1` → Play → დააჭირე მეფეს e1-ზე: g1 და c1 მწვანეა → დააჭირე g1-ს: მეფე g1-ზე, ეტლი f1-ზე (როქი).
+    6. გააჩერე. Start Fen = `8/P6k/8/8/8/8/8/K7 w - - 0 1` → Play → a7 → a8: ჩნდება ფანჯარა 4 ღილაკით → **Knight** → a8-ზე მხედარია. გაიმეორე და დააჭირე **Cancel**-ს: პაიკი a7-ზე რჩება.
+    7. გააჩერე. Start Fen = `4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1` → Play → e5 → d6: შავი პაიკი d5-დან ქრება (en passant).
+    8. გააჩერე, **Start Fen** გაასუფთავე (ცარიელი) და **Play Against AI** ისევ მონიშნე ✓. **Ctrl+S**.
 
 - [x] 13. Game: CameraRig — სარდლის და ტაქტიკური ხედი (TAB) — owner: task-executor — files: Assets/Scripts/Game/CameraRig.cs, Assets/Scripts/Game/GameController.cs (extends task 11) — depends: 11 — done when:
   - `CameraRig` API Contract-ის და Decision Log-ის („კამერა“) მიხედვით: ველების სახელები და ნაგულისხმევი მნიშვნელობები, TAB (`Keyboard.current.tabKey`), exponential lerp, `returnToCommanderAfterMove`.
@@ -169,9 +153,9 @@ Stage 1 — MVP
   - Grep legacy Input → 0 შედეგი. `dotnet test` გადის.
   - საბოლოო შემოწმება: USER task 14.
 
-- [ ] 14. USER: კამერის აწყობა და შემოწმება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 12, 13 — done when: ქვემოთ ჩამოთვლილი შემოწმებები გადის; Console = 0 შეცდომა
-    1. Console **Clear** → 0 შეცდომა. Hierarchy → **Main Camera** → **Add Component** → `CameraRig`. მნიშვნელობები დატოვე ნაგულისხმევი.
-    2. Hierarchy → `ChessGame` → **GameController** → **Camera Rig** ← გადაათრიე **Main Camera**. **Human Side** = `White`. **Ctrl+S**.
+- [ ] 14. USER: კამერის შემოწმება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 12, 13 — done when: ქვემოთ ჩამოთვლილი შემოწმებები გადის; Console = 0 შეცდომა
+    1. აწყობა უკვე გაკეთებულია (**Tools → Setup Chess Scene**: CameraRig Main Camera-ზე, GameController → Camera Rig მიბმულია, Human Side = White). Console **Clear** → 0 შეცდომა.
+    2. Hierarchy → **Main Camera** → Inspector-ში დარწმუნდი, რომ **Camera Rig** კომპონენტი ჩანს (ნაგულისხმევი მნიშვნელობებით).
     3. Play: კამერა თეთრი მეფის (e1) უკან და ზემოთ დგას და შავისკენ იყურება (სარდლის ხედი).
     4. დააჭირე **TAB**-ს: კამერა გლუვად ადის დაფის ზემოთ (ტაქტიკური ხედი). კიდევ ერთხელ TAB: ბრუნდება.
     5. ტაქტიკურ ხედში გააკეთე სვლა: კამერა თავად ბრუნდება სარდლის ხედზე.
@@ -189,8 +173,8 @@ Stage 1 — MVP
   - საბოლოო შემოწმება: USER task 16.
 
 - [ ] 16. USER: საბოლოო აწყობა და MVP-ის მიღება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 8, 14, 15, 17 — done when: ყველა შემოწმება გადის; Console = 0 შეცდომა; Play-ის შემდეგ stockfish.exe პროცესი აღარ არსებობს
-    1. Console **Clear** → 0 შეცდომა. `ChessGame` → **Add Component** → `StatusHud`. **GameController** → **Hud** ← `ChessGame`.
-    2. GameController: **Play Against AI** ✓, **Difficulty** = `Easy`, **Human Side** = `White`, **Stockfish Relative Path** = `Stockfish/stockfish.exe`, **Stockfish Path Override** ცარიელი. **Ctrl+S**.
+    1. აწყობა უკვე გაკეთებულია (**Tools → Setup Chess Scene**: StatusHud + Hud კავშირი). Console **Clear** → 0 შეცდომა.
+    2. შეამოწმე GameController (ბრძანება ამას აყენებს; თუ ხელით შეცვალე, ხელახლა გაუშვი **Tools → Setup Chess Scene**): **Play Against AI** ✓, **Difficulty** = `Easy`, **Human Side** = `White`, **Stockfish Relative Path** = `Stockfish/stockfish.exe`, **Stockfish Path Override** ცარიელი.
     3. Play: ზედა-მარცხენა კუთხეში წერია `White to move`. გააკეთე სვლა: სტატუსი იცვლება (`AI thinking...` შეიძლება ძალიან სწრაფად გაქრეს), შავი პასუხობს 1–2 წამში.
     4. **Difficulty** = `Master` (Play-ს გარეშე) → Play → სვლის შემდეგ, სანამ `AI thinking...` წერია, დააჭირე ფიგურებს: არაფერი ხდება (input დაბლოკილია).
     5. AI-ის ფიქრისას დააჭირე **R**-ს: თამაში თავიდან იწყება, ძველი AI-ის სვლა ახალ დაფაზე არ ჩნდება, Console-ში შეცდომა არაა.
@@ -215,6 +199,20 @@ Stage 1 — MVP
   - ჯერ ტესტი, რომელიც ძველ კოდზე ვარდება: `FenTests`-ში ზემოთ მოცემული FEN → FormatException; ასევე ep, რომლის უკანაც ფიგურაა. არსებული სწორი FEN-ები (`4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1`, perft პოზიციები, ToFen round-trip ორმაგი სვლის შემდეგ) კვლავ გადის.
   - `GameStateTests.UsableEnPassantSquare_DistinguishesPositions` შეიცვალა მნიშვნელოვანი ტესტით: (a) პოზიცია, რომელიც პირველად გამოყენებადი ep-ით ჩნდება, შემდეგ კი ორჯერ ep-ის გარეშე → ჯერ კიდევ InProgress (ep-იანი არ ითვლება იგივედ), და მხოლოდ შემდეგი გამეორებისას ThreefoldRepetition; (b) შეკრული პაიკის შემთხვევა (`8/8/8/KPp4r/...`-ის მსგავსი): გამოუსადეგარი ep გასაღებს არ ცვლის. ტესტი ჩავარდებოდა, თუ ep გასაღებიდან საერთოდ ამოვარდებოდა ან ყოველთვის ჩაიწერებოდა.
   - `dotnet test Tests/ChessCore.Tests` გადის.
+
+### მომხმარებლის მოთხოვნით დამატებული (2026-10-25)
+- [ ] 19. Editor: სცენის ავტომატური აწყობა (Tools → Setup Chess Scene) — owner: task-executor — files: Assets/Editor/ChessSceneSetup.cs, Assets/Editor/Chess.Editor.asmdef, Tests/EditorCompileCheck/EditorCompileCheck.csproj — depends: 15, 17 — done when:
+  - Editor-only asmdef `Chess.Editor` (includePlatforms ["Editor"], references Chess.Core, Chess.AI, Chess.Game); namespace `Chess.Editor`.
+  - მენიუ **Tools → Setup Chess Scene** (`[MenuItem("Tools/Setup Chess Scene")]`): ჯერ `EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()` (უარზე — გაუქმება), შემდეგ ხსნის `Assets/Scenes/MainScene.unity`-ს და აკეთებს:
+    - `Assets/Materials/` + 6 მასალა URP/Lit-ით (task 10-ის ცხრილი): `M_Ground` 8A9A5B opaque; `M_Tile` FFFFFF α40 transparent; `M_TileLegal` 3CDC3C α160 transparent; `M_TileSelected` FFD700 α180 transparent; `M_WhitePiece` EDE6D6 opaque; `M_BlackPiece` 2B2B2B opaque. არსებული მასალა ხელახლა არ იქმნება — ფერი/პარამეტრები ახლდება. Transparent სწორად: `_Surface`=1, blend SrcAlpha/OneMinusSrcAlpha, `_ZWrite`=0, keyword `_SURFACE_TYPE_TRANSPARENT`, RenderType tag Transparent, renderQueue 3000 (Inspector-ში Surface Type = Transparent ჩანს).
+    - Main Camera (tag MainCamera, ან სახელით „Main Camera“; თუ არ არის — იქმნება Camera-თი და MainCamera tag-ით): `GameObjectUtility.RemoveMonoBehavioursWithMissingScript`; `CameraRig` (თუ არ არის).
+    - root `ChessGame` (თუ არ არის — იქმნება, Transform reset): კომპონენტები BoardView, PiecesView, SquarePicker, PromotionPrompt, SelectionController, StatusHud, GameController — თითო ერთხელ (GetComponent ?? AddComponent).
+    - ველები `SerializedObject`-ით, API Contract-ის ზუსტი სახელებით: BoardView (groundMaterial, tileMaterial, legalTargetMaterial, selectedMaterial; groundSize არ იცვლება), PiecesView (whiteMaterial, blackMaterial), SquarePicker.raycastCamera = Main Camera, SelectionController (boardView, picker, promotionPrompt), GameController (boardView, piecesView, selection, cameraRig, hud; playAgainstAI = true, difficulty = Easy, humanSide = White, stockfishRelativePath = `Stockfish/stockfish.exe`, stockfishPathOverride = "", startFen = ""). ვერ ნაპოვნი property → `Debug.LogError` სახელით (ჩუმად არ გამოტოვდება).
+    - სცენის მონიშვნა dirty + `EditorSceneManager.SaveScene`; `AssetDatabase.SaveAssets()`.
+    - ბოლოს ერთი `Debug.Log("[ChessSceneSetup] ...")` სიით: Created: … / Updated: … / Removed missing scripts: N.
+  - მეორედ გაშვებისას დუბლიკატები არ იქმნება (ერთი `ChessGame`, თითო კომპონენტი ერთხელ, მასალები არ დუბლირდება).
+  - `Tests/EditorCompileCheck/EditorCompileCheck.csproj` (verification-only, GameCompileCheck-ის ანალოგიით, + UnityEditor DLL-ები, ProjectReference GameCompileCheck/Core/AI build პროექტებზე) → `dotnet build Tests/EditorCompileCheck` 0 შეცდომა, 0 warning. `dotnet build Tests/GameCompileCheck` და `dotnet test Tests/ChessCore.Tests` კვლავ გადის.
+  - საბოლოო შემოწმება: USER task 10 (ბრძანების გაშვება + Console ჩანაწერი + Play).
 
 ## Shared files
 <!-- ფაილები, რომლებიც რამდენიმე task-ის files-ში შეიძლება იყოს (shared). წესი: მხოლოდ დამატება (ახალი dependency, ტიპი, route), სხვისი ჩანაწერის შეცვლა ან წაშლა არა; ერთ საერთო ფაილზე ორი task ერთდროულად არ მუშაობს. -->
