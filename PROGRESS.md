@@ -4,8 +4,8 @@
 Stage 2 — Campaign
 
 ## Tasks
-<!-- ფორმატი: - [ ] N. Title — owner: task-executor | frontend-dev | USER — files: ... — depends: ... — done when: ...
-     task-executor = სუფთა C# (Campaign, AI, build/test პროექტები); frontend-dev = Unity სკრიპტები (Game, UI) და Editor სკრიპტი; USER = Play-mode შემოწმება Unity Editor-ში (დეტალური ინსტრუქცია task-ის ქვეშაა).
+<!-- ფორმატი: - [ ] N. Title — owner: task-executor | USER — files: ... — depends: ... — done when: ...
+     task-executor = სუფთა C#, Unity სკრიპტები (Game, UI) და Editor სკრიპტი; USER = Play-mode შემოწმება Unity Editor-ში (დეტალური ინსტრუქცია task-ის ქვეშაა).
      API-ს, ველების სახელების, ტექსტების და ქცევის ერთადერთი წყარო: PROJECT.md → ## API Contract და ## Business Rules → Stage 2.
      Game/Editor task-ები (24–27) dotnet-ით მხოლოდ კომპილაციაზე მოწმდება; საბოლოო შემოწმება = USER task-ები 28, 29.
      Stage 1-ის task-ები (1–19) — ფაილის ბოლოს, ## Stage 1 — Done. -->
@@ -67,7 +67,7 @@ Stage 2 — Campaign
     - `FromElo_Below1320_SendsSkillAndDepth`: `BuildDifficultyCommands(FromElo(1100), options{Skill Level 0..20, UCI_LimitStrength, UCI_Elo min 1320 max 3190})` == [`setoption name Skill Level value 3`, `setoption name UCI_LimitStrength value false`]; `BuildGo` == `go depth 2`;
     - `FromElo_AtOrAbove1320_SendsUciElo`: `FromElo(1800)` → [`setoption name Skill Level value 20`, `setoption name UCI_LimitStrength value true`, `setoption name UCI_Elo value 1800`]; `BuildGo` == `go movetime 500`.
 
-- [ ] 24. Game: `GameSession` + asmdef/compile-check-ის განახლება — owner: frontend-dev — files: Assets/Scripts/Game/Session/GameSession.cs, Assets/Scripts/Game/Chess.Game.asmdef, Tests/GameCompileCheck/GameCompileCheck.csproj — depends: 22 — done when:
+- [ ] 24. Game: `GameSession` + asmdef/compile-check-ის განახლება — owner: task-executor — files: Assets/Scripts/Game/Session/GameSession.cs, Assets/Scripts/Game/Chess.Game.asmdef, Tests/GameCompileCheck/GameCompileCheck.csproj — depends: 22 — done when:
   - `Chess.Game.asmdef` references = `["Chess.Core","Chess.AI","Chess.Campaign","Unity.InputSystem","UnityEngine.UI"]`; სხვა ველები უცვლელია.
   - `GameCompileCheck.csproj`: + `<Reference Include="../../Library/ScriptAssemblies/UnityEngine.UI.dll" Private="false" />` და + ProjectReference `../ChessCampaign.Build/ChessCampaign.Build.csproj`; სხვა უცვლელია.
   - `GameSession.cs` (`LaunchMode`, `SceneNames`, `GameSession`) ზუსტად API Contract → „Chess.Game — Stage 2“-ის მიხედვით, მათ შორის: static-ების reset `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]`-ით (ყველა ველი, `Store`-ის და „უკვე ჩატვირთულია“ flag-ის ჩათვლით); `EnsureLoaded` ერთხელ Play-ზე + log `[GameSession] Campaign save file: <path>`; `TrySaveCampaign` იჭერს მხოლოდ `IOException`/`UnauthorizedAccessException`-ს; `StartCampaignBattle` Locked/null-ზე → InvalidOperationException; სცენების სახელები მხოლოდ `SceneNames`-იდან.
@@ -75,7 +75,7 @@ Stage 2 — Campaign
   - `dotnet build Tests/GameCompileCheck` → 0 შეცდომა, 0 warning; `dotnet build Tests/EditorCompileCheck` კვლავ გადის; `dotnet test Tests/ChessCore.Tests` გადის; legacy Input grep (`UnityEngine\.Input\b|\bInput\.(Get|mouse|any)` `Assets/Scripts/Game`-ში) → 0.
   - საბოლოო შემოწმება: USER task 28, 29.
 
-- [ ] 25. Game UI: MainMenuController, RegionButton, CampaignMapController (uGUI) — owner: frontend-dev — files: Assets/Scripts/Game/UI/MainMenuController.cs, Assets/Scripts/Game/UI/RegionButton.cs, Assets/Scripts/Game/UI/CampaignMapController.cs — depends: 24 — done when:
+- [ ] 25. Game UI: MainMenuController, RegionButton, CampaignMapController (uGUI) — owner: task-executor — files: Assets/Scripts/Game/UI/MainMenuController.cs, Assets/Scripts/Game/UI/RegionButton.cs, Assets/Scripts/Game/UI/CampaignMapController.cs — depends: 24 — done when:
   - Inspector ველების სახელები, ტიპები, ტექსტები, ფერები და ნაკადი ზუსტად API Contract → „Chess.Game — Stage 2“-ის მიხედვით (`[SerializeField] private`; ღილაკები `onClick.AddListener`-ით `Awake`/`Start`-ში; null ველზე `Debug.LogError` სახელით, NRE არა).
   - MainMenu: `Continue` მხოლოდ `GameSession.Campaign != null`-ზე; დადასტურება მხოლოდ არსებული კამპანიისას; Quick Game ნაგულისხმევი White/Medium, ციკლი Easy → Medium → Hard → Master → Easy; `Quit` → log + `Application.Quit()`; `warningText` წესი Contract-იდან.
   - CampaignMap: მდგომარეობები მხოლოდ `GameSession.Campaign.GetState`-იდან, ტექსტები მხოლოდ `CampaignText`-იდან; Locked → `interactable = false`; `Campaign == null` → `StartNewCampaign()`.
@@ -83,17 +83,18 @@ Stage 2 — Campaign
   - `dotnet build Tests/GameCompileCheck` → 0 შეცდომა, 0 warning; `dotnet test Tests/ChessCore.Tests` გადის; legacy Input grep → 0.
   - საბოლოო შემოწმება: USER task 28, 29.
 
-- [ ] 26. Game: BattlePanel + GameController-ის კამპანია/Quick Game ინტეგრაცია — owner: frontend-dev — files: Assets/Scripts/Game/UI/BattlePanel.cs, Assets/Scripts/Game/GameController.cs — depends: 23, 24 — done when:
+- [ ] 26. Game: BattlePanel + GameController-ის კამპანია/Quick Game ინტეგრაცია — owner: task-executor — files: Assets/Scripts/Game/UI/BattlePanel.cs, Assets/Scripts/Game/GameController.cs — depends: 23, 24 — done when:
   - `BattlePanel` ზუსტად Contract-ის ცხრილით (ველები, events, `ShowInGame`/`ShowResult`/`HideResult`/`HideAll`; `leaveButton` → `BackClicked`).
   - `GameController`: Stage 1-ის ყველა Inspector ველი (სახელი, ტიპი, ნაგულისხმევი) და ნაკადი უცვლელია; დაემატა მხოლოდ `[SerializeField] private BattlePanel battlePanel;` და „Stage 2 — GameController-ის დამატებები“: launch პარამეტრები `Start`-ში `CreateAi`-მდე; `Mode == None` → Stage 1-ის ქცევა + `battlePanel?.HideAll()`; AI-ის log ხაზი ზუსტი ფორმატით; შედეგი მუშავდება ერთხელ პარტიაზე, მხოლოდ წარმატებული სვლის შემდეგ (ადამიანის და AI-ის); `counted = playAgainstAI && _ai != null`; `RecordBattle` + `TrySaveCampaign` + `SaveFailedWarning`; Retry = R; Back → `GoToCampaignMap`/`GoToMainMenu`; events-ის გამოწერა `OnEnable`/`OnDisable`-ში.
   - GameController-ში არ არის Elo-ს ზოლები, განბლოკვის წესი ან შედეგის ტექსტები (მხოლოდ `AIDifficulty.FromElo`, `BattleRules`, `CampaignProgress.RecordBattle`, `CampaignText`); გამონაკლისი: Quick Game-ის info ხაზი და ღილაკების label-ები Contract-იდან.
   - `dotnet build Tests/GameCompileCheck` → 0 შეცდომა, 0 warning; `dotnet build Tests/EditorCompileCheck` გადის (ChessSceneSetup-ის ველები უცვლელია); `dotnet test Tests/ChessCore.Tests` გადის; legacy Input grep → 0.
   - საბოლოო შემოწმება: USER task 29 (მათ შორის MainScene standalone).
 
-- [ ] 27. Editor: Tools → Setup Campaign Scenes (MainMenu, CampaignMap, MainScene-ის BattleCanvas, Build Settings) — owner: frontend-dev — files: Assets/Editor/CampaignScenesSetup.cs, Assets/Editor/Chess.Editor.asmdef, Tests/EditorCompileCheck/EditorCompileCheck.csproj — depends: 25, 26 — done when:
+- [ ] 27. Editor: Tools → Setup Campaign Scenes (MainMenu, CampaignMap, MainScene-ის BattleCanvas, Build Settings) — owner: task-executor — files: Assets/Editor/CampaignScenesSetup.cs, Assets/Editor/Chess.Editor.asmdef, Tests/EditorCompileCheck/EditorCompileCheck.csproj — depends: 25, 26 — done when:
   - `Chess.Editor.asmdef` references = `["Chess.Core","Chess.AI","Chess.Campaign","Chess.Game","Unity.InputSystem","UnityEngine.UI"]`; სხვა უცვლელია.
   - `EditorCompileCheck.csproj`: + `../../Library/ScriptAssemblies/UnityEngine.UI.dll`, + `../../Library/ScriptAssemblies/Unity.InputSystem.dll` (Private="false"), + ProjectReference `../ChessCampaign.Build/ChessCampaign.Build.csproj`.
   - `CampaignScenesSetup` ზუსტად API Contract → „Editor: Assets/Editor/CampaignScenesSetup.cs“ ნაბიჯებით 1–10: სცენების შექმნა/გახსნა, Main Camera, ერთი EventSystem (`InputSystemUIInputModule` + `AssignDefaultActions()`), გენერირებული Canvas-ების წაშლა+შექმნა, ობიექტების სახელები, `RegionButton`-ები `CampaignRegions.All`-ის რიგით და anchor-ებით, ყველა ველი `SerializedObject`-ით (ვერ ნაპოვნი → LogError), `GameController.battlePanel`, MainScene-ში `ChessGame`-ის არარსებობისას LogError და გამოტოვება, `EditorBuildSettings.scenes` = [MainMenu, CampaignMap, MainScene], ბოლოს MainMenu ღიაა, ერთი შემაჯამებელი log.
+  - ფერები, ზომები, font size-ები და Canvas Scaler ზუსტად API Contract → „UI სტილი (Stage 2)“-ის მიხედვით.
   - `ChessSceneSetup.cs` არ შეცვლილა.
   - `dotnet build Tests/EditorCompileCheck` და `dotnet build Tests/GameCompileCheck` → 0 შეცდომა, 0 warning; `dotnet test Tests/ChessCore.Tests` გადის.
   - `git status --porcelain` აჩვენებს მხოლოდ ამ task-ის 3 ფაილს (აგენტს `Assets/Scenes/**` და `ProjectSettings/**` არ შეუცვლია — მათ USER-ის მიერ გაშვებული ბრძანება ცვლის).

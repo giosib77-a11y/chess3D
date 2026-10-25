@@ -694,6 +694,21 @@ public static class GameSession
 
 **რეგიონის ღილაკის ფერი (`background.color`):** Locked `#5A5A5A` (`button.interactable = false`), Available `#C8962D`, Liberated `#3C8C3C`. ტექსტი თეთრი.
 
+**UI სტილი (Stage 2, DESIGN.md-ის ნაცვლად; ყველაფერს `CampaignScenesSetup` აწყობს):**
+- Canvas: Screen Space - Overlay; `CanvasScaler` Scale With Screen Size, reference 1920×1080, match 0.5. ყველა ზომა ქვემოთ reference პიქსელებშია.
+- ფერები:
+  - ფონი (კამერა, MainMenu/CampaignMap): `#1C1C22`;
+  - პანელი (Confirm, QuickGame, Result): `#2A2A33`, alpha 0.95;
+  - რუკის არე (`MapArea`): `#2F3A2A`;
+  - ჩვეულებრივი ღილაკი: `#3A4A6B`; ღილაკის `ColorTint`: highlighted ×1.15, pressed ×0.85, disabled `#5A5A5A` alpha 0.5;
+  - ტექსტი `#FFFFFF`; `warningText` `#FFB347`; რეგიონის ღილაკები — ზემოთ.
+- ზომები:
+  - მენიუს ღილაკი 400×80; ვერტიკალური სვეტი ცენტრში, დაშორება 20;
+  - რეგიონის ღილაკი 280×130 (ორხაზიანი label);
+  - BattleCanvas-ის ღილაკი (`LeaveButton`, `RetryButton`, `BackButton`) 260×70; `LeaveButton` ზედა-მარჯვნივ, დაშორება კიდიდან 24;
+  - პანელები: Confirm 800×300, QuickGame 600×520, Result 700×360 — ცენტრში.
+- ტექსტის ზომა (font size): სათაური 64; პანელის სათაური 40; ღილაკი 32; რეგიონის label 26; info/status/warning/message 28. ყველა ტექსტი LegacyRuntime.ttf, `alignment` MiddleCenter (`InfoText` UpperCenter), `horizontalOverflow` Wrap.
+
 **MainMenuController-ის ნაკადი:** `Start` → `GameSession.EnsureLoaded()` → `continueButton` აქტიურია მხოლოდ თუ `Campaign != null`; ჩანს `mainPanel`, დამალულია `confirmPanel`, `quickGamePanel`; Quick Game-ის ნაგულისხმევი: White, Medium.
 - `New Campaign`: `Campaign != null` → `confirmPanel` (`mainPanel` იმალება); სხვა შემთხვევაში `StartNewCampaign()` → `GoToCampaignMap()`. `Start new` → იგივე. `Cancel` → `mainPanel`.
 - `Continue` → `GoToCampaignMap()`. `Quick Game` → `quickGamePanel`; `colorButton` ცვლის White↔Black; `difficultyButton` ციკლავს; `Start` → `StartQuickGame(side, preset)`; `Back` → `mainPanel`.
@@ -967,8 +982,13 @@ public static class GameSession
 - Reason (ვარაუდი): პირველი იცავს პროგრესს შემთხვევითი დაკარგვისგან; მეორის გარეშე 2200 Elo-ს ბრძოლიდან გასვლა მხოლოდ პარტიის დასრულებით იქნებოდა შესაძლებელი. ორივე მცირე UI-ია.
 
 ### 2026-10-25 — Stage 2-ის ტესტები იმავე პროექტში; owner-ები
-- Decision: Campaign-ის ტესტები `Tests/ChessCore.Tests/Campaign/`-შია (ახალი სატესტო პროექტის გარეშე); build პროექტი `Tests/ChessCampaign.Build`. Stage 2-ში Unity სკრიპტების და Editor სკრიპტის owner = `frontend-dev`, სუფთა C#-ის = `task-executor` (მომხმარებლის მითითება; Stage 1-ში ყველა `task-executor` იყო).
+- Decision: Campaign-ის ტესტები `Tests/ChessCore.Tests/Campaign/`-შია (ახალი სატესტო პროექტის გარეშე); build პროექტი `Tests/ChessCampaign.Build`. Owner-ები: იხ. „Stage 2: owner-ები, დიზაინი, E2E“.
 - Reason: ერთი `dotnet test` ბრძანება, verify.sh უცვლელია.
+
+### 2026-10-25 — Stage 2: owner-ები, დიზაინი, E2E
+- Decision: Stage 2-ის ყველა agent task-ის owner = `task-executor` (Campaign, AI, Game, UI, Editor), როგორც Stage 1-ში. designer/DESIGN.md არ გამოიყენება — UI-ის ფერები, Canvas Scaler და ზომები მოკლედ ჩაწერილია API Contract-ში („UI სტილი (Stage 2)“). browser-tester/Playwright არ გამოიყენება; Play-mode შემოწმება = USER task-ები 28, 29.
+- Reason: მომხმარებლის მითითება — Unity C# არ არის web UI; სქემატური UI დროებითია (რუკის art და ქართული font — Stage 3).
+- How to change: Stage 3-ში რეალური art-ისთვის შეიძლება DESIGN.md-ის შექმნა.
 
 ## Open Questions
 - ვარაუდი: პლატფორმა მხოლოდ Windows PC (x86-64). Stockfish-ის binary მხოლოდ Windows-ისთვის.
