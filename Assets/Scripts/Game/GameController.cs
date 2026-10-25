@@ -12,7 +12,21 @@ namespace Chess.Game
         [SerializeField] private PiecesView piecesView;
         [SerializeField] private string startFen = "";
 
+        [SerializeField] private SelectionController selection;
+
         private GameState _state;
+
+        private void OnEnable()
+        {
+            if (selection != null)
+                selection.MoveChosen += OnMoveChosen;
+        }
+
+        private void OnDisable()
+        {
+            if (selection != null)
+                selection.MoveChosen -= OnMoveChosen;
+        }
 
         private void Start()
         {
@@ -21,8 +35,26 @@ namespace Chess.Game
 
         private void Update()
         {
-            if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
+            if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame
+                && (selection == null || !selection.IsPromotionOpen))
                 Restart();
+        }
+
+        private void OnMoveChosen(Move move)
+        {
+            if (_state == null)
+                return;
+            if (_state.TryMakeMove(move))
+            {
+                if (boardView != null)
+                    boardView.ClearHighlights();
+                Refresh();
+            }
+            else
+            {
+                Debug.LogWarning("Rejected move: " + move);
+                selection.Bind(_state);
+            }
         }
 
         private void Restart()
@@ -57,6 +89,8 @@ namespace Chess.Game
         private void Refresh()
         {
             piecesView.Sync(_state.Position);
+            if (selection != null)
+                selection.Bind(_state);
         }
     }
 }

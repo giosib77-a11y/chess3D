@@ -141,7 +141,7 @@ Stage 1 — MVP
     14. ისევ დააჭირე ▶-ს Play-ის გასაჩერებლად. მნიშვნელოვანი: Play-ის დროს Inspector-ში გაკეთებული ცვლილებები გაჩერებისას იკარგება. აწყობა ყოველთვის Play-ს გარეშე გააკეთე.
     15. თუ რამე არ ემთხვევა, გადაუღე screenshot-ი და Console-ის ტექსტი გადაეცი გუნდს.
 
-- [ ] 11. Game: მონიშვნა, განათება, სვლა, გარდაქმნა (hot-seat) — owner: task-executor — files: Assets/Scripts/Game/SquarePicker.cs, Assets/Scripts/Game/SelectionController.cs, Assets/Scripts/Game/PromotionPrompt.cs, Assets/Scripts/Game/GameController.cs (extends task 9) — depends: 9 — done when:
+- [x] 11. Game: მონიშვნა, განათება, სვლა, გარდაქმნა (hot-seat) — owner: task-executor — files: Assets/Scripts/Game/SquarePicker.cs, Assets/Scripts/Game/SelectionController.cs, Assets/Scripts/Game/PromotionPrompt.cs, Assets/Scripts/Game/GameController.cs (extends task 9) — depends: 9 — done when:
   - კოდი API Contract-ის მიხედვით.
   - `SquarePicker`: `Mouse.current`, raycast → `GetComponentInParent<SquareRef>()`.
   - `SelectionController`: წესები API Contract-ის ცხრილიდან; მონიშნავს მხოლოდ `SideToMove`-ის ფიგურას; click-ებს უგულებელყოფს, როცა `!Interactable` ან `PromotionPrompt.IsOpen`.
