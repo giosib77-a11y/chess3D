@@ -75,7 +75,7 @@ Stage 2 — Campaign
   - `dotnet build Tests/GameCompileCheck` → 0 შეცდომა, 0 warning; `dotnet build Tests/EditorCompileCheck` კვლავ გადის; `dotnet test Tests/ChessCore.Tests` გადის; legacy Input grep (`UnityEngine\.Input\b|\bInput\.(Get|mouse|any)` `Assets/Scripts/Game`-ში) → 0.
   - საბოლოო შემოწმება: USER task 28, 29.
 
-- [ ] 25. Game UI: MainMenuController, RegionButton, CampaignMapController (uGUI) — owner: task-executor — files: Assets/Scripts/Game/UI/MainMenuController.cs, Assets/Scripts/Game/UI/RegionButton.cs, Assets/Scripts/Game/UI/CampaignMapController.cs — depends: 24 — done when:
+- [x] 25. Game UI: MainMenuController, RegionButton, CampaignMapController (uGUI) — owner: task-executor — files: Assets/Scripts/Game/UI/MainMenuController.cs, Assets/Scripts/Game/UI/RegionButton.cs, Assets/Scripts/Game/UI/CampaignMapController.cs — depends: 24 — done when:
   - Inspector ველების სახელები, ტიპები, ტექსტები, ფერები და ნაკადი ზუსტად API Contract → „Chess.Game — Stage 2“-ის მიხედვით (`[SerializeField] private`; ღილაკები `onClick.AddListener`-ით `Awake`/`Start`-ში; null ველზე `Debug.LogError` სახელით, NRE არა).
   - MainMenu: `Continue` მხოლოდ `GameSession.Campaign != null`-ზე; დადასტურება მხოლოდ არსებული კამპანიისას; Quick Game ნაგულისხმევი White/Medium, ციკლი Easy → Medium → Hard → Master → Easy; `Quit` → log + `Application.Quit()`; `warningText` წესი Contract-იდან.
   - CampaignMap: მდგომარეობები მხოლოდ `GameSession.Campaign.GetState`-იდან, ტექსტები მხოლოდ `CampaignText`-იდან; Locked → `interactable = false`; `Campaign == null` → `StartNewCampaign()`.
