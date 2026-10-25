@@ -230,10 +230,10 @@ Stage 2 — Campaign
 
 ## Last Session
 - Date: 2026-10-25
-- Done: Stage 2 — Campaign, agent task-ები 20–27 და finish-check-ის 30–32 `[x]` (ბრენჩი `team/stage2-campaign`). finish-check: code-reviewer + security-auditor → 3 should-fix (შენახვის ჩავარდნისას ორივე ასლის დაკარგვა, `Continue` დამალვა, რეგიონის label-ის ჩამოჭრა) → გასწორდა fix round 1-ში, re-review: სამივე მოგვარებულია, ახალი critical/should-fix არ არის.
+- Done: Stage 2 — Campaign, agent task-ები 20–27 და finish-check-ის 30–32 `[x]` (ბრენჩი `team/stage2-campaign`). finish-check: code-reviewer + security-auditor → 3 should-fix (შენახვის ჩავარდნისას ორივე ასლის დაკარგვა, `Continue` დამალვა, რეგიონის label-ის ჩამოჭრა) → გასწორდა fix round 1-ში, re-review: სამივე მოგვარებულია, ახალი critical/should-fix არ არის. USER task 28 გავიდა (სცენები და `.meta`-ები დაკომიტდა `bc04739`-ში). მომხმარებლის შენიშვნებით: T33 — Editor-only `debugCampaignStartFen` (`startFen` ახლა მხოლოდ Mode None-ში), T34 — რუკის სათაური MapArea-ს ზემოთ, რეგიონის label Bold 22–28, ღილაკი 400×190; task 29-ის ინსტრუქცია თავიდან დაიწერა (მოგება/წაგება/ფრე debug FEN-ით).
 - Verification: `dotnet test Tests/ChessCore.Tests` 411/411; `dotnet build Tests/ChessCore.Tests`, `Tests/GameCompileCheck`, `Tests/EditorCompileCheck` — 0 warning / 0 error; legacy Input grep → 0; Campaign-ში UnityEngine/record/init → 0. STOCKFISH_PATH integration არ გაშვებულა.
-- Known issues / blockers: არცერთი agent-ის მხარეს. Unity-ის ქცევა (სცენების გენერაცია, UI, Play-mode, `File.Replace` Mono-ზე) შეუმოწმებელია — USER task-ები 28, 29.
-- Next: USER task 28 → (სცენები + Unity-ს შექმნილი `.meta`-ები დაკომიტდეს) → USER task 29. პრობლემის შემთხვევაში — `/auto continue` შეცდომის აღწერით.
+- Known issues / blockers: არცერთი agent-ის მხარეს. Play-mode (debug FEN, ახალი რუკის განლაგება, ბრძოლები, შენახვა, `File.Replace` Mono-ზე) შეუმოწმებელია — USER task 29. T33/T34 მომხმარებლის მოთხოვნით დამატებული მცირე ცვლილებებია და ცალკე reviewer-ით არ შემოწმებულა (diff ორკესტრატორმა გადახედა).
+- Next: USER task 29 (ნაბიჯი 1 — ხელახლა Tools → Setup Campaign Scenes) → სცენების commit. პრობლემის შემთხვევაში — `/auto continue` შეცდომის აღწერით.
 
 ## Stage 1 — Done
 - [x] 1. Test infrastructure, .gitignore, asmdef skeleton — owner: task-executor — files: .gitignore, Tests/ChessCore.Build/ChessCore.Build.csproj, Tests/ChessAI.Build/ChessAI.Build.csproj, Tests/ChessCore.Tests/ChessCore.Tests.csproj, Tests/ChessCore.Tests/BuildTargetTests.cs, Assets/Scripts/Core/Chess.Core.asmdef, Assets/Scripts/AI/Chess.AI.asmdef, Assets/Scripts/Game/Chess.Game.asmdef, Assets/StreamingAssets/Stockfish/README.md — depends: — — done when:
