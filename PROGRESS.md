@@ -194,6 +194,9 @@ Stage 2 — Campaign
 - nit (finish-check Stage 2, ორივე reviewer): `CampaignSaveStore.Load` — თუ ფაილი გაშვებისას სხვა პროცესს უჭირავს, წაკითხვაც და backup-ის გადატანაც ჩავარდება (ჩუმად), გაფრთხილება მაინც წერს „It was kept as campaign.corrupt.json“, ხოლო შემდეგი `New Campaign` (დადასტურების გარეშე, რადგან `Campaign == null`) ვალიდურ ფაილს გადააწერს. გამოსწორება: `TryBackUpCorruptFile` → bool; ჩავარდნისას სხვა გაფრთხილება / ჩაწერის დაბლოკვა. ძალიან იშვიათია.
 - nit (finish-check Stage 2): `CampaignMapController.Start` — `regionButtons == null`-ზე ბრუნდება `backButton`-ის მიბმამდე (მხოლოდ არასწორად აწყობილ სცენაზე).
 - nit (finish-check Stage 2, შესამოწმებელი): `InputSystemUIInputModule.AssignDefaultActions()` Editor-ში ქმნის არამუდმივ actions asset-ს — სცენის ფაილში reference შეიძლება null იყოს; runtime-ზე `OnEnable` აღადგენს. USER task 28-ის შემდეგ სცენის ფაილი გადასახედია.
+- nit (fix round 1 re-review): `Save_TargetLocked_ThrowsAndKeepsOldSave` ძველ კოდზეც გადიოდა; `Save`-ის ტოტი „tmp რჩება, როცა target აღარ არსებობს“ პირდაპირ ტესტით არ მოწმდება (იდეა: `campaign.json` სახელის საქაღალდე → `File.Move` ვარდება → tmp რჩება). 64 KB-ის ზუსტი ზღვარი (65536 / 65537) არ ტესტირდება.
+- nit (fix round 1 re-review): პირველი ჩაწერისას ნაწილობრივ ჩაწერილი tmp (მაგ. disk full) შემდეგ გაშვებაზე აღდგება და „damaged“ გაფრთხილებას აჩვენებს `NoSave`-ის ნაცვლად (უვნებელია; შესაძლო `tempWritten` flag).
+- nit (fix round 1 re-review): დამალული `Continue`-ს ადგილას მთავარ მენიუში 100px ცარიელი ადგილი რჩება (ფიქსირებული პოზიციები) — `VerticalLayoutGroup` `MainPanel`-ზე.
 
 ## Blockers
 - (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
@@ -209,10 +212,10 @@ Stage 2 — Campaign
 
 ## Last Session
 - Date: 2026-10-25
-- Done: Stage 1 — MVP დასრულებულია (task-ები 1–19, ქვემოთ `## Stage 1 — Done`). დაიგეგმა Stage 2 — Campaign: PROJECT.md (scope, Business Rules, Data/schema, API Contract: Chess.Campaign, `AIDifficulty.FromElo`, GameSession, uGUI კომპონენტები, Setup Campaign Scenes; Decision Log), PROGRESS.md (task-ები 20–29), CLAUDE.md (Commands/Conventions).
-- Verification: მხოლოდ დაგეგმვა — კოდი არ შეცვლილა, ბრძანებები არ გაშვებულა. Stage 1-ის ბოლო შედეგი: `dotnet test Tests/ChessCore.Tests` 284/284; GameCompileCheck/EditorCompileCheck 0/0.
-- Known issues / blockers: არცერთი. რისკები: `File.Replace` Unity Mono-ზე (fallback + USER task 29, ნაბიჯი 12); uGUI/EventSystem-ის აწყობა Editor სკრიპტით მოწმდება მხოლოდ USER task 28-ში.
-- Next: task 20 და 23 (პარალელურად) → 21 → 22 → 24 → 25 ∥ 26 → 27 → USER 28 → USER 29 → `/finish-check`.
+- Done: Stage 2 — Campaign, agent task-ები 20–27 და finish-check-ის 30–32 `[x]` (ბრენჩი `team/stage2-campaign`). finish-check: code-reviewer + security-auditor → 3 should-fix (შენახვის ჩავარდნისას ორივე ასლის დაკარგვა, `Continue` დამალვა, რეგიონის label-ის ჩამოჭრა) → გასწორდა fix round 1-ში, re-review: სამივე მოგვარებულია, ახალი critical/should-fix არ არის.
+- Verification: `dotnet test Tests/ChessCore.Tests` 411/411; `dotnet build Tests/ChessCore.Tests`, `Tests/GameCompileCheck`, `Tests/EditorCompileCheck` — 0 warning / 0 error; legacy Input grep → 0; Campaign-ში UnityEngine/record/init → 0. STOCKFISH_PATH integration არ გაშვებულა.
+- Known issues / blockers: არცერთი agent-ის მხარეს. Unity-ის ქცევა (სცენების გენერაცია, UI, Play-mode, `File.Replace` Mono-ზე) შეუმოწმებელია — USER task-ები 28, 29.
+- Next: USER task 28 → (სცენები + Unity-ს შექმნილი `.meta`-ები დაკომიტდეს) → USER task 29. პრობლემის შემთხვევაში — `/auto continue` შეცდომის აღწერით.
 
 ## Stage 1 — Done
 - [x] 1. Test infrastructure, .gitignore, asmdef skeleton — owner: task-executor — files: .gitignore, Tests/ChessCore.Build/ChessCore.Build.csproj, Tests/ChessAI.Build/ChessAI.Build.csproj, Tests/ChessCore.Tests/ChessCore.Tests.csproj, Tests/ChessCore.Tests/BuildTargetTests.cs, Assets/Scripts/Core/Chess.Core.asmdef, Assets/Scripts/AI/Chess.AI.asmdef, Assets/Scripts/Game/Chess.Game.asmdef, Assets/StreamingAssets/Stockfish/README.md — depends: — — done when:
