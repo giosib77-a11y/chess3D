@@ -92,11 +92,11 @@ Stage 2 — Campaign
 
 | # | Id | Name | Era | Elo | რუკაზე (anchor x, y) |
 |---|---|---|---|---|---|
-| 1 | `kartli` | Kartli | `5th century - King Vakhtang Gorgasali` | 800 | (0.50, 0.42) |
-| 2 | `kakheti` | Kakheti | `16th century - King Levan` | 1100 | (0.78, 0.38) |
-| 3 | `imereti` | Imereti | `17th century - King Alexander III` | 1400 | (0.24, 0.45) |
+| 1 | `kartli` | Kartli | `5th century - King Vakhtang Gorgasali` | 800 | (0.47, 0.42) |
+| 2 | `kakheti` | Kakheti | `16th century - King Levan` | 1100 | (0.80, 0.38) |
+| 3 | `imereti` | Imereti | `17th century - King Alexander III` | 1400 | (0.17, 0.45) |
 | 4 | `svaneti` | Svaneti | `12th century - King David the Builder` | 1800 | (0.30, 0.78) |
-| 5 | `khevsureti` | Khevsureti | `18th century - King Erekle II` | 2200 | (0.64, 0.74) |
+| 5 | `khevsureti` | Khevsureti | `18th century - King Erekle II` | 2200 | (0.66, 0.74) |
 
 **მდგომარეობის წესი (გამოითვლება, არ ინახება):**
 - `Liberated` — id არის განთავისუფლებულების სიაში;
@@ -106,7 +106,7 @@ Stage 2 — Campaign
 განთავისუფლება მუდმივია: შემდგომი წაგება ან ფრე მას არ აუქმებს.
 
 **ბრძოლის წესები:**
-- კამპანიაში ადამიანი ყოველთვის თეთრია, AI — შავი, სირთულე = `AIDifficulty.FromElo(region.Elo)`. საწყისი პოზიცია სტანდარტულია (`startFen`, თუ inspector-ში ცარიელი არ არის, ყველა რეჟიმში გამოიყენება — მხოლოდ ტესტისთვის; Setup Chess Scene მას ასუფთავებს).
+- კამპანიაში ადამიანი ყოველთვის თეთრია, AI — შავი, სირთულე = `AIDifficulty.FromElo(region.Elo)`. საწყისი პოზიცია სტანდარტულია. `startFen` მოქმედებს მხოლოდ `Mode == None`-ში (MainScene პირდაპირ). ტესტისთვის კამპანიაში — მხოლოდ Editor-ში `debugCampaignStartFen` (იხ. „Stage 2 — GameController-ის დამატებები“); Quick Game ყოველთვის სტანდარტული პოზიციიდან იწყება.
 - Locked რეგიონზე ბრძოლა შეუძლებელია (`InvalidOperationException`). Liberated რეგიონის თავიდან თამაში შეიძლება; შედეგი პროგრესს არ ცვლის.
 - შედეგი (`BattleRules.GetOutcome`): ადამიანის მხარის მოგება = `Victory`, მოწინააღმდეგის = `Defeat`, ნებისმიერი ფრე (პატი, 50 სვლა, გამეორება, მასალის ნაკლებობა) = `Draw`.
 - შედეგი **ითვლება** მხოლოდ მაშინ, თუ პარტიის დასრულების მომენტში AI მოწინააღმდეგე აქტიურია (`playAgainstAI && _ai != null`). hot-seat-ზე გადასვლის შემდეგ (Stockfish არ არის / გაფუჭდა / domain reload) შედეგი არ ითვლება.
@@ -605,7 +605,7 @@ public sealed class CampaignSaveStore
 | `SelectionController` | `ChessGame` | მონიშვნის ლოგიკა: საკუთარი ფიგურა → განათება; დასაშვები უჯრა → სვლა (გარდაქმნისას ჯერ PromotionPrompt); სხვა საკუთარი ფიგურა → ხელახალი მონიშვნა; სხვაგან → მონიშვნის მოხსნა | `boardView`, `picker` (SquarePicker), `promotionPrompt`. API: `Bind(GameState state)`, `bool Interactable { get; set; }`, `ClearSelection()`, `event Action<Move> MoveChosen` |
 | `CameraRig` | `Main Camera` | ერთი კამერა, ორი გამოთვლილი პოზა, გლუვი lerp; TAB ცვლის ხედს | `transitionSpeed` (5), `tacticalHeight` (9), `tacticalDistance` (8), `commanderEyeHeight` (1.4), `commanderBackOffset` (0.6), `commanderPitch` (15), `returnToCommanderAfterMove` (bool, true), `startInCommanderView` (bool, true). API: `enum CameraView { Commander, Tactical }`, `CameraView CurrentView`, `SetCommander(Square kingSquare, Side side)`, `SetView(CameraView view)`, `Toggle()`, `NotifyHumanMoveMade()` |
 | `StatusHud` | `ChessGame` | OnGUI ტექსტი ზედა-მარცხენა კუთხეში: სტატუსი, შეცდომა, დახმარების ხაზი | API: `Show(string status, string error)` |
-| `GameController` | `ChessGame` | კომპოზიცია და თამაშის ნაკადი: GameState, სვლები, AI-ის რიგი, input-ის დაბლოკვა, R = restart, შეცდომა → hot-seat, `OnDisable`/`OnDestroy`-ში AI-ის Dispose (domain reload-ზე OnDestroy არ იძახება; reload-ის შემდეგ — hot-seat) | `boardView`, `piecesView`, `selection`, `cameraRig`, `hud`, `humanSide` (Side, White), `playAgainstAI` (bool, true), `difficulty` (DifficultyPreset, Medium), `stockfishRelativePath` (string, `Stockfish/stockfish.exe`, StreamingAssets-ის მიმართ), `stockfishPathOverride` (string, ცარიელი = გამოიყენება relative), `startFen` (string, ცარიელი = საწყისი პოზიცია). Stage 2: + `battlePanel` (BattlePanel, null = პანელის გარეშე); ნაკადი — „Stage 2 — GameController-ის დამატებები“ |
+| `GameController` | `ChessGame` | კომპოზიცია და თამაშის ნაკადი: GameState, სვლები, AI-ის რიგი, input-ის დაბლოკვა, R = restart, შეცდომა → hot-seat, `OnDisable`/`OnDestroy`-ში AI-ის Dispose (domain reload-ზე OnDestroy არ იძახება; reload-ის შემდეგ — hot-seat) | `boardView`, `piecesView`, `selection`, `cameraRig`, `hud`, `humanSide` (Side, White), `playAgainstAI` (bool, true), `difficulty` (DifficultyPreset, Medium), `stockfishRelativePath` (string, `Stockfish/stockfish.exe`, StreamingAssets-ის მიმართ), `stockfishPathOverride` (string, ცარიელი = გამოიყენება relative), `startFen` (string, ცარიელი = საწყისი პოზიცია; Stage 2-დან მხოლოდ Mode None). Stage 2: + `battlePanel` (BattlePanel, null = პანელის გარეშე), + `debugCampaignStartFen` (string, ცარიელი; მხოლოდ Editor, მხოლოდ Campaign); ნაკადი — „Stage 2 — GameController-ის დამატებები“ |
 
 **ფიგურების ფორმები (დროებითი):**
 - pawn: დაბალი cylinder (~0.5 სიმაღლე);
@@ -704,10 +704,11 @@ public static class GameSession
   - ტექსტი `#FFFFFF`; `warningText` `#FFB347`; რეგიონის ღილაკები — ზემოთ.
 - ზომები:
   - მენიუს ღილაკი 400×80; ვერტიკალური სვეტი ცენტრში, დაშორება 20;
-  - რეგიონის ღილაკი 380×170; label 4-ხაზიანია (`CampaignText.RegionLabel`: სახელი, ეპოქა, Elo, მდგომარეობა), `resizeTextForBestFit` = true, min 14, max 24, `verticalOverflow` Truncate;
+  - რეგიონის ღილაკი 400×190; label 4-ხაზიანია (`CampaignText.RegionLabel`: სახელი, ეპოქა, Elo, მდგომარეობა), `fontStyle` Bold, `resizeTextForBestFit` = true, min 22, max 28, `verticalOverflow` Truncate, 8px inset;
+  - CampaignMap: `MapArea` 1500×660, center (0, -50) (y -380..280); `TitleText` ზედა კიდიდან 70 (center), სიმაღლე 90 და იქმნება `MapArea`-ს **შემდეგ** (ხატვის რიგით ზემოთაა); `StatusText` ქვედა კიდიდან 100, `BackButton` ქვედა-მარცხნივ — არცერთი არ ფარავს `MapArea`-ს;
   - BattleCanvas-ის ღილაკი (`LeaveButton`, `RetryButton`, `BackButton`) 260×70; `LeaveButton` ზედა-მარჯვნივ, დაშორება კიდიდან 24;
   - პანელები: Confirm 800×300, QuickGame 600×520, Result 700×360 — ცენტრში.
-- ტექსტის ზომა (font size): სათაური 64; პანელის სათაური 40; ღილაკი 32; რეგიონის label best fit 14–24; info/status/warning/message 28. ყველა ტექსტი LegacyRuntime.ttf, `alignment` MiddleCenter (`InfoText` UpperCenter), `horizontalOverflow` Wrap.
+- ტექსტის ზომა (font size): სათაური 64; პანელის სათაური 40; ღილაკი 32; რეგიონის label best fit 22–28 (Bold); info/status/warning/message 28. ყველა ტექსტი LegacyRuntime.ttf, `alignment` MiddleCenter (`InfoText` UpperCenter), `horizontalOverflow` Wrap.
 
 **MainMenuController-ის ნაკადი:** `Start` → `GameSession.EnsureLoaded()` → `continueButton` ჩანს (`gameObject.SetActive`) მხოლოდ თუ `Campaign != null`, სხვა შემთხვევაში დამალულია; ჩანს `mainPanel`, დამალულია `confirmPanel`, `quickGamePanel`; Quick Game-ის ნაგულისხმევი: White, Medium.
 - `New Campaign`: `Campaign != null` → `confirmPanel` (`mainPanel` იმალება); სხვა შემთხვევაში `StartNewCampaign()` → `GoToCampaignMap()`. `Start new` → იგივე. `Cancel` → `mainPanel`.
@@ -720,7 +721,7 @@ public static class GameSession
   - `Mode == Campaign`: `region = CampaignRegions.Get(GameSession.RegionId)`; `humanSide = White`; `playAgainstAI = true`; AI-ის სირთულე = `AIDifficulty.FromElo(region.Elo)`; `battlePanel.ShowInGame(CampaignText.BattleInfo(region), "Back to map")`.
   - `Mode == QuickGame`: `humanSide = GameSession.HumanSide`; `playAgainstAI = true`; სირთულე = `AIDifficulty.FromPreset(GameSession.QuickDifficulty)`; `ShowInGame("Quick Game - ...", "Back to menu")`.
   - `Mode == None`: inspector-ის მნიშვნელობები (Stage 1); `battlePanel?.HideAll()`.
-  - `startFen` (თუ ცარიელი არ არის) ყველა რეჟიმში გამოიყენება.
+  - `startFen` (თუ ცარიელი არ არის) მოქმედებს მხოლოდ `Mode == None`-ში. Campaign: Editor-ში (`#if UNITY_EDITOR`) `debugCampaignStartFen` — თუ ცარიელი არ არის, ბრძოლა ამ FEN-ით იწყება (ყოველ restart/Retry-ზეც), `Debug.LogWarning("[GameController] DEBUG FEN active: <fen>")`, HUD-ის სტატუსს ბოლოში ემატება `  [DEBUG FEN]` (მხოლოდ `UpdateHud`-ში, არა შედეგის ტექსტში); არასწორი FEN → `Debug.LogError` + საწყისი პოზიცია (როგორც startFen). შედეგი ჩვეულებრივ ითვლება. build-ში ეს ლოგიკა არ არსებობს (ველი სერიალიზდება, რომ serialization layout Editor-სა და build-ში ერთი იყოს). QuickGame: ყოველთვის საწყისი პოზიცია.
 - `CreateAi` იყენებს launch სირთულეს, თუ ის არსებობს, სხვა შემთხვევაში `AIDifficulty.FromPreset(difficulty)`, და წერს `Debug.Log("[GameController] AI difficulty: skill {SkillLevel}, depth {Depth|-}, movetime {MoveTimeMs} ms, UCI_Elo {Elo|off}")`.
 - ყოველი წარმატებული `TryMakeMove`-ის შემდეგ (ადამიანის და AI-ის): თუ `_state.IsGameOver` და შედეგი ამ პარტიაში ჯერ არ დამუშავებულა → `HandleGameOver()` (flag ნულდება `ResetGame`-ში, სადაც ასევე `battlePanel?.HideResult()`).
 - `HandleGameOver`: `Mode == None` → არაფერი. `counted = playAgainstAI && _ai != null`; `outcome = BattleRules.GetOutcome(_state.Result, humanSide)`.
@@ -734,7 +735,7 @@ public static class GameSession
 2. ყოველი სცენა: თუ ფაილი არ არსებობს → `EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single)` + `SaveScene(scene, path)`; სხვა შემთხვევაში `OpenScene(path, Single)`. `.meta`-ს Unity ქმნის.
 3. MainMenu და CampaignMap: `Main Camera` (Camera, Clear Flags = Solid Color `#1C1C22`, tag MainCamera, AudioListener) — თუ არ არის; `EventSystem` (EventSystem + `InputSystemUIInputModule` + `AssignDefaultActions()`; `StandaloneInputModule` იშლება, თუ არის) — ერთი.
 4. გენერირებული UI root (`MainMenuCanvas`, `CampaignMapCanvas`, `BattleCanvas`) ყოველ გაშვებაზე **იშლება და თავიდან იქმნება** (ხელით ცვლილებები ამ ობიექტებში იკარგება). Canvas: Screen Space - Overlay, `CanvasScaler` Scale With Screen Size 1920×1080, match 0.5, `GraphicRaycaster`. ტექსტი: `UnityEngine.UI.Text`, font `Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")`, ცენტრში, თეთრი. ობიექტების სახელები = Inspector ველის სახელები PascalCase-ით (მაგ. `NewCampaignButton`, `ConfirmPanel`, `Region_kartli`). `ConfirmPanel`, `QuickGamePanel`, `ResultPanel` იქმნება inactive.
-5. CampaignMap: `MapArea` (Image `#2F3A2A`) და მასში 5 `Region_<id>` ღილაკი (380×170, label best fit — იხ. „UI სტილი“) anchor-ებით Business Rules-ის ცხრილიდან (`CampaignRegions.All`-ის რიგით), თითოზე `RegionButton` (`regionId`, `button`, `label`, `background`); `regionButtons` მასივი იმავე რიგით.
+5. CampaignMap: `MapArea` (Image `#2F3A2A`) და მასში 5 `Region_<id>` ღილაკი (400×190, label Bold best fit 22–28 — იხ. „UI სტილი“) anchor-ებით Business Rules-ის ცხრილიდან (`CampaignRegions.All`-ის რიგით), თითოზე `RegionButton` (`regionId`, `button`, `label`, `background`); `regionButtons` მასივი იმავე რიგით.
 6. MainScene: root `ChessGame` + `GameController` უნდა არსებობდეს; თუ არა → `Debug.LogError("[CampaignScenesSetup] ChessGame not found in MainScene. Run Tools > Setup Chess Scene first.")`, MainScene-ის ნაწილი გამოტოვდება (დანარჩენი გრძელდება, შედეგი „WITH ERRORS“). სხვა შემთხვევაში: `EventSystem` (როგორც 3) + `BattleCanvas` (sortingOrder 10; `InfoText` ზედა ცენტრში, `LeaveButton` ზედა-მარჯვნივ, `ResultPanel` ცენტრში: `TitleText`, `MessageText`, `RetryButton`, `BackButton`) + `GameController.battlePanel` მიბმა `SerializedObject`-ით. GameController-ის სხვა ველებს არ ეხება.
 7. ყოველი ველი `SerializedObject.FindProperty`-ით; ვერ ნაპოვნი → `Debug.LogError` სახელით (როგორც `ChessSceneSetup`).
 8. `EditorBuildSettings.scenes` = ზუსტად `[MainMenu, CampaignMap, MainScene]`, სამივე enabled.
@@ -972,7 +973,7 @@ public static class GameSession
 - Trade-off: გენერირებულ Canvas-ებში ხელით ცვლილება ხელახალ გაშვებაზე იკარგება (Stage 3-ის art-მდე მისაღებია).
 - Note: ბრძანება მოითხოვს, რომ MainScene უკვე აწყობილი იყოს (Tools → Setup Chess Scene); `ChessSceneSetup` `battlePanel`-ს არ ეხება.
 
-### 2026-10-25 — MainScene: Stage 1-ის ქცევა რჩება; startFen ყველა რეჟიმში
+### 2026-10-25 — MainScene: Stage 1-ის ქცევა რჩება; startFen ყველა რეჟიმში (ჩანაცვლდა — იხ. „USER task 28-ის შენიშვნები“)
 - Decision: `GameSession.Mode == None` → არაფერი იცვლება (პანელი დამალულია). `startFen` (თუ ცარიელი არ არის) კამპანიასა და Quick Game-შიც გამოიყენება.
 - Reason: მომხმარებლის მოთხოვნა (standalone). startFen USER-ს აძლევს საშუალებას, კამპანიის გამარჯვება/ფრე წამებში შეამოწმოს (მატი 1 სვლით); Setup Chess Scene მას ცარიელზე აბრუნებს.
 - Risk: თუ startFen სცენაში დარჩა, კამპანია ამ პოზიციიდან დაიწყება — USER task-ები ბოლოს მის გასუფთავებას ითხოვს.
@@ -999,6 +1000,14 @@ public static class GameSession
 - Decision: (1) ჩაწერის ჩავარდნისას tmp იშლება მხოლოდ თუ `campaign.json` არსებობს; `Load` აღადგენს დარჩენილ tmp-ს; fallback მხოლოდ `PlatformNotSupportedException`-ზე; > 64 KB ფაილი = დაზიანებული. (2) `Continue` იმალება (`SetActive`), არ ითიშება. (3) რეგიონის ღილაკი 380×170, label best fit 14–24.
 - Reason: (1) წინა კოდში I/O ჩავარდნამ შეიძლება ძველი და ახალი შენახვა ერთად წაშალოს; (2) მომხმარებლის მოთხოვნა „ჩანს მხოლოდ შენახვისას“; (3) 4-ხაზიანი label 280×130-ში მდგომარეობის ხაზს კვეთდა.
 - How to change: `CampaignSaveStore`, `MainMenuController`, `CampaignScenesSetup`.
+
+### 2026-10-25 — USER task 28-ის შენიშვნები: debug FEN, რუკის სათაური, რეგიონის ტექსტი
+- Decision:
+  - `startFen` მოქმედებს მხოლოდ `Mode == None`-ში; კამპანიის ტესტისთვის ახალი ველი `debugCampaignStartFen` (მხოლოდ Editor-ში და მხოლოდ Campaign რეჟიმში; HUD-ზე `[DEBUG FEN]`); Quick Game — ყოველთვის საწყისი პოზიცია. ძველი გადაწყვეტილება „startFen ყველა რეჟიმში“ ჩანაცვლდა.
+  - ველი თავად `#if UNITY_EDITOR`-ში **არ** არის, მხოლოდ მისი გამოყენება: MonoBehaviour-ის სერიალიზებული ველის `#if`-ში მოქცევა Editor-სა და build-ს შორის serialization layout-ის შეუსაბამობას იწვევს. build-ში ველის მნიშვნელობა რჩება, მაგრამ არაფერზე მოქმედებს.
+  - CampaignMap: `MapArea` 1500×660 (0, -50); `TitleText` იქმნება მის შემდეგ (ზემოთ ხატავს). რეგიონის ღილაკი 400×190, label Bold best fit 22–28; anchor-ები: imereti 0.17, kartli 0.47, kakheti 0.80, khevsureti 0.66 (x), y უცვლელია.
+- Reason: მომხმარებლის მოთხოვნა USER task 28-ის შემდეგ (კამპანიის მოგება 800 Elo-ზე ხელით ვერ მოწმდება; სათაური რუკის უკან იმალებოდა; ტექსტი ძალიან პატარა იყო). startFen-ის ყველა რეჟიმზე გავრცელება build-ში დატოვების რისკს ქმნიდა.
+- How to change: `GameController` (debug ველი), `CampaignScenesSetup` (განლაგება) → ხელახლა Tools → Setup Campaign Scenes.
 
 ## Open Questions
 - ვარაუდი: პლატფორმა მხოლოდ Windows PC (x86-64). Stockfish-ის binary მხოლოდ Windows-ისთვის.
