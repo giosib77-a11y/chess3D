@@ -4,7 +4,9 @@
     "references": [
         "Chess.Core",
         "Chess.AI",
-        "Unity.InputSystem"
+        "Chess.Campaign",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

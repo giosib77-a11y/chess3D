@@ -25,11 +25,13 @@
     <Reference Include="$(UnityEditorDataDir)\Managed\UnityEngine\UnityEngine.dll" Private="false" />
     <Reference Include="$(UnityEditorDataDir)\Managed\UnityEngine\UnityEngine.*Module.dll" Private="false" />
     <Reference Include="../../Library/ScriptAssemblies/Unity.InputSystem.dll" Private="false" />
+    <Reference Include="../../Library/ScriptAssemblies/UnityEngine.UI.dll" Private="false" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../ChessCore.Build/ChessCore.Build.csproj" />
     <ProjectReference Include="../ChessAI.Build/ChessAI.Build.csproj" />
+    <ProjectReference Include="../ChessCampaign.Build/ChessCampaign.Build.csproj" />
   </ItemGroup>
 
 </Project>
