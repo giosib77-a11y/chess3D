@@ -4,7 +4,10 @@
     "references": [
         "Chess.Core",
         "Chess.AI",
-        "Chess.Game"
+        "Chess.Campaign",
+        "Chess.Game",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [
         "Editor"
