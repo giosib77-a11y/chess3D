@@ -48,7 +48,7 @@ Stage 1 — MVP
     - `IsInCheck` და `IsSquareAttacked` მარტივ პოზიციებზე.
   - მთელი ტესტ-run 30 წამამდეა. დრო report-შია.
 
-- [ ] 5. Core: GameState, თამაშის დასრულების წესები, UCI სვლის resolve — owner: task-executor — files: Assets/Scripts/Core/GameState.cs, Assets/Scripts/Core/GameStatus.cs, Assets/Scripts/Core/DrawRules.cs, Tests/ChessCore.Tests/Core/GameStateTests.cs, Tests/ChessCore.Tests/Core/DrawRulesTests.cs — depends: 4 — done when:
+- [x] 5. Core: GameState, თამაშის დასრულების წესები, UCI სვლის resolve — owner: task-executor — files: Assets/Scripts/Core/GameState.cs, Assets/Scripts/Core/GameStatus.cs, Assets/Scripts/Core/DrawRules.cs, Tests/ChessCore.Tests/Core/GameStateTests.cs, Tests/ChessCore.Tests/Core/DrawRulesTests.cs — depends: 4 — done when:
   - `dotnet test Tests/ChessCore.Tests` გადის. API და სტატუსის რიგი ზუსტად PROJECT.md-ის Business Rules-ის და API Contract-ის მიხედვით.
   - `GameStateTests`:
     - fool's mate (`f2f3 e7e5 g2g4 d8h4`) → Checkmate, BlackWins, IsCheck;
