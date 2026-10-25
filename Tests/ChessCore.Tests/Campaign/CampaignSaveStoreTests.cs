@@ -182,6 +182,64 @@ namespace Chess.Tests.Campaign
                 Assert.Equal(0, r.Progress.LiberatedCount);
                 Assert.Equal(CampaignText.CorruptedSaveWarning, r.Warning);
             }
+
+            Assert.Equal("{\"version\":1,\"liberated\":[\"kartli\",\"kakheti\"]}", File.ReadAllText(store.FilePath));
+        }
+
+        [Fact]
+        public void Save_TargetLocked_ThrowsAndKeepsOldSave()
+        {
+            CampaignSaveStore store = NewStore();
+            store.Save(Two());
+            using (new FileStream(store.FilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+                Assert.ThrowsAny<IOException>(() => store.Save(CampaignProgress.CreateNew()));
+            }
+
+            Assert.True(File.Exists(store.FilePath));
+            Assert.False(File.Exists(Path.Combine(_dir, CampaignSaveStore.TempFileName)));
+            CampaignLoadResult r = store.Load();
+            Assert.Equal(CampaignLoadStatus.Loaded, r.Status);
+            Assert.Equal(new[] { "kartli", "kakheti" }, r.Progress.LiberatedRegionIds.ToArray());
+        }
+
+        [Fact]
+        public void Load_OnlyTempFileExists_RecoversIt()
+        {
+            CampaignSaveStore store = NewStore();
+            string temp = Path.Combine(_dir, CampaignSaveStore.TempFileName);
+            File.WriteAllText(temp, "{\"version\":1,\"liberated\":[\"kartli\"]}");
+            CampaignLoadResult r = store.Load();
+            Assert.Equal(CampaignLoadStatus.Loaded, r.Status);
+            Assert.Equal(new[] { "kartli" }, r.Progress.LiberatedRegionIds.ToArray());
+            Assert.True(File.Exists(store.FilePath));
+            Assert.False(File.Exists(temp));
+        }
+
+        [Fact]
+        public void Load_OnlyCorruptTempFile_IsCorrupted()
+        {
+            CampaignSaveStore store = NewStore();
+            string temp = Path.Combine(_dir, CampaignSaveStore.TempFileName);
+            File.WriteAllText(temp, "garbage");
+            CampaignLoadResult r = store.Load();
+            Assert.Equal(CampaignLoadStatus.Corrupted, r.Status);
+            Assert.Equal(CampaignText.CorruptedSaveWarning, r.Warning);
+            Assert.False(File.Exists(temp));
+            Assert.Equal("garbage", File.ReadAllText(store.BackupPath));
+        }
+
+        [Fact]
+        public void Load_FileOver64KB_IsCorrupted()
+        {
+            CampaignSaveStore store = NewStore();
+            string big = "{\"version\":1,\"liberated\":[]}" + new string(' ', 64 * 1024);
+            File.WriteAllText(store.FilePath, big);
+            CampaignLoadResult r = store.Load();
+            Assert.Equal(CampaignLoadStatus.Corrupted, r.Status);
+            Assert.Equal(CampaignText.CorruptedSaveWarning, r.Warning);
+            Assert.False(File.Exists(store.FilePath));
+            Assert.True(File.Exists(store.BackupPath));
         }
 
         [Fact]

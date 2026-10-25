@@ -26,6 +26,8 @@ namespace Chess.Campaign
         public const string TempFileName = "campaign.json.tmp";
         public const string BackupFileName = "campaign.corrupt.json";
 
+        private const long MaxFileBytes = 64 * 1024;
+
         private static readonly UTF8Encoding StrictUtf8 = new UTF8Encoding(false, true);
 
         public CampaignSaveStore(string directory)
@@ -63,13 +65,30 @@ namespace Chess.Campaign
         {
             try
             {
+                if (!File.Exists(FilePath) && File.Exists(TempPath))
+                {
+                    // A previous write was interrupted after the old file was removed: recover it.
+                    try
+                    {
+                        File.Move(TempPath, FilePath);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+
                 if (!File.Exists(FilePath))
                 {
                     return new CampaignLoadResult(CampaignLoadStatus.NoSave, CampaignProgress.CreateNew(), null);
                 }
 
+                if (new FileInfo(FilePath).Length > MaxFileBytes)
+                {
+                    throw new InvalidDataException("Save file is too large.");
+                }
+
                 string text = StrictUtf8.GetString(File.ReadAllBytes(FilePath));
-                if (text.Length > 0 && text[0] == '﻿')
+                if (text.Length > 0 && text[0] == '\uFEFF')
                 {
                     text = text.Substring(1);
                 }
@@ -106,9 +125,9 @@ namespace Chess.Campaign
                     {
                         File.Replace(temp, FilePath, null);
                     }
-                    catch (Exception ex) when (ex is PlatformNotSupportedException || ex is IOException)
+                    catch (PlatformNotSupportedException)
                     {
-                        // Fallback for runtimes where File.Replace is unavailable.
+                        // Fallback only for runtimes where File.Replace is unavailable.
                         File.Delete(FilePath);
                         File.Move(temp, FilePath);
                     }
@@ -120,7 +139,12 @@ namespace Chess.Campaign
             }
             catch
             {
-                TryDelete(temp);
+                // Keep the tmp file when the target is gone: it may be the only copy left.
+                if (File.Exists(FilePath))
+                {
+                    TryDelete(temp);
+                }
+
                 throw;
             }
         }
