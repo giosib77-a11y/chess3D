@@ -118,7 +118,7 @@ Stage 1 — MVP
   - `dotnet test Tests/ChessCore.Tests` კვლავ გადის.
   - საბოლოო შემოწმება: USER task 10.
 
-- [ ] 10. USER: სცენის აწყობა (ერთი ბრძანებით) + ველი და ფიგურები — owner: USER — files: Assets/Scenes/MainScene.unity, Assets/Materials/** (ქმნის Tools → Setup Chess Scene) — depends: 9, 19 — done when: Play-ში ჩანს ველი, ბადე და 32 ფიგურა სწორ ადგილებზე; Console = 0 შეცდომა
+- [x] 10. USER: სცენის აწყობა (ერთი ბრძანებით) + ველი და ფიგურები — owner: USER — files: Assets/Scenes/MainScene.unity, Assets/Materials/** (ქმნის Tools → Setup Chess Scene) — depends: 9, 19 — done when: Play-ში ჩანს ველი, ბადე და 32 ფიგურა სწორ ადგილებზე; Console = 0 შეცდომა
     1. გადადი Unity-ის ფანჯარაზე და დაელოდე, სანამ სკრიპტები დაკომპილირდება (ქვედა მარჯვენა კუთხის პროგრესის ზოლი ქრება). Console → **Clear** → 0 წითელი შეცდომა.
     2. ზედა მენიუ: **Tools → Setup Chess Scene**. თუ სხვა სცენაში შენახული ცვლილებები გაქვს, Unity შეგეკითხება შენახვას — დააჭირე **Save**. ბრძანება თავად გახსნის `MainScene`-ს და გააკეთებს task 10, 12, 14, 16-ის მთელ აწყობას (მასალები, Main Camera + CameraRig, `ChessGame` ყველა კომპონენტით და კავშირით, GameController-ის პარამეტრები) და შეინახავს სცენას.
     3. Console-ში გამოჩნდება ჩანაწერი `[ChessSceneSetup] ...` სიით, რა შეიქმნა და რა განახლდა. ბრძანება შეგიძლია მეორედაც გაუშვა — დუბლიკატებს არ ქმნის, მხოლოდ აახლებს.
@@ -137,7 +137,7 @@ Stage 1 — MVP
   - Grep legacy Input → 0 შედეგი. `dotnet test` გადის.
   - საბოლოო შემოწმება: USER task 12.
 
-- [ ] 12. USER: სვლების შემოწმება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 10, 11 — done when: ყველა ქვემოთ ჩამოთვლილი შემოწმება გადის; Console = 0 შეცდომა
+- [x] 12. USER: სვლების შემოწმება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 10, 11 — done when: ყველა ქვემოთ ჩამოთვლილი შემოწმება გადის; Console = 0 შეცდომა
     1. აწყობა უკვე გაკეთებულია (task 10 → **Tools → Setup Chess Scene**). Console **Clear** → 0 შეცდომა.
     2. ამ task-ში ორივე მხარეს შენ თამაშობ: Hierarchy → `ChessGame` → **GameController** → მოხსენი მონიშვნა **Play Against AI**-ს (Play-ს გარეშე). task-ის ბოლოს (ნაბიჯი 8) დააბრუნე ✓.
     3. Play → დააჭირე თეთრ პაიკს e2-ზე: e2 გაყვითლდება, e3 და e4 გამწვანდება. დააჭირე e4-ს: პაიკი გადავა. ახლა შავის სვლაა (ორივე მხარეს შენ თამაშობ): დააჭირე e7-ს, შემდეგ e5-ს.
@@ -153,7 +153,7 @@ Stage 1 — MVP
   - Grep legacy Input → 0 შედეგი. `dotnet test` გადის.
   - საბოლოო შემოწმება: USER task 14.
 
-- [ ] 14. USER: კამერის შემოწმება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 12, 13 — done when: ქვემოთ ჩამოთვლილი შემოწმებები გადის; Console = 0 შეცდომა
+- [x] 14. USER: კამერის შემოწმება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 12, 13 — done when: ქვემოთ ჩამოთვლილი შემოწმებები გადის; Console = 0 შეცდომა
     1. აწყობა უკვე გაკეთებულია (**Tools → Setup Chess Scene**: CameraRig Main Camera-ზე, GameController → Camera Rig მიბმულია, Human Side = White). Console **Clear** → 0 შეცდომა.
     2. Hierarchy → **Main Camera** → Inspector-ში დარწმუნდი, რომ **Camera Rig** კომპონენტი ჩანს (ნაგულისხმევი მნიშვნელობებით).
     3. Play: კამერა თეთრი მეფის (e1) უკან და ზემოთ დგას და შავისკენ იყურება (სარდლის ხედი).
@@ -172,7 +172,7 @@ Stage 1 — MVP
   - Grep legacy Input → 0 შედეგი. `dotnet test` გადის.
   - საბოლოო შემოწმება: USER task 16.
 
-- [ ] 16. USER: საბოლოო აწყობა და MVP-ის მიღება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 8, 14, 15, 17 — done when: ყველა შემოწმება გადის; Console = 0 შეცდომა; Play-ის შემდეგ stockfish.exe პროცესი აღარ არსებობს
+- [x] 16. USER: საბოლოო აწყობა და MVP-ის მიღება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 8, 14, 15, 17 — done when: ყველა შემოწმება გადის; Console = 0 შეცდომა; Play-ის შემდეგ stockfish.exe პროცესი აღარ არსებობს
     1. აწყობა უკვე გაკეთებულია (**Tools → Setup Chess Scene**: StatusHud + Hud კავშირი). Console **Clear** → 0 შეცდომა.
     2. შეამოწმე GameController (ბრძანება ამას აყენებს; თუ ხელით შეცვალე, ხელახლა გაუშვი **Tools → Setup Chess Scene**): **Play Against AI** ✓, **Difficulty** = `Easy`, **Human Side** = `White`, **Stockfish Relative Path** = `Stockfish/stockfish.exe`, **Stockfish Path Override** ცარიელი.
     3. Play: ზედა-მარცხენა კუთხეში წერია `White to move`. გააკეთე სვლა: სტატუსი იცვლება (`AI thinking...` შეიძლება ძალიან სწრაფად გაქრეს), შავი პასუხობს 1–2 წამში.
@@ -245,7 +245,6 @@ Stage 1 — MVP
 - nit (finish-check): `StockfishAI` timeout-ები ყოველ ხაზზეა და არა მთელ ლოდინზე (engine, რომელიც მუდმივად `info`-ს ბეჭდავს, timeout-ს ვერ მიიღებს; preset-ებს არ ეხება) — deadline ერთხელ.
 - nit (finish-check): `StockfishAI` — `GetBestMoveAsync`-ის ct shared init-ის დროს არ მოწმდება (გაუქმება init-ის დასრულებამდე ჩერდება); Game-ს არ ეხება.
 - nit (finish-check): `StockfishAITests.GetBestMove_Cancel_DiscardsStaleBestmove...` იყენებს SearchTimeout 500 ms-ს — დატვირთვისას შეიძლება flaky იყოს; 30 s.
-- შესამოწმებელი (finish-check): Unity-ის Mono პატივს სცემს თუ არა `StandardInputEncoding = new UTF8Encoding(false)`-ს (BOM-ის შემთხვევაში handshake timeout) — USER task 16 აჩვენებს.
 - nit (fix round 1 re-review): `GameController.StopAi` არ იძახებს `UpdateHud()`/`UpdateInteractable()`-ს — inspector-ში კომპონენტის disable/enable AI-ის ფიქრისას ტოვებს „AI thinking...“-ს და დაბლოკილ input-ს R-მდე (მხოლოდ Editor-ის debug სცენარი).
 - nit (fix round 1 re-review): domain reload-ის შემდეგ AI ჩუმად ქრება (hot-seat) — HUD-ზე შენიშვნა არ ჩანს (მაგ. `Scripts reloaded. Human vs human mode.`).
 - nit: README.md არ არსებობს — გაშვების ინსტრუქცია ახლა CLAUDE.md-ის Commands-სა და PROGRESS.md-ის USER task-ებშია.
@@ -253,9 +252,9 @@ Stage 1 — MVP
 
 ## Blockers
 - (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
-- USER task-ები 10, 12, 14, 16 მომხმარებლის შესასრულებელია (2 და 8 დადასტურდა). აგენტის ყველა task (1, 3–7, 9, 11, 13, 15, 17, 18, 19) დასრულებულია. Stage Done გახდება USER task 16-ის წარმატებით გავლის შემდეგ.
+- (მოგვარდა) USER task-ები 10, 12, 14, 16 მომხმარებელმა დაადასტურა 2026-10-25.
 - (მოგვარდა `de73a20`-ში) Game სკრიპტების `.meta` ფაილები.
-- **Tools → Setup Chess Scene**-ის შემდეგ დაა-commit-ე `Assets/Scenes/MainScene.unity`, `Assets/Materials/**` (+ `.meta`).
+- (მოგვარდა `a16b924`-ში) `Assets/Scenes/MainScene.unity` და `Assets/Materials/**` დაკომიტებულია.
 
 ## Run State
 - Stage: Stage 1 — MVP
@@ -265,7 +264,8 @@ Stage 1 — MVP
 
 ## Last Session
 - Date: 2026-10-25
-- Done: USER task 2 და 8 მომხმარებელმა დაადასტურა (Console 0 შეცდომა; Stockfish integration ტესტი Passed, skipped 0). task 19 — Editor-ის ბრძანება Tools → Setup Chess Scene; USER task-ები 10/12/14/16 გამარტივდა (აწყობა = ერთი ბრძანება, Play-შემოწმებები უცვლელი; task 12-ს დაემატა Play Against AI-ის დროებით მოხსნა).
-- Verification: `dotnet test Tests/ChessCore.Tests` 284/284; `dotnet build Tests/GameCompileCheck` და `Tests/EditorCompileCheck` 0 warn/0 err; Unity-მ დააკომპილირა Chess.Core/AI/Game/Editor 0 `error CS`-ით (Editor.log, 15:18).
-- Known issues / blockers: Setup ბრძანების გაშვება და Play-mode შეუმოწმებელია (USER task 10).
-- Next: USER task 10 → 12 → 14 → 16.
+- Status: **Stage 1 — MVP: Done.** ყველა task (1–19) `[x]`, 0 ღია critical/should-fix.
+- Done: USER task-ები 10, 12, 14, 16 მომხმარებელმა დაადასტურა: სცენა (Tools → Setup Chess Scene), სვლები (როქი, გარდაქმნა/Cancel, en passant), კამერა (TAB, Black side), AI Easy და Master, input-ის დაბლოკვა, R AI-ის ფიქრისას, მატი, პატი, insufficient material, Stockfish not found fallback, Play-ის შემდეგ `stockfish.exe` არ რჩება; Console = 0 შეცდომა. ამით დადასტურდა Backlog-ის შესამოწმებელი პუნქტიც (Unity Mono + `StandardInputEncoding` UTF-8 BOM-ის გარეშე — handshake მუშაობს), ის Backlog-იდან ამოღებულია.
+- Verification: `dotnet test Tests/ChessCore.Tests` 284/284 (skipped 0); `dotnet build Tests/GameCompileCheck` და `Tests/EditorCompileCheck` 0 warn/0 err; legacy Input grep → 0.
+- Known issues / blockers: არცერთი. nit-ები Backlog-შია.
+- Next: Stage 2-ის არჩევა მომხმარებლის გადაწყვეტილებაა (Backlog → ფაზა 2 / ფაზა 3 / გადადებული).
