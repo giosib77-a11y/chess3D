@@ -30,6 +30,11 @@ namespace Chess.Game
 
         [SerializeField] private BattlePanel battlePanel;
 
+        // Serialized in every build (layout must match); only read inside #if UNITY_EDITOR.
+#pragma warning disable CS0414 // assigned but never used in the non-Editor variant
+        [SerializeField] private string debugCampaignStartFen = "";
+#pragma warning restore CS0414
+
         private LaunchMode _mode = LaunchMode.None; // captured from GameSession in Start
         private Region _region; // Campaign only
         private AIDifficulty _launchDifficulty; // null = use the inspector 'difficulty'
@@ -102,6 +107,10 @@ namespace Chess.Game
         {
             ApplyLaunchParameters();
             CreateAi();
+#if UNITY_EDITOR
+            if (DebugFenActive)
+                Debug.LogWarning("[GameController] DEBUG FEN active: " + debugCampaignStartFen);
+#endif
             ResetGame();
         }
 
@@ -300,19 +309,39 @@ namespace Chess.Game
 
         private GameState CreateState()
         {
-            if (!string.IsNullOrWhiteSpace(startFen))
+            // None: startFen (Stage 1). Campaign: Editor-only debug FEN. QuickGame: always the start position.
+            string fen = "";
+            string fenName = "startFen";
+            if (_mode == LaunchMode.None)
+            {
+                fen = startFen;
+            }
+#if UNITY_EDITOR
+            else if (DebugFenActive)
+            {
+                fen = debugCampaignStartFen;
+                fenName = "debugCampaignStartFen";
+            }
+#endif
+
+            if (!string.IsNullOrWhiteSpace(fen))
             {
                 try
                 {
-                    return new GameState(startFen);
+                    return new GameState(fen);
                 }
                 catch (FormatException ex)
                 {
-                    Debug.LogError("Invalid startFen, using the start position: " + ex.Message);
+                    Debug.LogError("Invalid " + fenName + ", using the start position: " + ex.Message);
                 }
             }
             return new GameState();
         }
+
+#if UNITY_EDITOR
+        private bool DebugFenActive =>
+            _mode == LaunchMode.Campaign && !string.IsNullOrWhiteSpace(debugCampaignStartFen);
+#endif
 
         private void CreateAi()
         {
@@ -455,8 +484,14 @@ namespace Chess.Game
 
         private void UpdateHud()
         {
-            if (hud != null && _state != null)
-                hud.Show(BuildStatus(), _error);
+            if (hud == null || _state == null)
+                return;
+            string status = BuildStatus();
+#if UNITY_EDITOR
+            if (DebugFenActive)
+                status += "  [DEBUG FEN]";
+#endif
+            hud.Show(status, _error);
         }
 
         private string BuildStatus()
