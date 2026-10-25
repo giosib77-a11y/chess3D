@@ -248,10 +248,15 @@ Stage 1 — MVP
 - nit (finish-check): `StockfishAI` — `GetBestMoveAsync`-ის ct shared init-ის დროს არ მოწმდება (გაუქმება init-ის დასრულებამდე ჩერდება); Game-ს არ ეხება.
 - nit (finish-check): `StockfishAITests.GetBestMove_Cancel_DiscardsStaleBestmove...` იყენებს SearchTimeout 500 ms-ს — დატვირთვისას შეიძლება flaky იყოს; 30 s.
 - შესამოწმებელი (finish-check): Unity-ის Mono პატივს სცემს თუ არა `StandardInputEncoding = new UTF8Encoding(false)`-ს (BOM-ის შემთხვევაში handshake timeout) — USER task 16 აჩვენებს.
+- nit (fix round 1 re-review): `GameController.StopAi` არ იძახებს `UpdateHud()`/`UpdateInteractable()`-ს — inspector-ში კომპონენტის disable/enable AI-ის ფიქრისას ტოვებს „AI thinking...“-ს და დაბლოკილ input-ს R-მდე (მხოლოდ Editor-ის debug სცენარი).
+- nit (fix round 1 re-review): domain reload-ის შემდეგ AI ჩუმად ქრება (hot-seat) — HUD-ზე შენიშვნა არ ჩანს (მაგ. `Scripts reloaded. Human vs human mode.`).
+- nit: README.md არ არსებობს — გაშვების ინსტრუქცია ახლა CLAUDE.md-ის Commands-სა და PROGRESS.md-ის USER task-ებშია.
 - nit: `EnsureNonEmptyCompile` target-ის მოშორება `Tests/ChessCore.Build` და `Tests/ChessAI.Build` csproj-ებიდან, როცა Core-სა და AI-ში რეალური `.cs` ფაილებია (ცარიელი Compile set-ის დროს SDK `TargetFrameworkAttribute`-ს არ აგენერირებს).
 
 ## Blockers
 - (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
+- USER task-ები 2, 8, 10, 12, 14, 16 მომხმარებლის შესასრულებელია (Unity Editor, Stockfish-ის ჩამოტვირთვა). აგენტის ყველა task (1, 3–7, 9, 11, 13, 15, 17, 18) დასრულებულია. Stage Done გახდება USER task 16-ის წარმატებით გავლის შემდეგ.
+- Unity-მ ჯერ არ შექმნა `.meta` ფაილები `Assets/Scripts/Game/{CameraRig,PromotionPrompt,SelectionController,SquarePicker,StatusHud}.cs`-ისთვის (Unity-ის ფანჯარა უნდა გააქტიურდეს). ისინი სცენასთან ერთად უნდა დაა-commit-ო, თორემ სხვა კომპიუტერზე სცენის სკრიპტების GUID-ები გაფუჭდება.
 
 ## Run State
 - Stage: Stage 1 — MVP
@@ -261,7 +266,7 @@ Stage 1 — MVP
 
 ## Last Session
 - Date: 2026-10-25
-- Done: არქიტექტორმა შექმნა PROJECT.md (მოთხოვნები, API Contract, Decision Log), PROGRESS.md (16 task, მათ შორის 6 USER) და პროექტის CLAUDE.md. პროდუქტის კოდი ჯერ არ დაწერილა.
-- Verification: — (კოდი არ არის)
-- Known issues / blockers: იხ. Blockers (dotnet-ის ნებართვები).
-- Next: task 1 (test infrastructure).
+- Done: აგენტის task-ები 1, 3–7, 9, 11, 13, 15; finish-check (code-reviewer + security-auditor) → should-fix task-ები 17, 18 გასწორდა (fix round 1), მიზნობრივმა re-review-მ დაადასტურა; nit-ები Backlog-შია.
+- Verification: `dotnet build Tests/ChessCore.Tests` 0 warn/0 err; `dotnet test Tests/ChessCore.Tests` 284/284 (integration ტესტი SKIPPED — STOCKFISH_PATH არ არის); `dotnet build Tests/GameCompileCheck` 0 warn/0 err; legacy Input grep 0. Unity-მ Core/AI/Game (T9-ის მდგომარეობით) დააკომპილირა 0 `error CS`-ით (Editor.log).
+- Known issues / blockers: Unity Play-mode და რეალური Stockfish შეუმოწმებელია (USER task-ები).
+- Next: USER task 2 → 8 → 10 → 12 → 14 → 16 (თანმიმდევრობით, ინსტრუქციები task-ების ქვეშ).

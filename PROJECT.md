@@ -233,7 +233,7 @@ public sealed class GameState
 - თითო მხარეს ზუსტად ერთი მეფე; პაიკი 1-ელ ან მე-8 რიგზე არ დგას.
 - სვლის რიგი: `w` ან `b`.
 - როქი: `-` ან `KQkq`-ის ქვესიმრავლე, გამეორების გარეშე (რიგი ნებისმიერია). თითო უფლებას სჭირდება მეფე და ეტლი საწყის უჯრებზე, თორემ `FormatException`.
-- en passant: `-`, ან მე-6 რიგის უჯრა (როცა თეთრის სვლაა) / მე-3 რიგის უჯრა (როცა შავის სვლაა).
+- en passant: `-`, ან მე-6 რიგის უჯრა (როცა თეთრის სვლაა) / მე-3 რიგის უჯრა (როცა შავის სვლაა). ep უჯრა და მის უკან მდგომი უჯრა ცარიელი უნდა იყოს, ხოლო წინ უნდა იდგეს მოწინააღმდეგის პაიკი, რომელმაც ორმაგი სვლა გააკეთა; სხვა შემთხვევაში `FormatException` (`en passant square '<sq>' is inconsistent with the position`). მომჭრელი პაიკის არსებობა არ მოითხოვება (ep იწერება ყოველი ორმაგი სვლის შემდეგ).
 - halfmove ≥ 0, fullmove ≥ 1, მთელი რიცხვები.
 - `GameState(string)` დამატებით ამოწმებს, რომ იმ მხარის მეფე, რომლის სვლაც არ არის, შახში არ დგას.
 
@@ -356,7 +356,7 @@ public sealed class StockfishAI : IChessAI
 | `SelectionController` | `ChessGame` | მონიშვნის ლოგიკა: საკუთარი ფიგურა → განათება; დასაშვები უჯრა → სვლა (გარდაქმნისას ჯერ PromotionPrompt); სხვა საკუთარი ფიგურა → ხელახალი მონიშვნა; სხვაგან → მონიშვნის მოხსნა | `boardView`, `picker` (SquarePicker), `promotionPrompt`. API: `Bind(GameState state)`, `bool Interactable { get; set; }`, `ClearSelection()`, `event Action<Move> MoveChosen` |
 | `CameraRig` | `Main Camera` | ერთი კამერა, ორი გამოთვლილი პოზა, გლუვი lerp; TAB ცვლის ხედს | `transitionSpeed` (5), `tacticalHeight` (9), `tacticalDistance` (8), `commanderEyeHeight` (1.4), `commanderBackOffset` (0.6), `commanderPitch` (15), `returnToCommanderAfterMove` (bool, true), `startInCommanderView` (bool, true). API: `enum CameraView { Commander, Tactical }`, `CameraView CurrentView`, `SetCommander(Square kingSquare, Side side)`, `SetView(CameraView view)`, `Toggle()`, `NotifyHumanMoveMade()` |
 | `StatusHud` | `ChessGame` | OnGUI ტექსტი ზედა-მარცხენა კუთხეში: სტატუსი, შეცდომა, დახმარების ხაზი | API: `Show(string status, string error)` |
-| `GameController` | `ChessGame` | კომპოზიცია და თამაშის ნაკადი: GameState, სვლები, AI-ის რიგი, input-ის დაბლოკვა, R = restart, შეცდომა → hot-seat, `OnDestroy`-ში AI-ის Dispose | `boardView`, `piecesView`, `selection`, `cameraRig`, `hud`, `humanSide` (Side, White), `playAgainstAI` (bool, true), `difficulty` (DifficultyPreset, Medium), `stockfishRelativePath` (string, `Stockfish/stockfish.exe`, StreamingAssets-ის მიმართ), `stockfishPathOverride` (string, ცარიელი = გამოიყენება relative), `startFen` (string, ცარიელი = საწყისი პოზიცია) |
+| `GameController` | `ChessGame` | კომპოზიცია და თამაშის ნაკადი: GameState, სვლები, AI-ის რიგი, input-ის დაბლოკვა, R = restart, შეცდომა → hot-seat, `OnDisable`/`OnDestroy`-ში AI-ის Dispose (domain reload-ზე OnDestroy არ იძახება; reload-ის შემდეგ — hot-seat) | `boardView`, `piecesView`, `selection`, `cameraRig`, `hud`, `humanSide` (Side, White), `playAgainstAI` (bool, true), `difficulty` (DifficultyPreset, Medium), `stockfishRelativePath` (string, `Stockfish/stockfish.exe`, StreamingAssets-ის მიმართ), `stockfishPathOverride` (string, ცარიელი = გამოიყენება relative), `startFen` (string, ცარიელი = საწყისი პოზიცია) |
 
 **ფიგურების ფორმები (დროებითი):**
 - pawn: დაბალი cylinder (~0.5 სიმაღლე);
