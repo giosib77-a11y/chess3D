@@ -383,7 +383,7 @@ collider-ები ბავშვ primitive-ებზე რჩება; root-
   - `await ai.GetBestMoveAsync(state.ToFen(), cts.Token)`;
   - თუ ამასობაში თაობის (generation) მთვლელი შეიცვალა (restart), შედეგი უგულებელყოფა;
   - სხვა შემთხვევაში `TryMakeMove`; შეცდომისას hot-seat.
-- R (Keyboard.current.rKey), როცა PromotionPrompt დახურულია: cts.Cancel → ახალი GameState → generation++ → Sync. AI instance-ი იმავე რჩება.
+- R (Keyboard.current.rKey), როცა PromotionPrompt დახურულია: cts.Cancel → ახალი GameState → generation++ → Sync. თუ AI ამ დროს **არ** ფიქრობდა, AI instance-ი იმავე რჩება; თუ ფიქრობდა — ძველი instance-ი იშლება ფონურად (`Task.Run(Dispose)`) და იქმნება ახალი `StockfishAI` (იხ. Decision Log „Restart AI-ის ფიქრისას“).
 - hot-seat რეჟიმში მოთამაშე ორივე მხარეს აკონტროლებს; კამერა `humanSide`-ის მეფესთან რჩება.
 
 ## Testing Strategy
@@ -539,6 +539,11 @@ collider-ები ბავშვ primitive-ებზე რჩება; root-
 ### 2026-10-25 — USER შემოწმებები აგენტის task-ებს არ აჩერებს
 - Decision: task 9 ფორმალურად task 2-ზეა დამოკიდებული (Unity-ის პირველი გახსნა). `.meta` ფაილები უკვე შეიქმნა (Unity გაიხსნა), Console-ის შემოწმება USER-ის დადასტურებას ელოდება. აგენტის Game task-ები (9, 11, 13, 15) გრძელდება, USER task-ები (2, 8, 10, 12, 14, 16) მომხმარებელს რჩება თანმიმდევრობით.
 - Reason: Game-ის კოდი Core-ზე და API Contract-ზეა დამოკიდებული, არა Editor-ის მდგომარეობაზე; კომპილაცია მოწმდება `Tests/GameCompileCheck`-ით.
+
+### 2026-10-25 — Restart AI-ის ფიქრისას: ახალი StockfishAI
+- Decision: R-ზე, თუ AI ფიქრობს, ძველი `StockfishAI` ფონურად Dispose-დება და იქმნება ახალი (ახალი პროცესი + InitializeAsync). თუ არ ფიქრობს — იგივე instance რჩება.
+- Reason: გაუქმებული ძებნა (`stop` + `bestmove`-ის მოლოდინი ≤ 2 s) ჯერ კიდევ იკავებს instance-ს; humanSide = Black-ის დროს AI-ის ახალი სვლა მაშინვე `InvalidOperationException`-ს მიიღებდა და თამაში არასწორად გადავიდოდა hot-seat-ზე. (finish-check-მა აღმოაჩინა კონტრაქტთან შეუსაბამობა; კოდის ქცევა სწორია, კონტრაქტი განახლდა.)
+- How to change: StockfishAI-ს გაუქმების ასინქრონული დასრულების API, რის შემდეგაც instance-ის ხელახლა გამოყენება შეიძლება.
 
 ## Open Questions
 - ვარაუდი: პლატფორმა მხოლოდ Windows PC (x86-64). Stockfish-ის binary მხოლოდ Windows-ისთვის.

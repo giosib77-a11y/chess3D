@@ -188,7 +188,7 @@ Stage 1 — MVP
   - Grep legacy Input → 0 შედეგი. `dotnet test` გადის.
   - საბოლოო შემოწმება: USER task 16.
 
-- [ ] 16. USER: საბოლოო აწყობა და MVP-ის მიღება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 8, 14, 15 — done when: ყველა შემოწმება გადის; Console = 0 შეცდომა; Play-ის შემდეგ stockfish.exe პროცესი აღარ არსებობს
+- [ ] 16. USER: საბოლოო აწყობა და MVP-ის მიღება — owner: USER — files: Assets/Scenes/MainScene.unity — depends: 8, 14, 15, 17 — done when: ყველა შემოწმება გადის; Console = 0 შეცდომა; Play-ის შემდეგ stockfish.exe პროცესი აღარ არსებობს
     1. Console **Clear** → 0 შეცდომა. `ChessGame` → **Add Component** → `StatusHud`. **GameController** → **Hud** ← `ChessGame`.
     2. GameController: **Play Against AI** ✓, **Difficulty** = `Easy`, **Human Side** = `White`, **Stockfish Relative Path** = `Stockfish/stockfish.exe`, **Stockfish Path Override** ცარიელი. **Ctrl+S**.
     3. Play: ზედა-მარცხენა კუთხეში წერია `White to move`. გააკეთე სვლა: სტატუსი იცვლება (`AI thinking...` შეიძლება ძალიან სწრაფად გაქრეს), შავი პასუხობს 1–2 წამში.
@@ -201,6 +201,20 @@ Stage 1 — MVP
     10. **Human Side** = `Black` → Play → თეთრი (AI) პირველი აკეთებს სვლას. დააბრუნე `White`.
     11. Play-ის გაჩერების შემდეგ გახსენი Task Manager (Ctrl+Shift+Esc) → **Details** → სიაში `stockfish.exe` არ უნდა იყოს.
     12. თუ ყველაფერი გავიდა, MVP მზადაა. გაუშვი `/finish-check`.
+
+### Finish-check-ის task-ები (2026-10-25)
+- [ ] 17. [should-fix] Game: გარდაქმნა ჩუმი არჩევის გარეშე + Stockfish-ის Dispose domain reload-ზე — owner: task-executor — files: Assets/Scripts/Game/GameController.cs, Assets/Scripts/Game/SelectionController.cs — depends: 15 — done when:
+  - `SelectionController`: თუ გარდაქმნის სვლაა და `promotionPrompt` მიბმული არ არის → `Debug.LogError("PromotionPrompt is not assigned on SelectionController")`, სვლა არ იგზავნება, მონიშვნა იხსნება (ჩუმად მხედრის/დედოფლის არჩევა აღარ ხდება — API Contract: „ავტომატური დედოფალი არ არის“).
+  - `GameController.OnDisable`: AI-ის გაუქმება + Dispose (`_cts.Cancel()`, `_ai?.Dispose()`, `_ai = null`), რომ Play-ის დროს სკრიპტის recompile-ზე (domain reload: OnDisable იძახება, OnDestroy — არა) `stockfish.exe` ობლად არ დარჩეს; `OnDestroy` იგივეს უსაფრთხოდ (idempotent) აკეთებს. reload-ის შემდეგ თამაში hot-seat-ში გრძელდება ან R-ზე თავიდან იწყება NRE-ს გარეშე (`_state == null` შემთხვევები დაცულია: Update/OnMoveChosen/Refresh).
+  - Restart-ის comment გასწორებულია: AI იცვლება, რადგან გაუქმებული ძებნა (`stop` + ≤ 2 s) ჯერ კიდევ `_busy`-ს იკავებს და ახალი `GetBestMoveAsync` `InvalidOperationException`-ს მიიღებდა.
+  - იმავე ფაილებში (nit-ები): HUD-ის შეცდომის ტექსტში ორმაგი წერტილი აღარ არის (`ex.Message.TrimEnd('.')`); `FallBackToHotSeat`-ში `failed.Dispose()` გადატანილია `Task.Run`-ში (main thread-ის ≥1 s გაყინვის თავიდან ასაცილებლად); `Refresh`-ში `piecesView` null-check.
+  - `dotnet build Tests/GameCompileCheck` → 0 შეცდომა, 0 warning; `dotnet test Tests/ChessCore.Tests` გადის; legacy Input grep → 0.
+  - საბოლოო შემოწმება: USER task 16.
+- [ ] 18. [should-fix] Core: en passant ველის თანმიმდევრულობა FEN-ში + გამეორების გასაღების ტესტი — owner: task-executor — files: Assets/Scripts/Core/Position.cs, Tests/ChessCore.Tests/Core/FenTests.cs, Tests/ChessCore.Tests/Core/GameStateTests.cs — depends: 5 — done when:
+  - ბაგი: `4k3/8/8/3PN3/8/8/8/4K3 w - e6 0 1`-ში Core აგენერირებს `d5e6`-ს EnPassant-ად და MakeMove შლის **თეთრ** მხედარს e5-ზე. გასწორება: `Position.FromFen` → `FormatException` (`Invalid FEN: en passant square '<sq>' is inconsistent ...`), თუ ep უჯრა ან მის უკან მდგომი უჯრა (შავის სვლისას/თეთრის სვლისას შესაბამისად) ცარიელი არ არის, ან ep უჯრის წინ არ დგას მოწინააღმდეგის პაიკი, რომელმაც ორმაგი სვლა გააკეთა (თეთრის სვლისას: შავი პაიკი 5-ე რიგზე იმავე file-ზე; შავის სვლისას: თეთრი პაიკი მე-4 რიგზე).
+  - ჯერ ტესტი, რომელიც ძველ კოდზე ვარდება: `FenTests`-ში ზემოთ მოცემული FEN → FormatException; ასევე ep, რომლის უკანაც ფიგურაა. არსებული სწორი FEN-ები (`4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1`, perft პოზიციები, ToFen round-trip ორმაგი სვლის შემდეგ) კვლავ გადის.
+  - `GameStateTests.UsableEnPassantSquare_DistinguishesPositions` შეიცვალა მნიშვნელოვანი ტესტით: (a) პოზიცია, რომელიც პირველად გამოყენებადი ep-ით ჩნდება, შემდეგ კი ორჯერ ep-ის გარეშე → ჯერ კიდევ InProgress (ep-იანი არ ითვლება იგივედ), და მხოლოდ შემდეგი გამეორებისას ThreefoldRepetition; (b) შეკრული პაიკის შემთხვევა (`8/8/8/KPp4r/...`-ის მსგავსი): გამოუსადეგარი ep გასაღებს არ ცვლის. ტესტი ჩავარდებოდა, თუ ep გასაღებიდან საერთოდ ამოვარდებოდა ან ყოველთვის ჩაიწერებოდა.
+  - `dotnet test Tests/ChessCore.Tests` გადის.
 
 ## Shared files
 <!-- ფაილები, რომლებიც რამდენიმე task-ის files-ში შეიძლება იყოს (shared). წესი: მხოლოდ დამატება (ახალი dependency, ტიპი, route), სხვისი ჩანაწერის შეცვლა ან წაშლა არა; ერთ საერთო ფაილზე ორი task ერთდროულად არ მუშაობს. -->
@@ -228,6 +242,12 @@ Stage 1 — MVP
 - კამერის orbit/zoom მარჯვენა ღილაკით; hot-seat-ში კამერის მობრუნება მოთამაშის მიხედვით.
 - Runtime მენიუ: სირთულის და ფერის არჩევა თამაშიდან (ახლა მხოლოდ inspector-ით); Stockfish full-strength preset.
 - Unity Test Framework / Play-mode ავტომატური ტესტები.
+- nit (finish-check, security): `StockfishAI.GetBestMoveAsync` engine-ს უგზავნის შემოსულ `fen`-ს და არა `state.ToFen()`-ს (ნორმალიზებული); `ProcessUciTransport.SendLine` არ უარყოფს `\r`/`\n`-ს. რეალური ზიანი არ არის (Game ყოველთვის `ToFen()`-ს აგზავნის).
+- nit (finish-check, security): `StockfishAI`/`ProcessUciTransport` — `Path.GetFullPath` ერთხელ, რომ `File.Exists` და გაშვება ერთსა და იმავე ფაილს ეხებოდეს (მხოლოდ inspector-ის override-ზე).
+- nit (finish-check): `StockfishAI` timeout-ები ყოველ ხაზზეა და არა მთელ ლოდინზე (engine, რომელიც მუდმივად `info`-ს ბეჭდავს, timeout-ს ვერ მიიღებს; preset-ებს არ ეხება) — deadline ერთხელ.
+- nit (finish-check): `StockfishAI` — `GetBestMoveAsync`-ის ct shared init-ის დროს არ მოწმდება (გაუქმება init-ის დასრულებამდე ჩერდება); Game-ს არ ეხება.
+- nit (finish-check): `StockfishAITests.GetBestMove_Cancel_DiscardsStaleBestmove...` იყენებს SearchTimeout 500 ms-ს — დატვირთვისას შეიძლება flaky იყოს; 30 s.
+- შესამოწმებელი (finish-check): Unity-ის Mono პატივს სცემს თუ არა `StandardInputEncoding = new UTF8Encoding(false)`-ს (BOM-ის შემთხვევაში handshake timeout) — USER task 16 აჩვენებს.
 - nit: `EnsureNonEmptyCompile` target-ის მოშორება `Tests/ChessCore.Build` და `Tests/ChessAI.Build` csproj-ებიდან, როცა Core-სა და AI-ში რეალური `.cs` ფაილებია (ცარიელი Compile set-ის დროს SDK `TargetFrameworkAttribute`-ს არ აგენერირებს).
 
 ## Blockers
@@ -235,8 +255,8 @@ Stage 1 — MVP
 
 ## Run State
 - Stage: Stage 1 — MVP
-- Finish-check this stage: not run
-- Fix rounds this stage: 0/2
+- Finish-check this stage: done
+- Fix rounds this stage: 1/2
 - Failed attempts: —
 
 ## Last Session
