@@ -530,6 +530,16 @@ collider-ები ბავშვ primitive-ებზე რჩება; root-
 - Decision: თამაში `Assets/Scenes/MainScene.unity`-შია. placeholder `ChessSmokeTest.cs` (და `.meta`) იშლება task 9-ში; USER Main Camera-დან შლის „Missing script“ კომპონენტს.
 - Reason: MainScene უკვე შეიცავს მომხმარებლის smoke-test-ს, ანუ ეს არის განზრახული სცენა.
 
+### 2026-10-25 — Game-ის კომპილაციის შემოწმება Unity-ის გარეშე
+- Decision: `Tests/GameCompileCheck/GameCompileCheck.csproj` (netstandard2.1, LangVersion 9.0, ImplicitUsings disable) აკომპილირებს `Assets/Scripts/Game/**/*.cs`-ს Unity-ის DLL-ებით: `$(UnityEditorDataDir)` (ნაგულისხმევი `C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Data`) → `Managed/UnityEngine/*.dll`, და `Library/ScriptAssemblies/Unity.InputSystem.dll` (მხოლოდ კითხვა). Core/AI — ProjectReference build პროექტებზე. ბრძანება: `dotnet build Tests/GameCompileCheck`. `dotnet test Tests/ChessCore.Tests`-ში არ შედის.
+- Reason: აგენტებს Unity Editor არ აქვთ; ასე Game-ის კომპილაციის შეცდომები USER-ის შემოწმებამდე ჩანს.
+- Limits: საჭიროა Unity-ის დაყენება ამ გზაზე და `Library/` ერთხელ მაინც დაგენერირებული (Unity-ის გახსნა). Unity-ის serialization/runtime ქცევას არ ამოწმებს — ეს ისევ USER task-ებია.
+- How to change: სხვა Unity გზა → `dotnet build Tests/GameCompileCheck -p:UnityEditorDataDir=<path>`.
+
+### 2026-10-25 — USER შემოწმებები აგენტის task-ებს არ აჩერებს
+- Decision: task 9 ფორმალურად task 2-ზეა დამოკიდებული (Unity-ის პირველი გახსნა). `.meta` ფაილები უკვე შეიქმნა (Unity გაიხსნა), Console-ის შემოწმება USER-ის დადასტურებას ელოდება. აგენტის Game task-ები (9, 11, 13, 15) გრძელდება, USER task-ები (2, 8, 10, 12, 14, 16) მომხმარებელს რჩება თანმიმდევრობით.
+- Reason: Game-ის კოდი Core-ზე და API Contract-ზეა დამოკიდებული, არა Editor-ის მდგომარეობაზე; კომპილაცია მოწმდება `Tests/GameCompileCheck`-ით.
+
 ## Open Questions
 - ვარაუდი: პლატფორმა მხოლოდ Windows PC (x86-64). Stockfish-ის binary მხოლოდ Windows-ისთვის.
 - ვარაუდი: ადამიანი ნაგულისხმევად თეთრია (`humanSide` inspector-ში იცვლება); ნაგულისხმევი სირთულე = Medium.

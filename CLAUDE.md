@@ -12,6 +12,7 @@
 - lint: — (none)
 - typecheck: `dotnet build Tests/ChessCore.Tests`
 - test: `dotnet test Tests/ChessCore.Tests`
+- typecheck (Game, Unity-ის DLL-ებით): `dotnet build Tests/GameCompileCheck` (task 9-დან)
 - build: Unity Editor → File → Build Profiles (ხელით, USER; Stage 1-ში არ არის საჭირო)
 - migrations: —
 - integration (არასავალდებულო): `$env:STOCKFISH_PATH="<abs path to stockfish.exe>"` და შემდეგ test ბრძანება
