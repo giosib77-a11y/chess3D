@@ -59,7 +59,7 @@ namespace Chess.Game
 
             if (continueButton != null)
             {
-                continueButton.interactable = GameSession.Campaign != null;
+                continueButton.gameObject.SetActive(GameSession.Campaign != null);
             }
 
             quickSide = Side.White;
