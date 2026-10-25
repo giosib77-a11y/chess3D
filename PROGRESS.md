@@ -109,7 +109,7 @@ Stage 2 — Campaign
 - [x] 31. (should-fix) `Continue` უნდა იმალებოდეს და არა ითიშებოდეს — owner: task-executor — files: Assets/Scripts/Game/UI/MainMenuController.cs — depends: 25 — done when:
   - `Start`-ში `continueButton.gameObject.SetActive(GameSession.Campaign != null)` (`interactable` აღარ გამოიყენება), PROJECT.md → „MainMenuController-ის ნაკადი“ (განახლებული) და Core Flow 6. მომხმარებლის მოთხოვნა: „Continue (ჩანს მხოლოდ შენახვისას)“.
   - `dotnet build Tests/GameCompileCheck` 0 შეცდომა / 0 warning; legacy Input grep → 0. საბოლოო შემოწმება: USER task 28 (ნაბიჯი 7, 14), 29 (ნაბიჯი 14).
-- [ ] 32. (should-fix, სავარაუდო) რეგიონის ღილაკის label-ში მდგომარეობის ხაზი არ უნდა ჩამოიჭრას — owner: task-executor — files: Assets/Editor/CampaignScenesSetup.cs — depends: 27 — done when:
+- [x] 32. (should-fix, სავარაუდო) რეგიონის ღილაკის label-ში მდგომარეობის ხაზი არ უნდა ჩამოიჭრას — owner: task-executor — files: Assets/Editor/CampaignScenesSetup.cs — depends: 27 — done when:
   - პრობლემა: `RegionLabel` 4 ხაზია (ეპოქის ხაზი 280px-ში იკეცება → 5 ხაზი ≈150px), ღილაკი 280×130, font 26, Truncate → ბოლო ხაზი (`Available`/`Locked`/`Liberated`) არ ჩანს (code-reviewer, font metrics-ით; Unity-ში არ დადასტურებულა).
   - ღილაკი 380×170, label: `resizeTextForBestFit = true`, `resizeTextMinSize = 14`, `resizeTextMaxSize = 24`, horizontal Wrap — PROJECT.md → „UI სტილი (Stage 2)“ (განახლებული) და Editor ნაბიჯი 5. anchor-ები უცვლელია (MapArea 1500×720-ში 380×170 ღილაკები ერთმანეთს არ ფარავს — შეამოწმე გამოთვლით და report-ში ჩაწერე).
   - `dotnet build Tests/EditorCompileCheck` და `Tests/GameCompileCheck` 0/0. საბოლოო შემოწმება: USER task 28 (ნაბიჯი 13).

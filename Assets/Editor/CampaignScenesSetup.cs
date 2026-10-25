@@ -271,7 +271,14 @@ namespace Chess.Editor
                     Debug.LogError(Tag + "No map anchor defined for region '" + region.Id + "'");
                     continue;
                 }
-                Button button = MakeButton("Region_" + region.Id, map.transform, region.Name, Anchored(anchor.Value, new Vector2(280f, 130f)), 26, out Text label);
+                Button button = MakeButton("Region_" + region.Id, map.transform, region.Name, Anchored(anchor.Value, new Vector2(380f, 170f)), 24, out Text label);
+                label.resizeTextForBestFit = true;
+                label.resizeTextMinSize = 14;
+                label.resizeTextMaxSize = 24;
+                label.horizontalOverflow = HorizontalWrapMode.Wrap;
+                label.verticalOverflow = VerticalWrapMode.Truncate;
+                label.rectTransform.offsetMin = new Vector2(8f, 8f);
+                label.rectTransform.offsetMax = new Vector2(-8f, -8f);
                 Image bg = button.GetComponent<Image>();
                 bg.color = LockedColor;
                 var rb = button.gameObject.AddComponent<RegionButton>();
