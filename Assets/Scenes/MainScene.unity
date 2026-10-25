@@ -266,9 +266,162 @@ MonoBehaviour:
   m_GameObject: {fileID: 330585543}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d097e9604968ff54abb997064ad58626, type: 3}
+  m_Script: {fileID: 11500000, guid: 44393c62a8cb4164f8cc94c0c3d03671, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ChessSmokeTest
+  m_EditorClassIdentifier: Chess.Game::Chess.Game.CameraRig
+  transitionSpeed: 5
+  tacticalHeight: 9
+  tacticalDistance: 8
+  commanderEyeHeight: 1.4
+  commanderBackOffset: 0.6
+  commanderPitch: 15
+  returnToCommanderAfterMove: 1
+  startInCommanderView: 1
+--- !u!1 &346096520
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 346096528}
+  - component: {fileID: 346096527}
+  - component: {fileID: 346096526}
+  - component: {fileID: 346096525}
+  - component: {fileID: 346096524}
+  - component: {fileID: 346096523}
+  - component: {fileID: 346096522}
+  - component: {fileID: 346096521}
+  m_Layer: 0
+  m_Name: ChessGame
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &346096521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346096520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fae2242010c0395448c72b1a9e7e73e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Chess.Game::Chess.Game.GameController
+  boardView: {fileID: 346096527}
+  piecesView: {fileID: 346096526}
+  startFen: 
+  selection: {fileID: 346096523}
+  cameraRig: {fileID: 330585548}
+  humanSide: 0
+  hud: {fileID: 346096522}
+  playAgainstAI: 1
+  difficulty: 0
+  stockfishRelativePath: Stockfish/stockfish.exe
+  stockfishPathOverride: 
+--- !u!114 &346096522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346096520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 334cb938d99ebf74b833ff04a677a30e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Chess.Game::Chess.Game.StatusHud
+--- !u!114 &346096523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346096520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28b723ae80184474eb1aac5e59fe14ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Chess.Game::Chess.Game.SelectionController
+  boardView: {fileID: 346096527}
+  picker: {fileID: 346096525}
+  promotionPrompt: {fileID: 346096524}
+--- !u!114 &346096524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346096520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cbe6c0407afd5545b8f23b21afc3170, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Chess.Game::Chess.Game.PromotionPrompt
+--- !u!114 &346096525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346096520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfba30ff04289e24fa06a0243bc14a05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Chess.Game::Chess.Game.SquarePicker
+  raycastCamera: {fileID: 330585545}
+  maxDistance: 200
+--- !u!114 &346096526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346096520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145308d64fa7af848b69335bd5cbcc6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Chess.Game::Chess.Game.PiecesView
+  whiteMaterial: {fileID: 2100000, guid: 2f680ded6e0605443a7a5557e38b4e24, type: 2}
+  blackMaterial: {fileID: 2100000, guid: dd10ecaa32cbbf145ba56097a5c5e3fb, type: 2}
+--- !u!114 &346096527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346096520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eda4fbac76c07334fbd51c5067945b13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Chess.Game::Chess.Game.BoardView
+  groundMaterial: {fileID: 2100000, guid: ac38d6e589a59874aa490b56979626c7, type: 2}
+  tileMaterial: {fileID: 2100000, guid: 8bc04ae22e2f35f428eca2ef78157243, type: 2}
+  legalTargetMaterial: {fileID: 2100000, guid: a956c19861bdb7d45992c59b3f82a5ba, type: 2}
+  selectedMaterial: {fileID: 2100000, guid: 718d700cd481e614cac486ffaa2d3227, type: 2}
+  groundSize: 30
+--- !u!4 &346096528
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346096520}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,3 +605,4 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
+  - {fileID: 346096528}
