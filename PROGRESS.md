@@ -83,7 +83,7 @@ Stage 2 — Campaign
   - `dotnet build Tests/GameCompileCheck` → 0 შეცდომა, 0 warning; `dotnet test Tests/ChessCore.Tests` გადის; legacy Input grep → 0.
   - საბოლოო შემოწმება: USER task 28, 29.
 
-- [ ] 26. Game: BattlePanel + GameController-ის კამპანია/Quick Game ინტეგრაცია — owner: task-executor — files: Assets/Scripts/Game/UI/BattlePanel.cs, Assets/Scripts/Game/GameController.cs — depends: 23, 24 — done when:
+- [x] 26. Game: BattlePanel + GameController-ის კამპანია/Quick Game ინტეგრაცია — owner: task-executor — files: Assets/Scripts/Game/UI/BattlePanel.cs, Assets/Scripts/Game/GameController.cs — depends: 23, 24 — done when:
   - `BattlePanel` ზუსტად Contract-ის ცხრილით (ველები, events, `ShowInGame`/`ShowResult`/`HideResult`/`HideAll`; `leaveButton` → `BackClicked`).
   - `GameController`: Stage 1-ის ყველა Inspector ველი (სახელი, ტიპი, ნაგულისხმევი) და ნაკადი უცვლელია; დაემატა მხოლოდ `[SerializeField] private BattlePanel battlePanel;` და „Stage 2 — GameController-ის დამატებები“: launch პარამეტრები `Start`-ში `CreateAi`-მდე; `Mode == None` → Stage 1-ის ქცევა + `battlePanel?.HideAll()`; AI-ის log ხაზი ზუსტი ფორმატით; შედეგი მუშავდება ერთხელ პარტიაზე, მხოლოდ წარმატებული სვლის შემდეგ (ადამიანის და AI-ის); `counted = playAgainstAI && _ai != null`; `RecordBattle` + `TrySaveCampaign` + `SaveFailedWarning`; Retry = R; Back → `GoToCampaignMap`/`GoToMainMenu`; events-ის გამოწერა `OnEnable`/`OnDisable`-ში.
   - GameController-ში არ არის Elo-ს ზოლები, განბლოკვის წესი ან შედეგის ტექსტები (მხოლოდ `AIDifficulty.FromElo`, `BattleRules`, `CampaignProgress.RecordBattle`, `CampaignText`); გამონაკლისი: Quick Game-ის info ხაზი და ღილაკების label-ები Contract-იდან.

@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Chess.AI;
+using Chess.Campaign;
 using Chess.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -27,6 +28,13 @@ namespace Chess.Game
         [SerializeField] private string stockfishRelativePath = "Stockfish/stockfish.exe";
         [SerializeField] private string stockfishPathOverride = "";
 
+        [SerializeField] private BattlePanel battlePanel;
+
+        private LaunchMode _mode = LaunchMode.None; // captured from GameSession in Start
+        private Region _region; // Campaign only
+        private AIDifficulty _launchDifficulty; // null = use the inspector 'difficulty'
+        private bool _gameOverHandled; // reset in ResetGame
+
         private GameState _state;
         private IChessAI _ai; // null = hot-seat
         private CancellationTokenSource _cts = new CancellationTokenSource();
@@ -40,12 +48,22 @@ namespace Chess.Game
         {
             if (selection != null)
                 selection.MoveChosen += OnMoveChosen;
+            if (battlePanel != null)
+            {
+                battlePanel.RetryClicked += OnRetryClicked;
+                battlePanel.BackClicked += OnBackClicked;
+            }
         }
 
         private void OnDisable()
         {
             if (selection != null)
                 selection.MoveChosen -= OnMoveChosen;
+            if (battlePanel != null)
+            {
+                battlePanel.RetryClicked -= OnRetryClicked;
+                battlePanel.BackClicked -= OnBackClicked;
+            }
             // A domain reload (script recompile during Play) calls OnDisable but NOT OnDestroy, so the
             // engine must be stopped here or stockfish.exe is orphaned. Disposed synchronously on the
             // main thread (blocks <= ~1-3 s at teardown): a Task.Run might not finish before the domain
@@ -82,8 +100,126 @@ namespace Chess.Game
 
         private void Start()
         {
+            ApplyLaunchParameters();
             CreateAi();
             ResetGame();
+        }
+
+        // Stage 2: scene launch parameters. Mode None (MainScene played directly) keeps the Stage 1 behavior.
+        private void ApplyLaunchParameters()
+        {
+            _mode = GameSession.Mode;
+            _region = null;
+            _launchDifficulty = null;
+
+            if (_mode == LaunchMode.Campaign)
+            {
+                if (!CampaignRegions.TryGet(GameSession.RegionId, out _region))
+                {
+                    Debug.LogError("[GameController] Unknown campaign region '" + GameSession.RegionId
+                        + "'. Playing without campaign progress.");
+                }
+                if (GameSession.Campaign == null)
+                {
+                    Debug.LogError("[GameController] Campaign launch without a loaded campaign. Results will not be recorded.");
+                }
+
+                humanSide = Side.White;
+                playAgainstAI = true;
+                if (_region != null)
+                {
+                    _launchDifficulty = AIDifficulty.FromElo(_region.Elo);
+                    ShowInGame(CampaignText.BattleInfo(_region), "Back to map");
+                }
+                else
+                {
+                    ShowInGame("Campaign", "Back to map");
+                }
+            }
+            else if (_mode == LaunchMode.QuickGame)
+            {
+                humanSide = GameSession.HumanSide;
+                playAgainstAI = true;
+                _launchDifficulty = AIDifficulty.FromPreset(GameSession.QuickDifficulty);
+                ShowInGame("Quick Game - " + GameSession.QuickDifficulty + " - you play "
+                    + (humanSide == Side.White ? "White" : "Black"), "Back to menu");
+            }
+            else if (battlePanel != null)
+            {
+                battlePanel.HideAll();
+            }
+        }
+
+        private void ShowInGame(string info, string leaveLabel)
+        {
+            if (battlePanel != null)
+                battlePanel.ShowInGame(info, leaveLabel);
+        }
+
+        private void OnRetryClicked()
+        {
+            Restart();
+        }
+
+        private void OnBackClicked()
+        {
+            if (_mode == LaunchMode.Campaign)
+                GameSession.GoToCampaignMap();
+            else if (_mode == LaunchMode.QuickGame)
+                GameSession.GoToMainMenu();
+        }
+
+        // Called after every successful move; records the result once per game.
+        private void CheckGameOver()
+        {
+            if (_state == null || !_state.IsGameOver || _gameOverHandled)
+                return;
+            _gameOverHandled = true;
+            try
+            {
+                HandleGameOver();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+        }
+
+        private void HandleGameOver()
+        {
+            if (_mode == LaunchMode.None)
+                return;
+
+            // Counted only if the AI is still the opponent (not lost to a hot-seat fallback / missing Stockfish).
+            bool counted = playAgainstAI && _ai != null;
+            BattleOutcome outcome = BattleRules.GetOutcome(_state.Result, humanSide);
+
+            if (_mode == LaunchMode.Campaign)
+            {
+                CampaignProgress campaign = GameSession.Campaign;
+                if (campaign == null || _region == null)
+                {
+                    // Invalid launch (already logged in Start): show the outcome, record nothing.
+                    ShowResult(BattleRules.GetTitle(outcome), BuildStatus(), true, "Retry", "Back to map");
+                    return;
+                }
+
+                BattleSummary summary = campaign.RecordBattle(_region.Id, outcome, counted);
+                string message = summary.Message;
+                if (summary.ProgressChanged && !GameSession.TrySaveCampaign())
+                    message += "\n" + CampaignText.SaveFailedWarning;
+                ShowResult(summary.Title, message, summary.CanRetry, "Retry", "Back to map");
+            }
+            else
+            {
+                ShowResult(BattleRules.GetTitle(outcome), BuildStatus(), true, "Play again", "Back to menu");
+            }
+        }
+
+        private void ShowResult(string title, string message, bool showRetry, string retryLabel, string backLabel)
+        {
+            if (battlePanel != null)
+                battlePanel.ShowResult(title, message, showRetry, retryLabel, backLabel);
         }
 
         private void Update()
@@ -116,6 +252,7 @@ namespace Chess.Game
                 Refresh();
                 if (cameraRig != null)
                     cameraRig.NotifyHumanMoveMade();
+                CheckGameOver();
                 StartAiTurnIfNeeded();
             }
             else
@@ -152,6 +289,9 @@ namespace Chess.Game
         private void ResetGame()
         {
             _state = CreateState();
+            _gameOverHandled = false;
+            if (battlePanel != null)
+                battlePanel.HideResult();
             if (boardView != null)
                 boardView.ClearHighlights();
             Refresh();
@@ -186,7 +326,12 @@ namespace Chess.Game
                 string path = !string.IsNullOrWhiteSpace(stockfishPathOverride)
                     ? stockfishPathOverride
                     : Path.Combine(Application.streamingAssetsPath, stockfishRelativePath);
-                ai = new StockfishAI(path, AIDifficulty.FromPreset(difficulty));
+                AIDifficulty level = _launchDifficulty ?? AIDifficulty.FromPreset(difficulty);
+                ai = new StockfishAI(path, level);
+                Debug.Log("[GameController] AI difficulty: skill " + level.SkillLevel
+                    + ", depth " + (level.Depth.HasValue ? level.Depth.Value.ToString() : "-")
+                    + ", movetime " + level.MoveTimeMs + " ms, UCI_Elo "
+                    + (level.Elo.HasValue ? level.Elo.Value.ToString() : "off"));
             }
             catch (Exception ex)
             {
@@ -239,6 +384,7 @@ namespace Chess.Game
                 if (!_state.TryMakeMove(move))
                     throw new ChessAIException("AI returned a move the game rejected: " + move);
                 Refresh();
+                CheckGameOver();
             }
             catch (OperationCanceledException)
             {
