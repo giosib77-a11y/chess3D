@@ -16,9 +16,9 @@ namespace Chess.Game
         [SerializeField] private float transitionSpeed = 5f;
         [SerializeField] private float tacticalHeight = 9f;
         [SerializeField] private float tacticalDistance = 8f;
-        [SerializeField] private float commanderEyeHeight = 3.0f;
-        [SerializeField] private float commanderBackOffset = 1.6f;
-        [SerializeField] private float commanderPitch = 30f;
+        [SerializeField] private float commanderEyeHeight = 4f;
+        [SerializeField] private float commanderBackOffset = 7f;
+        [SerializeField] private float commanderPitch = 40f;
         [SerializeField] private bool returnToCommanderAfterMove = true;
         [SerializeField] private bool startInCommanderView = true;
 

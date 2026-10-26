@@ -168,6 +168,9 @@ namespace Chess.Editor
             var stretch = new Placement(Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             labelText = MakeText("Label", go.transform, font, label, fontSize, stretch, TextAlignmentOptions.Center, Color.white,
                 false, 20f);
+            labelText.textWrappingMode = TextWrappingModes.NoWrap;
+            labelText.rectTransform.offsetMin = new Vector2(24f, 4f);
+            labelText.rectTransform.offsetMax = new Vector2(-24f, -4f);
             return button;
         }
 

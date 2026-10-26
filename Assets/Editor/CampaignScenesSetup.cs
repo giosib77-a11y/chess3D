@@ -182,17 +182,18 @@ namespace Chess.Editor
             GameObject quickPanel = EditorUi.NewPanel("QuickGamePanel", canvas.transform, new Vector2(600f, 520f));
             EditorUi.MakeText("QuickGameTitleText", quickPanel.transform, font, Get(TextId.QuickGameTitle), 40f,
                 EditorUi.Center(new Vector2(0f, 200f), new Vector2(560f, 60f)), TextAlignmentOptions.Center, Color.white, false, 28f);
+            var quickButtonSize = new Vector2(440f, 80f);
             Button color = EditorUi.MakeButton("ColorButton", quickPanel.transform, font, GameText.QuickColorLabel(Side.White),
-                EditorUi.Center(new Vector2(0f, 100f), buttonSize), 32f, out TMP_Text colorLabel);
+                EditorUi.Center(new Vector2(0f, 100f), quickButtonSize), 32f, out TMP_Text colorLabel);
             colorLabel.gameObject.name = "ColorLabel";
             Button difficulty = EditorUi.MakeButton("DifficultyButton", quickPanel.transform, font,
                 GameText.QuickDifficultyLabel(Get(TextId.DifficultyMedium)),
-                EditorUi.Center(new Vector2(0f, 0f), buttonSize), 32f, out TMP_Text difficultyLabel);
+                EditorUi.Center(new Vector2(0f, 0f), quickButtonSize), 32f, out TMP_Text difficultyLabel);
             difficultyLabel.gameObject.name = "DifficultyLabel";
             Button start = EditorUi.MakeButton("StartQuickGameButton", quickPanel.transform, font, Get(TextId.QuickStart),
-                EditorUi.Center(new Vector2(0f, -100f), buttonSize), 32f, out _);
+                EditorUi.Center(new Vector2(0f, -100f), quickButtonSize), 32f, out _);
             Button back = EditorUi.MakeButton("BackFromQuickGameButton", quickPanel.transform, font, Get(TextId.Back),
-                EditorUi.Center(new Vector2(0f, -200f), buttonSize), 32f, out _);
+                EditorUi.Center(new Vector2(0f, -200f), quickButtonSize), 32f, out _);
             quickPanel.SetActive(false);
 
             using (var so = new SerializedObject(controller))
@@ -332,25 +333,25 @@ namespace Chess.Editor
             Created.Add("BattleCanvas");
             var panel = canvas.AddComponent<BattlePanel>();
 
-            // x 410-1510, y 24-94.
+            // x 460-1460, y 24-94.
             TextMeshProUGUI info = EditorUi.MakeText("InfoText", canvas.transform, font, "", 28f,
-                EditorUi.Top(new Vector2(0f, -24f), new Vector2(1100f, 70f)), TextAlignmentOptions.Top, Color.white, false, 20f);
-            // x 1576-1896, y 24-94.
+                EditorUi.Top(new Vector2(0f, -24f), new Vector2(1000f, 70f)), TextAlignmentOptions.Top, Color.white, false, 20f);
+            // x 1496-1896, y 24-94.
             Button leave = EditorUi.MakeButton("LeaveButton", canvas.transform, font, Get(TextId.BackToMap),
-                EditorUi.TopRight(new Vector2(-24f, -24f), new Vector2(320f, 70f)), 32f, out TMP_Text leaveLabel);
+                EditorUi.TopRight(new Vector2(-24f, -24f), new Vector2(400f, 70f)), 32f, out TMP_Text leaveLabel);
             leaveLabel.gameObject.name = "LeaveLabel";
 
-            // x 580-1340, y 340-740.
-            GameObject result = EditorUi.NewPanel("ResultPanel", canvas.transform, new Vector2(760f, 400f));
+            // x 540-1380, y 340-740.
+            GameObject result = EditorUi.NewPanel("ResultPanel", canvas.transform, new Vector2(840f, 400f));
             TextMeshProUGUI title = EditorUi.MakeText("TitleText", result.transform, font, "", 40f,
-                EditorUi.Center(new Vector2(0f, 140f), new Vector2(700f, 70f)), TextAlignmentOptions.Center, Color.white, false, 28f);
+                EditorUi.Center(new Vector2(0f, 140f), new Vector2(780f, 70f)), TextAlignmentOptions.Center, Color.white, false, 28f);
             TextMeshProUGUI message = EditorUi.MakeText("MessageText", result.transform, font, "", 28f,
-                EditorUi.Center(new Vector2(0f, 30f), new Vector2(700f, 140f)), TextAlignmentOptions.Center, Color.white, false, 20f);
+                EditorUi.Center(new Vector2(0f, 30f), new Vector2(780f, 140f)), TextAlignmentOptions.Center, Color.white, false, 20f);
             Button retry = EditorUi.MakeButton("RetryButton", result.transform, font, Get(TextId.Retry),
-                EditorUi.Center(new Vector2(-170f, -130f), new Vector2(320f, 70f)), 32f, out TMP_Text retryLabel);
+                EditorUi.Center(new Vector2(-200f, -130f), new Vector2(380f, 70f)), 32f, out TMP_Text retryLabel);
             retryLabel.gameObject.name = "RetryLabel";
             Button back = EditorUi.MakeButton("BackButton", result.transform, font, Get(TextId.BackToMap),
-                EditorUi.Center(new Vector2(170f, -130f), new Vector2(320f, 70f)), 32f, out TMP_Text backLabel);
+                EditorUi.Center(new Vector2(200f, -130f), new Vector2(380f, 70f)), 32f, out TMP_Text backLabel);
             backLabel.gameObject.name = "BackLabel";
             result.SetActive(false);
 

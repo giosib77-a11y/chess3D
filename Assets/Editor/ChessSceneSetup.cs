@@ -82,9 +82,9 @@ namespace Chess.Editor
 
             using (var so = new SerializedObject(rig))
             {
-                SetFloatProp(so, "commanderEyeHeight", 3.0f);
-                SetFloatProp(so, "commanderBackOffset", 1.6f);
-                SetFloatProp(so, "commanderPitch", 30f);
+                SetFloatProp(so, "commanderEyeHeight", 4.0f);
+                SetFloatProp(so, "commanderBackOffset", 7.0f);
+                SetFloatProp(so, "commanderPitch", 40f);
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
 
@@ -161,7 +161,7 @@ namespace Chess.Editor
 
             // HUD: no raycast-blocking graphic, so board clicks pass through.
             GameObject hudPanel = EditorUi.NewRect("HudPanel", canvas.transform,
-                EditorUi.TopLeft(new Vector2(24f, -110f), new Vector2(680f, 220f)));
+                EditorUi.TopLeft(new Vector2(24f, -110f), new Vector2(960f, 220f)));
             var layout = hudPanel.AddComponent<VerticalLayoutGroup>();
             layout.spacing = 6f;
             layout.childAlignment = TextAnchor.UpperLeft;
@@ -170,16 +170,17 @@ namespace Chess.Editor
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
 
-            var line = new Vector2(680f, 40f);
+            var line = new Vector2(960f, 40f);
             TextMeshProUGUI status = EditorUi.MakeText("StatusText", hudPanel.transform, font, "", 30f,
                 EditorUi.TopLeft(Vector2.zero, line), TextAlignmentOptions.TopLeft, Color.white, true);
             TextMeshProUGUI error = EditorUi.MakeText("ErrorText", hudPanel.transform, font, "", 24f,
                 EditorUi.TopLeft(Vector2.zero, line), TextAlignmentOptions.TopLeft, EditorUi.ErrorColor);
             error.gameObject.SetActive(false);
-            EditorUi.MakeText("HelpText", hudPanel.transform, font, GameText.HelpLine, 22f,
+            EditorUi.MakeText("HelpText", hudPanel.transform, font, GameText.HelpLine, 28f,
                 EditorUi.TopLeft(Vector2.zero, line), TextAlignmentOptions.TopLeft, EditorUi.HelpColor);
 
             GameObject promo = EditorUi.NewPanel("PromotionPanel", canvas.transform, new Vector2(480f, 560f));
+            ((RectTransform)promo.transform).anchoredPosition = new Vector2(0f, -90f);
             TextMeshProUGUI title = EditorUi.MakeText("TitleText", promo.transform, font, GameText.PromotionTitle(Side.White), 32f,
                 EditorUi.Center(new Vector2(0f, 220f), new Vector2(440f, 60f)), TextAlignmentOptions.Center, Color.white, true, 24f);
             Button queen = PromoButton(promo, font, "QueenButton", GameText.PieceName(PieceType.Queen), 130f);
