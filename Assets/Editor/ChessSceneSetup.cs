@@ -82,8 +82,8 @@ namespace Chess.Editor
 
             using (var so = new SerializedObject(rig))
             {
-                SetFloatProp(so, "commanderEyeHeight", 4.0f);
-                SetFloatProp(so, "commanderBackOffset", 7.0f);
+                SetFloatProp(so, "commanderEyeHeight", 7.0f);
+                SetFloatProp(so, "commanderBackOffset", 4.0f);
                 SetFloatProp(so, "commanderPitch", 40f);
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
