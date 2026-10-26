@@ -13,7 +13,7 @@
 - ერთი ადამიანი, თავის Windows PC-ზე (ლოკალურად, ინტერნეტის გარეშე). როლები, ანგარიშები ან ავტორიზაცია არ არსებობს.
 
 ## Current Stage
-Stage 2 — Campaign
+Stage 2 — Campaign (Done, 2026-10-26; Stage 3 — მომხმარებლის არჩევანი)
 
 ## Scope
 ### In scope (Stage 1) — Done

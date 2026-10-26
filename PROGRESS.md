@@ -1,7 +1,7 @@
 # Progress
 
 ## Current Stage
-Stage 2 — Campaign
+Stage 2 — Campaign (Done)
 
 ## Tasks
 <!-- ფორმატი: - [ ] N. Title — owner: task-executor | USER — files: ... — depends: ... — done when: ...
@@ -147,7 +147,7 @@ Stage 2 — Campaign
   - report-ში გამოთვლა: 5 ღილაკის rect-ები `MapArea`-ში ერთმანეთს არ ფარავს და `MapArea`-ს არ სცდება; `TitleText`, `StatusText`, `BackButton` არ ფარავს `MapArea`-ს 1920×1080-ზე.
   - სხვა სცენები/ღილაკები უცვლელია. `dotnet build Tests/EditorCompileCheck` და `Tests/GameCompileCheck` 0/0. საბოლოო შემოწმება: USER task 29 (ნაბიჯი 1–2).
 
-- [ ] 29. USER: კამპანიის ბრძოლები, შენახვა, დაზიანებული ფაილი, MainScene ცალკე — owner: USER — files: Assets/Scenes/*.unity (ხელახლა გენერირდება Tools → Setup Campaign Scenes-ით), Assets/Scenes/MainScene.unity (Debug Campaign Start Fen / Stockfish Path Override დროებით; ბოლოს ცარიელი) — depends: 33, 34 — done when: ყველა შემოწმება გადის; Console = 0 წითელი შეცდომა; ბოლოს Debug Campaign Start Fen, Start Fen და Stockfish Path Override ცარიელია
+- [x] 29. USER: კამპანიის ბრძოლები, შენახვა, დაზიანებული ფაილი, MainScene ცალკე — owner: USER — files: Assets/Scenes/*.unity (ხელახლა გენერირდება Tools → Setup Campaign Scenes-ით), Assets/Scenes/MainScene.unity (Debug Campaign Start Fen / Stockfish Path Override დროებით; ბოლოს ცარიელი) — depends: 33, 34 — done when: ყველა შემოწმება გადის; Console = 0 წითელი შეცდომა; ბოლოს Debug Campaign Start Fen, Start Fen და Stockfish Path Override ცარიელია
     **სასარგებლო:** ველი **Debug Campaign Start Fen** (MainScene → `ChessGame` → **Game Controller**) მუშაობს მხოლოდ Editor-ში და მხოლოდ კამპანიის ბრძოლაში: თუ მასში FEN წერია, ყოველი კამპანიის ბრძოლა ამ პოზიციით იწყება, ზედა-მარცხენა სტატუსში კი ჩანს `[DEBUG FEN]`. ველის შეცვლის შემდეგ ყოველთვის **Ctrl+S** (სცენა უნდა შეინახო, თორემ ცვლილება არ იმოქმედებს). ცვლილება Play-ის **გაჩერებულ** მდგომარეობაში გააკეთე.
     1. დაელოდე კომპილაციას, Console → **Clear** → 0 წითელი. ზედა მენიუ **Tools → Setup Campaign Scenes** → Console: `[CampaignScenesSetup] Done.` (`WITH ERRORS`-ის გარეშე).
     2. ღიაა MainMenu. **Play** → `New Campaign` (თუ კითხვა გამოჩნდა — `Start new`). რუკაზე: სათაური `Campaign Map` მთლიანად ჩანს რუკის მწვანე არის **ზემოთ**; 5 ღილაკი ერთმანეთს არ ფარავს; ღილაკზე 4 ხაზი (სახელი, ეპოქა, `Elo ...`, `Available`/`Locked`) კარგად იკითხება და ბოლო ხაზი არ არის მოჭრილი. გააჩერე Play.
@@ -215,6 +215,10 @@ Stage 2 — Campaign
 - nit (fix round 1 re-review): `Save_TargetLocked_ThrowsAndKeepsOldSave` ძველ კოდზეც გადიოდა; `Save`-ის ტოტი „tmp რჩება, როცა target აღარ არსებობს“ პირდაპირ ტესტით არ მოწმდება (იდეა: `campaign.json` სახელის საქაღალდე → `File.Move` ვარდება → tmp რჩება). 64 KB-ის ზუსტი ზღვარი (65536 / 65537) არ ტესტირდება.
 - nit (fix round 1 re-review): პირველი ჩაწერისას ნაწილობრივ ჩაწერილი tmp (მაგ. disk full) შემდეგ გაშვებაზე აღდგება და „damaged“ გაფრთხილებას აჩვენებს `NoSave`-ის ნაცვლად (უვნებელია; შესაძლო `tempWritten` flag).
 - nit (fix round 1 re-review): დამალული `Continue`-ს ადგილას მთავარ მენიუში 100px ცარიელი ადგილი რჩება (ფიქსირებული პოზიციები) — `VerticalLayoutGroup` `MainPanel`-ზე.
+### ვიზუალური წვრილმანები Stage 3-ისთვის (USER task 29-ის შენიშვნები, 2026-10-26)
+- CampaignMap: `Back to menu` ღილაკი რუკის (`MapArea`) ქვედა-მარცხენა კუთხეს ფარავს (შესაძლოა Game view-ის aspect-ზე დამოკიდებული; reference 1920×1080-ზე გამოთვლით არ ფარავდა).
+- ბრძოლა: ზედა-მარცხენა სტატუსი (`StatusHud`, მაგ. `[DEBUG FEN]` ან გრძელი ტექსტი) ზედა ცენტრის რეგიონის წარწერას (`BattlePanel.infoText`) ფარავს.
+- სარდლის ხედში (`CameraRig`, commander view) საკუთარი მეფის ფიგურა კამერასთან ძალიან ახლოსაა და ხედს ფარავს (`commanderBackOffset` / `commanderEyeHeight` ან მეფის დამალვა ამ ხედში).
 
 ## Blockers
 - (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
@@ -223,17 +227,18 @@ Stage 2 — Campaign
 - (მოგვარდა `a16b924`-ში) `Assets/Scenes/MainScene.unity` და `Assets/Materials/**` დაკომიტებულია.
 
 ## Run State
-- Stage: Stage 2 — Campaign
+- Stage: Stage 2 — Campaign (Done)
 - Finish-check this stage: done (task-ები 33–34 — მომხმარებლის მოთხოვნა USER task 28-ის შემდეგ)
 - Fix rounds this stage: 1/2
 - Failed attempts: —
 
 ## Last Session
-- Date: 2026-10-25
-- Done: Stage 2 — Campaign, agent task-ები 20–27 და finish-check-ის 30–32 `[x]` (ბრენჩი `team/stage2-campaign`). finish-check: code-reviewer + security-auditor → 3 should-fix (შენახვის ჩავარდნისას ორივე ასლის დაკარგვა, `Continue` დამალვა, რეგიონის label-ის ჩამოჭრა) → გასწორდა fix round 1-ში, re-review: სამივე მოგვარებულია, ახალი critical/should-fix არ არის. USER task 28 გავიდა (სცენები და `.meta`-ები დაკომიტდა `bc04739`-ში). მომხმარებლის შენიშვნებით: T33 — Editor-only `debugCampaignStartFen` (`startFen` ახლა მხოლოდ Mode None-ში), T34 — რუკის სათაური MapArea-ს ზემოთ, რეგიონის label Bold 22–28, ღილაკი 400×190; task 29-ის ინსტრუქცია თავიდან დაიწერა (მოგება/წაგება/ფრე debug FEN-ით).
+- Date: 2026-10-26
+- Status: **Stage 2 — Campaign: Done.** ყველა task (20–34) `[x]`, 0 ღია critical/should-fix. USER task-ები 28 და 29 მომხმარებელმა დაადასტურა 2026-10-26: რუკა (სათაური, ტექსტი), მოგება Kartli/Kakheti, Imereti UCI_Elo 1400, წაგება + Retry, ფრე, Stockfish not found → შედეგი არ ითვლება, Quick Game debug FEN-ს არ იყენებს, შენახვა Play-ებს შორის (მათ შორის `File.Replace` Unity Mono-ზე), დაზიანებული ფაილი → `campaign.corrupt.json` + გაფრთხილება, MainScene ცალკე Stage 1-ივით, `stockfish.exe` არ რჩება, Console = 0 შეცდომა. ხელახლა გენერირებული სცენები დაკომიტდა (MainScene-ში `startFen`, `debugCampaignStartFen`, `stockfishPathOverride` ცარიელია; მასალებში შინაარსობრივი ცვლილება არ იყო).
+- Done (ისტორია): Stage 2 — Campaign, agent task-ები 20–27 და finish-check-ის 30–32 `[x]` (ბრენჩი `team/stage2-campaign`). finish-check: code-reviewer + security-auditor → 3 should-fix (შენახვის ჩავარდნისას ორივე ასლის დაკარგვა, `Continue` დამალვა, რეგიონის label-ის ჩამოჭრა) → გასწორდა fix round 1-ში, re-review: სამივე მოგვარებულია, ახალი critical/should-fix არ არის. USER task 28 გავიდა (სცენები და `.meta`-ები დაკომიტდა `bc04739`-ში). მომხმარებლის შენიშვნებით: T33 — Editor-only `debugCampaignStartFen` (`startFen` ახლა მხოლოდ Mode None-ში), T34 — რუკის სათაური MapArea-ს ზემოთ, რეგიონის label Bold 22–28, ღილაკი 400×190; task 29-ის ინსტრუქცია თავიდან დაიწერა (მოგება/წაგება/ფრე debug FEN-ით).
 - Verification: `dotnet test Tests/ChessCore.Tests` 411/411; `dotnet build Tests/ChessCore.Tests`, `Tests/GameCompileCheck`, `Tests/EditorCompileCheck` — 0 warning / 0 error; legacy Input grep → 0; Campaign-ში UnityEngine/record/init → 0. STOCKFISH_PATH integration არ გაშვებულა.
-- Known issues / blockers: არცერთი agent-ის მხარეს. Play-mode (debug FEN, ახალი რუკის განლაგება, ბრძოლები, შენახვა, `File.Replace` Mono-ზე) შეუმოწმებელია — USER task 29. T33/T34 მომხმარებლის მოთხოვნით დამატებული მცირე ცვლილებებია და ცალკე reviewer-ით არ შემოწმებულა (diff ორკესტრატორმა გადახედა).
-- Next: USER task 29 (ნაბიჯი 1 — ხელახლა Tools → Setup Campaign Scenes) → სცენების commit. პრობლემის შემთხვევაში — `/auto continue` შეცდომის აღწერით.
+- Known issues / blockers: არცერთი. ვიზუალური წვრილმანები და nit-ები Backlog-შია. T33/T34 ცალკე reviewer-ით არ შემოწმებულა (diff ორკესტრატორმა გადახედა; Play-mode-ში USER task 29-მა დაადასტურა).
+- Next: Stage 3-ის არჩევა მომხმარებლის გადაწყვეტილებაა (Backlog → ფაზა 2 Art & Sound / ფაზა 3 Polish & FX / ვიზუალური წვრილმანები).
 
 ## Stage 1 — Done
 - [x] 1. Test infrastructure, .gitignore, asmdef skeleton — owner: task-executor — files: .gitignore, Tests/ChessCore.Build/ChessCore.Build.csproj, Tests/ChessAI.Build/ChessAI.Build.csproj, Tests/ChessCore.Tests/ChessCore.Tests.csproj, Tests/ChessCore.Tests/BuildTargetTests.cs, Assets/Scripts/Core/Chess.Core.asmdef, Assets/Scripts/AI/Chess.AI.asmdef, Assets/Scripts/Game/Chess.Game.asmdef, Assets/StreamingAssets/Stockfish/README.md — depends: — — done when:
