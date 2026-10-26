@@ -30,7 +30,7 @@ Stage 3 — ქართული ინტერფეისი
   - `CampaignSaveStore.cs`, `CampaignSaveSerializer.cs`, `JsonReader.cs`, `Region.cs` და მათი ტესტები უცვლელია და გადის (schema v1, id-ები).
   - G2 → მხოლოდ `TextTable.Georgian.cs`. Grep Campaign: `UnityEngine|\brecord\b|\binit;` → 0.
 
-- [ ] 37. TMP-ის მიერთება: asmdef-ები და compile-check პროექტები — owner: task-executor — files: Assets/Scripts/Game/Chess.Game.asmdef, Assets/Editor/Chess.Editor.asmdef, Tests/GameCompileCheck/GameCompileCheck.csproj, Tests/EditorCompileCheck/EditorCompileCheck.csproj — depends: — — done when:
+- [x] 37. TMP-ის მიერთება: asmdef-ები და compile-check პროექტები — owner: task-executor — files: Assets/Scripts/Game/Chess.Game.asmdef, Assets/Editor/Chess.Editor.asmdef, Tests/GameCompileCheck/GameCompileCheck.csproj, Tests/EditorCompileCheck/EditorCompileCheck.csproj — depends: — — done when:
   - `Chess.Game.asmdef` references = `["Chess.Core","Chess.AI","Chess.Campaign","Unity.InputSystem","UnityEngine.UI","Unity.TextMeshPro"]`; `Chess.Editor.asmdef` references = `["Chess.Core","Chess.AI","Chess.Campaign","Chess.Game","Unity.InputSystem","UnityEngine.UI","Unity.TextMeshPro"]`; სხვა ველები უცვლელია.
   - ორივე csproj: + `<Reference Include="../../Library/ScriptAssemblies/Unity.TextMeshPro.dll" Private="false" />`; სხვა უცვლელია (`Unity.TextMeshPro.Editor.dll` არ ემატება — საჭირო არ არის).
   - `dotnet build Tests/GameCompileCheck` და `dotnet build Tests/EditorCompileCheck` → 0 შეცდომა, 0 warning; `dotnet test Tests/ChessCore.Tests` გადის. `.cs` ფაილები არ შეცვლილა.

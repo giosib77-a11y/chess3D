@@ -26,6 +26,7 @@
     <Reference Include="$(UnityEditorDataDir)\Managed\UnityEngine\UnityEditor.dll" Private="false" />
     <Reference Include="$(UnityEditorDataDir)\Managed\UnityEngine\UnityEditor.CoreModule.dll" Private="false" />
     <Reference Include="../../Library/ScriptAssemblies/UnityEngine.UI.dll" Private="false" />
+    <Reference Include="../../Library/ScriptAssemblies/Unity.TextMeshPro.dll" Private="false" />
     <Reference Include="../../Library/ScriptAssemblies/Unity.InputSystem.dll" Private="false" />
   </ItemGroup>
 
