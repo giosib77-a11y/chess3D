@@ -47,8 +47,8 @@ Stage 3 — ქართული ინტერფეისი
   - `dotnet build Tests/GameCompileCheck` 0/0; `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet test` გადის. `OnGUI|\bGUI\.|GUIStyle|GUILayout` მთელ `Assets/Scripts/Game`-ში → 0; ამ ორ ფაილში G1, G2, G3, G4 → 0.
   - საბოლოო შემოწმება: USER task 46 (ნაბიჯები 5–6).
 
-- [ ] 40. Game: GameController-ის ტექსტები ცხრილიდან + სარდლის ხედში საკუთარი მეფის დამალვა — owner: task-executor — files: Assets/Scripts/Game/GameController.cs, Assets/Scripts/Game/CameraRig.cs, Assets/Scripts/Game/PiecesView.cs — depends: 36, 38 — done when:
-  - ზუსტად API Contract → Stage 3 → „GameController — Stage 3“, `CameraRig` (`ViewChanged`) და `PiecesView` (`SetHiddenSquare`) სტრიქონები. `BuildStatus` → `GameText.Status`; `[DEBUG FEN]` → `GameText.WithDebugFen`; შეცდომები → `GameText.StockfishNotFound` / `AiError`; info/ღილაკების ტექსტები → `CampaignText`/`GameText`/`TextTable.Active`/`DifficultyText`.
+- [ ] 40. Game: GameController-ის ტექსტები ცხრილიდან + სარდლის ხედის კამერა მაღლა/უკან — owner: task-executor — files: Assets/Scripts/Game/GameController.cs, Assets/Scripts/Game/CameraRig.cs — depends: 36, 38 — done when:
+  - ზუსტად API Contract → Stage 3 → „GameController — Stage 3“ და `CameraRig` სტრიქონი: `CameraRig.cs`-ში იცვლება მხოლოდ სამი ნაგულისხმევი (`commanderEyeHeight` 3.0, `commanderBackOffset` 1.6, `commanderPitch` 30); მეფე არ იმალება, `PiecesView.cs` არ იცვლება, GameController-ში მეფის ხილვადობის ლოგიკა არ არის. `BuildStatus` → `GameText.Status`; `[DEBUG FEN]` → `GameText.WithDebugFen`; შეცდომები → `GameText.StockfishNotFound` / `AiError`; info/ღილაკების ტექსტები → `CampaignText`/`GameText`/`TextTable.Active`/`DifficultyText`.
   - Stage 1–2-ის ყველა Inspector ველი (სახელი, ტიპი, ნაგულისხმევი), ნაკადი, შედეგის დამუშავება, `Debug.Log*` ტექსტები (მათ შორის `[GameController] AI difficulty: ...` ფორმატი) და `CameraRig`-ის ველები/ნაგულისხმევები უცვლელია.
   - `dotnet build Tests/GameCompileCheck` 0/0 **და** `dotnet build Tests/GameCompileCheck -p:DefineConstants=UNITY_EDITOR` 0 შეცდომა (ბოლოს ისევ ჩვეულებრივი build); `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet test Tests/ChessCore.Tests` გადის.
   - მთელ `Assets/Scripts/Game`-ში: G1, G3, G4 → 0; G2 → 0 (Game-ში ქართული ასო არ არის).
@@ -60,8 +60,9 @@ Stage 3 — ქართული ინტერფეისი
   - `dotnet build Tests/EditorCompileCheck` → 0 შეცდომა, 0 warning; `dotnet build Tests/GameCompileCheck` 0/0; `dotnet test` გადის. ამ 2 ფაილში G2, G3, G4 → 0 (log-ები ინგლისურად).
   - საბოლოო შემოწმება: USER task 45 (ნაბიჯები 2–4).
 
-- [ ] 42. Editor: Setup Chess Scene → `HudCanvas` (HUD + გარდაქმნის ფანჯარა) და EventSystem — owner: task-executor — files: Assets/Editor/ChessSceneSetup.cs — depends: 39, 41 — done when:
-  - ზუსტად API Contract → Stage 3 → „ChessSceneSetup — Stage 3 დამატებები“ (ნაბიჯები 1–5) და „UI სტილი (Stage 3)“ → `HudCanvas`: font-ის შემოწმება სცენის გახსნამდე (null → LogError, არაფერი იცვლება), `EditorUi.EnsureEventSystem`, `HudCanvas` წაშლა+შექმნა, `HudPanel` (VerticalLayoutGroup; `StatusText`, `ErrorText`, `HelpText` = `GameText.HelpLine`), `PromotionPanel` (inactive; `TitleText` + 5 ღილაკი, label-ები `GameText.PieceName` / `Cancel`), `StatusHud`/`PromotionPrompt` ველების მიბმა `SerializedObject`-ით (ვერ ნაპოვნი → LogError + WITH ERRORS).
+- [ ] 42. Editor: Setup Chess Scene → `HudCanvas` (HUD + გარდაქმნის ფანჯარა), EventSystem და სარდლის კამერის მნიშვნელობები — owner: task-executor — files: Assets/Editor/ChessSceneSetup.cs — depends: 39, 40, 41 — done when:
+  - ზუსტად API Contract → Stage 3 → „ChessSceneSetup — Stage 3 დამატებები“ (ნაბიჯები 1–6) და „UI სტილი (Stage 3)“ → `HudCanvas`: font-ის შემოწმება სცენის გახსნამდე (null → LogError, არაფერი იცვლება), `EditorUi.EnsureEventSystem`, `HudCanvas` წაშლა+შექმნა, `HudPanel` (VerticalLayoutGroup; `StatusText`, `ErrorText`, `HelpText` = `GameText.HelpLine`), `PromotionPanel` (inactive; `TitleText` + 5 ღილაკი, label-ები `GameText.PieceName` / `Cancel`), `StatusHud`/`PromotionPrompt` ველების მიბმა `SerializedObject`-ით (ვერ ნაპოვნი → LogError + WITH ERRORS).
+  - ნაბიჯი 6: `Main Camera`-ს `CameraRig`-ზე `SerializedObject`-ით `commanderEyeHeight` = 3.0, `commanderBackOffset` = 1.6, `commanderPitch` = 30 (ვერ ნაპოვნი → LogError + WITH ERRORS); `CameraRig`-ის სხვა ველებს არ ეხება.
   - Stage 1-ის ნაბიჯები, მასალები, `GameController`-ის ველები და ნაგულისხმევები უცვლელია; `battlePanel`-ს და `BattleCanvas`-ს არ ეხება.
   - `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet build Tests/GameCompileCheck` 0/0. ამ ფაილში G2, G3, G4 → 0.
   - `git status --porcelain` — მხოლოდ ეს ფაილი (სცენებს USER-ის მიერ გაშვებული ბრძანება ცვლის).
@@ -75,7 +76,7 @@ Stage 3 — ქართული ინტერფეისი
   - `git status --porcelain` — მხოლოდ ეს ფაილი.
   - საბოლოო შემოწმება: USER task 45, 46.
 
-- [ ] 44. USER: Noto Sans Georgian ფონტის ჩამოტვირთვა და TMP Essential Resources-ის იმპორტი — owner: USER — files: Assets/Fonts/NotoSansGeorgian-Regular.ttf, Assets/Fonts/OFL.txt, Assets/TextMesh Pro/** (+ `.meta`-ები, Unity ქმნის) — depends: — — done when: ფონტი და ლიცენზია `Assets/Fonts`-შია, `Assets/TextMesh Pro` არსებობს, Console = 0 წითელი შეცდომა
+- [x] 44. (მომხმარებელმა შეასრულა და დააკომიტა `6d97068`-ში, 2026-10-26) USER: Noto Sans Georgian ფონტის ჩამოტვირთვა და TMP Essential Resources-ის იმპორტი — owner: USER — files: Assets/Fonts/NotoSansGeorgian-Regular.ttf, Assets/Fonts/OFL.txt, Assets/TextMesh Pro/** (+ `.meta`-ები, Unity ქმნის) — depends: — — done when: ფონტი და ლიცენზია `Assets/Fonts`-შია, `Assets/TextMesh Pro` არსებობს, Console = 0 წითელი შეცდომა
     **რატომ:** ქართული ასოების საჩვენებლად თამაშს სჭირდება ფონტის ფაილი (ის კოდში არ არის) და TextMeshPro-ს ძირითადი ფაილები (shader-ები, პარამეტრები). ეს task ნებისმიერ დროს შეგიძლია გააკეთო — სასურველია ახლავე.
     1. ბრაუზერში გახსენი **https://fonts.google.com/noto/specimen/Noto+Sans+Georgian** (Google Fonts — ოფიციალური საიტი; სხვა საიტიდან არ ჩამოტვირთო).
     2. ზედა-მარჯვნივ დააჭირე **Get font**, შემდეგ **Download all** (ზოგ ვერსიაში ღილაკს ჰქვია **Download family**). ჩამოიტვირთება `.zip` ფაილი (მაგ. `Noto_Sans_Georgian.zip`).
@@ -110,7 +111,7 @@ Stage 3 — ქართული ინტერფეისი
     **შეხსენება:** Inspector-ის ველებს ყოველთვის Play-ის **გაჩერებულ** მდგომარეობაში ცვლი და შემდეგ **Ctrl+S** (სცენის შენახვა).
     1. Console → **Clear**. ღიაა MainMenu → **Play** → `სწრაფი თამაში` → `ფერი: შავი`, `სირთულე: მარტივი` → `დაწყება`.
     2. ზემოთ ცენტრში `სწრაფი თამაში - მარტივი - შენი ფერი: შავი`; ზედა-მარჯვნივ `მენიუში დაბრუნება`; ამ ზოლის **ქვემოთ**, მარცხნივ: სტატუსი (`AI ფიქრობს...` ან `შავის სვლაა`) და დახმარება `მაუსი: არჩევა/სვლა  TAB: ხედი  R: თავიდან`. სტატუსი ზედა ტექსტს არ ფარავს.
-    3. **სარდლის ხედი:** კამერა შენი (შავი) მეფის ადგილიდან იყურება და შენი მეფე **არ ჩანს** — დაფა წინ თავისუფლად ჩანს. დააჭირე **TAB** → კამერა ზემოთ ადის და შავი მეფე e8-ზე ჩანს. ისევ **TAB** → სარდლის ხედი, მეფე ისევ არ ჩანს. სარდლის ხედში გააკეთე სვლა პაიკით (დააჭირე e7-ს, შემდეგ e5-ს) — მუშაობს. (სარდლის ხედში საკუთარ მეფეს ვერ აირჩევ — „შენ“ ხარ ის; მეფის სვლისთვის გადადი TAB-ით ტაქტიკურ ხედზე.)
+    3. **სარდლის ხედი:** კამერა შენი (შავი) მეფის უკან და მაღლაა. შენი მეფე **ჩანს** ეკრანის ქვედა ნაწილში და დაფას არ ფარავს — დაფა ბოლომდე (მოწინააღმდეგის მხარემდე) ჩანს. დააჭირე **TAB** → ტაქტიკური ხედი; ისევ **TAB** → სარდლის ხედი. სარდლის ხედში: დააჭირე პაიკს e7 → e5 (სვლა მუშაობს). შემდეგ, თეთრის პასუხის მერე, **დააჭირე შენს მეფეს** — ის მოინიშნება და დასაშვები უჯრა e7 ანათებს (მეფის არჩევა სარდლის ხედშიც მუშაობს). მეფის სვლა არ გააკეთო — დააჭირე ცარიელ ადგილს, მონიშვნა მოიხსნება. თუ ხედი უხერხულია (მეფე ზედმეტად დიდი/პატარაა ან დაფა ცუდად ჩანს) — screenshot გადაეცი გუნდს (მნიშვნელობები: Main Camera → **Camera Rig** → Commander Eye Height / Back Offset / Pitch).
     4. Game view-ში აირჩიე `4:3 Aspect`, შემდეგ `Free Aspect` და ფანჯარა გახადე ძალიან ფართო: ზედა ზოლი (ტექსტი + ღილაკი) და მარცხენა სტატუსი არცერთ ზომაზე ერთმანეთს არ ფარავს. `მენიუში დაბრუნება` → მენიუ. გააჩერე Play.
     5. **MainScene ცალკე + გარდაქმნა:** ორჯერ დააჭირე `Assets/Scenes/MainScene`-ს. Hierarchy → `ChessGame` → **Game Controller** → **Start Fen** = `8/P6k/8/8/8/8/8/K7 w - - 0 1` → **Ctrl+S** → **Play**. ზედა ზოლი (ტექსტი/ღილაკი) არ ჩანს; მარცხნივ ჩანს `თეთრის სვლაა` და დახმარების ხაზი.
     6. დააჭირე **TAB** (ტაქტიკური ხედი) → თეთრი პაიკი a7-ზე → a8: ეკრანის ცენტრში ფანჯარა `პაიკის გარდაქმნა (თეთრი)` და ღილაკები `ლაზიერი`, `ეტლი`, `კუ`, `მხედარი`, `გაუქმება`. დააჭირე `გაუქმება` → ფანჯარა ქრება, პაიკი a7-ზე რჩება. ისევ a7 → a8 → **Esc** → ფანჯარა ქრება. ისევ a7 → a8 → `მხედარი` → a8-ზე მხედარია, ფანჯარა ქრება და დაფაზე სხვა არაფერი შეცვლილა (ღილაკზე დაჭერამ დაფაზე არც სვლა, არც მონიშვნა არ გამოიწვია). შავი (AI) პასუხობს. გააჩერე Play.
@@ -126,7 +127,7 @@ Stage 3 — ქართული ინტერფეისი
 ## Shared files
 <!-- ფაილები, რომლებიც რამდენიმე task-ის files-ში შეიძლება იყოს (shared). წესი: მხოლოდ დამატება (ახალი dependency, ტიპი, route), სხვისი ჩანაწერის შეცვლა ან წაშლა არა; ერთ საერთო ფაილზე ორი task ერთდროულად არ მუშაობს. -->
 - Stage 3-ში არცერთი: ყოველ ფაილს ერთი task ეკუთვნის. `TextId.cs` / `TextTable*.cs` / `GameText.cs` — მხოლოდ 35 (ახალი ტექსტი სჭირდება? → ჯერ API Contract-ის ცხრილის განახლება და ცალკე task); asmdef-ები და compile-check csproj-ები — მხოლოდ 37; `GameController.cs` — მხოლოდ 40; `ChessSceneSetup.cs` — მხოლოდ 42; `CampaignScenesSetup.cs` — მხოლოდ 43. ახალი NuGet/Unity package არცერთ task-ს არ სჭირდება.
-- რიგი (რეკომენდებული — თანმიმდევრული, რადგან `GameCompileCheck`/`EditorCompileCheck` მთელ Game/Editor საქაღალდეს აკომპილირებს და პარალელური ნახევრად დასრულებული ცვლილება სხვის build-ს ჩააგდებს): 35 → 36 → 37 → 38 → 39 → 40 → 41 → 42 → 43 → USER 45 → USER 46. task 37 შეიძლება 35/36-ის პარალელურად. USER 44 — ნებისმიერ დროს, 45-მდე (აგენტის task-ებს არ აჩერებს).
+- რიგი (რეკომენდებული — თანმიმდევრული, რადგან `GameCompileCheck`/`EditorCompileCheck` მთელ Game/Editor საქაღალდეს აკომპილირებს და პარალელური ნახევრად დასრულებული ცვლილება სხვის build-ს ჩააგდებს): 35 → 36 → 37 → 38 → 39 → 40 → 41 → 42 → 43 → USER 45 → USER 46. task 37 შეიძლება 35/36-ის პარალელურად. USER 44 — შესრულებულია (`6d97068`).
 - აგენტი არ ცვლის: `Assets/Scenes/*.unity`, `ProjectSettings/**`, `Assets/Fonts/**`, `Assets/TextMesh Pro/**`, `.meta` ფაილებს — მათ ქმნის/ცვლის USER ან USER-ის მიერ გაშვებული Editor ბრძანება (44, 45, 46).
 
 ## Backlog (needs user decision)
@@ -168,7 +169,6 @@ Stage 3 — ქართული ინტერფეისი
 ### Stage 3-ის გარეთ დარჩენილი (გადაწყვეტილება საჭიროა)
 - ენის არჩევა მენიუში (ქართული / English) — `TextTable.English` უკვე არსებობს; საჭიროა `Active`-ის არჩევა და შენახვა.
 - ქართული Bold ფაილი (`NotoSansGeorgian-Bold.ttf`) synthetic bold-ის ნაცვლად, თუ სათაურები საკმარისად მკვეთრი არ იქნება.
-- სარდლის ხედში მეფის არჩევა (ახლა მხოლოდ ტაქტიკურ ხედში) — თუ მომხმარებელს დასჭირდება, ალტერნატივა: კამერის offset-ები + მეფე ხილული.
 
 ## Blockers
 - (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.

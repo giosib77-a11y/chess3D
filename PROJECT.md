@@ -60,7 +60,7 @@ Stage 3 — ქართული ინტერფეისი (დაგე�
 - სტრიქონების ცხრილი `Chess.Campaign`-ში (`TextId`, `TextTable`, `GameText`): ყველა UI ტექსტი ქართულად (აქტიური), Stage 2-ის ინგლისური ტექსტები — მეორე ცხრილად (runtime-ზე არ ჩანს). რეგიონების სახელები და ეპოქები ქართულია (id-ები, Elo და რიგი უცვლელია → შენახვა თავსებადია). ყველაფერი იტესტება `dotnet test`-ით, მათ შორის სიმბოლოების უსაფრთხოება (მხოლოდ ASCII + მხედრული).
 - TextMeshPro (უკვე `com.unity.ugui` 2.6.0-ში): ყველა uGUI `Text` → `TMP_Text`; ფონტი Noto Sans Georgian Regular (OFL), font asset იქმნება Editor ბრძანებით (**Tools → Setup Georgian Font**, Static atlas: ASCII + მხედრული).
 - `StatusHud` და `PromotionPrompt`: OnGUI → uGUI/TMP (`HudCanvas`, აწყობს **Tools → Setup Chess Scene**). public API უცვლელია.
-- განლაგება: CanvasScaler `Expand` (ნებისმიერ aspect-ზე არაფერი გადაიფარება), მენიუს ღილაკები `VerticalLayoutGroup`-ით, ბრძოლის ეკრანის ზოლები (ზედა ზოლში ინფო + გასვლის ღილაკი, მის ქვეშ მარცხნივ — HUD), სარდლის ხედში საკუთარი მეფე იმალება.
+- განლაგება: CanvasScaler `Expand` (ნებისმიერ aspect-ზე არაფერი გადაიფარება), მენიუს ღილაკები `VerticalLayoutGroup`-ით, ბრძოლის ეკრანის ზოლები (ზედა ზოლში ინფო + გასვლის ღილაკი, მის ქვეშ მარცხნივ — HUD), სარდლის ხედში კამერა მაღლა/უკან (მეფე ხილულია, ხედს არ ფარავს და აირჩევა).
 - Setup ბრძანებების განახლება (ახალი სცენის ბრძანება არ ემატება): Setup Chess Scene, Setup Campaign Scenes + ახალი Setup Georgian Font.
 
 ### Out of scope (Stage 3)
@@ -92,7 +92,7 @@ Stage 3 — ქართული ინტერფეისი (დაგე�
 
 ### Stage 3
 ნაკადები 1–13 უცვლელია; იცვლება მხოლოდ ტექსტები (ქართული, `TextTable`) და ორი რამ:
-14. **სარდლის ხედი:** სარდლის ხედში ადამიანის საკუთარი მეფე დამალულია (კამერა „მეფის თვალით“ იყურება); ტაქტიკურ ხედში (TAB) ჩანს. მეფის არჩევა და სვლა — ტაქტიკურ ხედში.
+14. **სარდლის ხედი:** კამერა ადამიანის მეფის უკან და მაღლაა; მეფე ჩანს ეკრანის ქვედა ნაწილში და ხედს არ ფარავს. მეფის არჩევა და სვლა ორივე ხედში მუშაობს.
 15. **გარდაქმნა:** იგივე არჩევანი (ლაზიერი / ეტლი / კუ / მხედარი / გაუქმება, Esc = გაუქმება), uGUI ფანჯარაში ეკრანის ცენტრში.
 
 ## Business Rules
@@ -948,15 +948,14 @@ public static class BattleRules
 | `StatusHud` (`StatusHud.cs`) | `ChessGame` | OnGUI წაიშალა. ტექსტები — `HudCanvas`-ის TMP ობიექტებში. `Awake`: null ველი → `Debug.LogError("[StatusHud] '<field>' is not assigned.", this)`; `errorText` დამალულია. `Show`: `statusText.text = status ?? ""`; `errorText.text = error ?? ""`, `errorText.gameObject` აქტიურია მხოლოდ არა-ცარიელ error-ზე (null ველზე NRE არა). დახმარების ხაზს (`GameText.HelpLine`) Editor წერს `HelpText`-ში | `statusText`, `errorText` (TMP_Text). API უცვლელი: `Show(string status, string error)` |
 | `PromotionPrompt` (`PromotionPrompt.cs`) | `ChessGame` | OnGUI წაიშალა. `Awake`: ღილაკებზე `onClick.AddListener` (Queen/Rook/Bishop/Knight → არჩევა, cancel → გაუქმება), `panel.SetActive(false)`, null ველი → `Debug.LogError` სახელით; `OnDestroy`: `RemoveListener`. `Open`: `titleText.text = GameText.PromotionTitle(side)`, `panel` აქტიური, `IsOpen = true`; თუ `panel == null` → `Debug.LogError` და მაშინვე `onCancelled` (ფიგურა ჩუმად არ აირჩევა). `Close`: `panel` inactive, `EventSystem.current?.SetSelectedGameObject(null)`, დანარჩენი როგორც ახლა (`IsOpen = false` callback-მდე, `LastClosedFrame`). Esc = Cancel (`Keyboard.current`, უცვლელი) | `panel` (GameObject), `titleText` (TMP_Text), `queenButton`, `rookButton`, `bishopButton`, `knightButton`, `cancelButton` (Button). API უცვლელი: `bool IsOpen`, `int LastClosedFrame`, `Open(Side side, Action<PieceType> onChosen, Action onCancelled)` |
 | `DifficultyText` (`UI/DifficultyText.cs`, static) | — | `DifficultyPreset` → ტექსტი (Campaign AI-ს არ იცნობს) | `public static string Name(DifficultyPreset preset)` → `TextTable.Active.Get(DifficultyEasy/Medium/Hard/Master)`; undefined → `ArgumentOutOfRangeException` |
-| `CameraRig` | `Main Camera` | + event; ველები/ნაგულისხმევები უცვლელი | + `public event Action<CameraView> ViewChanged` — `SetView`-ში მხოლოდ მაშინ, როცა ხედი რეალურად იცვლება (მათ შორის `Toggle`, `NotifyHumanMoveMade`) |
-| `PiecesView` | `ChessGame` | + დამალული უჯრა | + `public void SetHiddenSquare(Square? square)` — იმ უჯრის ფიგურის root `SetActive(false)` (renderer-ები და collider-ები; raycast უკან მდებარე უჯრას ხვდება), დანარჩენი აქტიურია; null → ყველა ჩანს. მნიშვნელობა ინახება და `Sync`-ის შემდეგაც მოქმედებს |
+| `CameraRig` | `Main Camera` | მხოლოდ სარდლის ხედის 3 ნაგულისხმევი მნიშვნელობა იცვლება (კამერა მაღლა/უკან, მეფე ხილულია და ხედს არ ფარავს); ველების სახელები, ტიპები, დანარჩენი ნაგულისხმევები, API და ფორმულა (`ComputeTarget`) უცვლელია | `commanderEyeHeight` **3.0** (იყო 1.4), `commanderBackOffset` **1.6** (იყო 0.6), `commanderPitch` **30** (იყო 15). API უცვლელი. `PiecesView` არ იცვლება (მეფე არ იმალება, არჩევა ორივე ხედში მუშაობს) |
 
-**GameController — Stage 3 (ნაკადი, Inspector და log-ები უცვლელია; იცვლება მხოლოდ ტექსტის წყარო და მეფის ხილვადობა):**
+**GameController — Stage 3 (ნაკადი, Inspector და log-ები უცვლელია; იცვლება მხოლოდ ტექსტის წყარო):**
 - სტატუსი: `GameText.Status(_state.Status, _state.SideToMove, _state.IsCheck, _thinking)`; Editor debug FEN → `GameText.WithDebugFen(status)` (მხოლოდ `UpdateHud`-ში, როგორც ახლა).
 - შეცდომა: `StockfishNotFoundException` → `GameText.StockfishNotFound(notFound.Path)`; სხვა → `GameText.AiError(ex.Message)`.
 - Campaign: `ShowInGame(CampaignText.BattleInfo(region), Get(BackToMap))`; უცნობი რეგიონი → `ShowInGame(Get(BattleInfoUnknown), Get(BackToMap))`; შედეგი → `ShowResult(..., Get(Retry), Get(BackToMap))`.
 - QuickGame: `ShowInGame(GameText.QuickGameInfo(DifficultyText.Name(GameSession.QuickDifficulty), humanSide), Get(BackToMenu))`; შედეგი → `ShowResult(BattleRules.GetTitle(outcome), <status>, true, Get(PlayAgain), Get(BackToMenu))`. (`Get` = `TextTable.Active.Get`.)
-- მეფე სარდლის ხედში: `OnEnable`-ში `cameraRig.ViewChanged += OnCameraViewChanged` (`OnDisable`-ში `-=`); `UpdateKingVisibility()`: თუ `piecesView`/`_state` null → არაფერი; სხვა შემთხვევაში `piecesView.SetHiddenSquare(cameraRig != null && cameraRig.CurrentView == CameraRig.CameraView.Commander ? _state.Position.FindKing(humanSide) : (Square?)null)`. იძახება `Refresh`-ში (`Sync` + `SetCommander`-ის შემდეგ) და `ViewChanged`-ზე. hot-seat-ში იმალება `humanSide`-ის მეფე (კამერა მასთანაა).
+- მეფის ხილვადობის ლოგიკა GameController-ში **არ** არის (სარდლის ხედი მხოლოდ `CameraRig`-ის ნაგულისხმევებით გასწორდა).
 - Game-ში ახალი static მდგომარეობა არ არის (`TextTable`-ის static-ები read-only-ია, reset არ სჭირდება).
 
 **MainMenuController:** `colorLabel.text = GameText.QuickColorLabel(quickSide)`; `difficultyLabel.text = GameText.QuickDifficultyLabel(DifficultyText.Name(quickDifficulty))`; warning-ის წესი უცვლელია (`CampaignText`-ის property-ებით).
@@ -985,6 +984,7 @@ public static TMP_FontAsset Ensure(out bool charactersMissing);    // null only 
 3. root `HudCanvas` — ყოველ გაშვებაზე იშლება და თავიდან იქმნება (`NewCanvas("HudCanvas", 20)`); შიგნით `HudPanel` და `PromotionPanel` (განლაგება — „UI სტილი (Stage 3)“); `HelpText.text = GameText.HelpLine`; ღილაკების label-ები: `GameText.PieceName(Queen/Rook/Bishop/Knight)`, `Get(Cancel)`.
 4. `StatusHud` (`statusText`, `errorText`) და `PromotionPrompt` (`panel`, `titleText`, `queenButton`, `rookButton`, `bishopButton`, `knightButton`, `cancelButton`) — `SerializedObject`-ით (ვერ ნაპოვნი → LogError, „WITH ERRORS“). კომპონენტები `ChessGame`-ზე რჩება.
 5. შემაჯამებელ log-ში `HudCanvas` ჩანს Created-ში. მეორე გაშვება: ერთი `HudCanvas`, ერთი `EventSystem`.
+6. `Main Camera`-ს `CameraRig`-ზე `SerializedObject`-ით იწერება `commanderEyeHeight` = 3.0, `commanderBackOffset` = 1.6, `commanderPitch` = 30 (ვერ ნაპოვნი → LogError, „WITH ERRORS“). მიზეზი: არსებულ MainScene-ში სერიალიზებულია ძველი 1.4 / 0.6 / 15 და კოდის ნაგულისხმევის შეცვლა მათ არ ცვლის. `CameraRig`-ის სხვა ველებს არ ეხება. (ხელით შეცვლილი ეს სამი მნიშვნელობა ხელახალ გაშვებაზე ბრუნდება — როგორც Stage 1-ის სხვა ველები.)
 
 **`CampaignScenesSetup` (Tools → Setup Campaign Scenes) — Stage 3 ცვლილებები** (ნაბიჯები 1–10, სცენები, ობიექტების სახელები, ველების მიბმა და Build Settings უცვლელია; `HudCanvas`-ს, `StatusHud`-ს, `PromotionPrompt`-ს არ ეხება):
 1. ნაბიჯი 1-ის შემდეგ: `GeorgianFontSetup.Ensure(out bool missing)`; null → `Debug.LogError(Tag + "Georgian font is not ready, nothing was changed.")` და გასვლა; `missing` → „WITH ERRORS“. `LegacyRuntime.ttf` და `UnityEngine.UI.Text` აღარ გამოიყენება — ყველა ტექსტი `EditorUi.MakeText`/`MakeButton`-ით (TMP, ქართული font asset).
@@ -1001,7 +1001,7 @@ public static TMP_FontAsset Ensure(out bool charactersMissing);    // null only 
 - **CampaignMap:** Stage 2-ის პოზიციები (`MapArea` x 210–1710, y 260–920; `TitleText` y 25–115; `StatusText` x 460–1460, y 935–1025; `BackButton` x 40–440, y 960–1040) — reference-ზე არ გადაიფარება, Expand-ით არც სხვა aspect-ზე.
 - **MainScene — `BattleCanvas` (sortingOrder 10, Setup Campaign Scenes):** `InfoText` Top (0, -24) 1100×70 → x 410–1510, y 24–94; `LeaveButton` ზედა-მარჯვნივ (-24, -24) **320×70** → x 1576–1896, y 24–94; `ResultPanel` center **760×400** → x 580–1340, y 340–740: `TitleText` (0, 140) 700×70, `MessageText` (0, 30) 700×140, `RetryButton` (-170, -130) 320×70, `BackButton` (170, -130) 320×70.
 - **MainScene — `HudCanvas` (sortingOrder 20, Setup Chess Scene):** `HudPanel` anchor/pivot ზედა-მარცხენა, (24, -110), **680×220** → x 24–704, y 110–330 (ზედა ზოლის ქვეშ — `InfoText`-ს და `LeaveButton`-ს ვერ ფარავს; `ResultPanel`-ზე მაღლაა). `HudPanel`-ზე `VerticalLayoutGroup` (spacing 6, UpperLeft, childControlWidth/Height true, childForceExpandWidth true, childForceExpandHeight false) → `StatusText`, `ErrorText` (დამალვისას ადგილს არ იკავებს), `HelpText`. `PromotionPanel` (Image `#2A2A33` α0.95) center **480×560** → x 720–1200, y 260–820, inactive: `TitleText` (0, 220) 440×60, `QueenButton` (0, 130), `RookButton` (0, 50), `BishopButton` (0, -30), `KnightButton` (0, -110), `CancelButton` (0, -200) — ღილაკები 400×70. `HudPanel` და `PromotionPanel` x-ით არ კვეთს ერთმანეთს; `PromotionPanel` და `ResultPanel` ერთდროულად არასდროს ჩანს.
-- **სარდლის ხედი:** საკუთარი მეფე დამალულია (`PiecesView.SetHiddenSquare`); `CameraRig`-ის ველები და ნაგულისხმევები უცვლელია.
+- **სარდლის ხედი:** კამერა მეფის უჯრიდან 1.6 უკან და 3.0 სიმაღლეზე, 30° ქვემოთ (vertical FOV 60). გამოთვლა: მეფის თავი (1.05) ცენტრიდან ≈20.6° ქვემოთაა, ძირი ≈31.9° (ეკრანის ქვედა კიდე 30°) → მეფე ჩანს ქვედა ნაწილში, ხოლო ცენტრის სხივი მიწას ≈ მე-4/მე-5 რიგზე ხვდება და მთელი დაფა ჩანს (ზედა კიდე ჰორიზონტზეა). მეფე ფარავს მხოლოდ მის უკან ≈0.86 უჯრამდე მიწას (მის წინ მდგომი პაიკი თავით ჩანს). მეფე ხილულია და click-ით აირჩევა ორივე ხედში.
 
 ## Testing Strategy
 - **Core (კრიტიკული ლოგიკა):** xUnit unit-ტესტები და perft (`Tests/ChessCore.Tests/Core`).
@@ -1019,7 +1019,7 @@ public static TMP_FontAsset Ensure(out bool charactersMissing);    // null only 
 - **AI (Stage 2):** `FromElo`-ს ზოლების საზღვრები და preset-ებთან ტოლობა; `BuildDifficultyCommands`/`BuildGo` `FromElo`-ს შედეგზე. არსებული ტესტები უცვლელად გადის.
 - **Game/Editor (Stage 2):** `dotnet build Tests/GameCompileCheck` და `Tests/EditorCompileCheck` (0 შეცდომა, 0 warning) + USER task-ები (Play-mode).
 - **Stage 3 — ტექსტები (Campaign, xUnit):** `TextTableTests` — ყოველ `TextId`-ს ორივე ცხრილში აქვს არა-ცარიელი ტექსტი; ორივე ცხრილის ყოველი ტექსტი ზუსტად API Contract-ის ცხრილით (73 × 2); `{n}` placeholder-ების სიმრავლე ორ ცხრილში ერთნაირია; სიმბოლოები მხოლოდ `IsSupportedChar` (ASCII + მხედრული + `\n`); `AtlasCharacters` = 143 სიმბოლო სწორი რიგით; `Active` == `Georgian`. `GameTextTests` — სტატუსის ყველა შემთხვევა (მატი/პატი/ფრე-ები/შახი/AI ფიქრობს, რიგის წესით), ფერი, ფიგურები, გარდაქმნის სათაური, Quick Game, შეცდომები, debug FEN. `CampaignTextTests`/`CampaignProgressTests`/`BattleRulesTests`/`CampaignRegionsTests` — იგივე შემთხვევები, ქართული ზუსტი ტექსტებით (ძველი ინგლისური მოლოდინები შეიცვალა contract-ის ახალი ტექსტებით — შემოწმება არ წაშლილა) + ყველა აწყობილი შედეგის (5 რეგიონი × 3 მდგომარეობა, MapStatus 0..5, RecordBattle-ის ყველა შეტყობინება) სიმბოლოების შემოწმება. `CampaignSaveSerializerTests`/`CampaignSaveStoreTests` უცვლელია (schema v1, id-ები).
-- **Stage 3 — Game/Editor:** compile check-ები (0/0, Game — `UNITY_EDITOR`-ითაც) + grep-ები (`PROGRESS.md` → G1–G4: legacy Input, ქართული ასოები მხოლოდ `TextTable.Georgian.cs`-ში, ძველი ინგლისური UI სტრიქონები Game/Editor-ში არ არის, legacy `Text`/IMGUI არ არის). font-ის დაფარვას ამოწმებს **Tools → Setup Georgian Font**-ის log (`All UI text characters are covered.`). ვიზუალი, TMP-ის რენდერი, განლაგება სხვადასხვა aspect-ზე, გარდაქმნის ფანჯარა და მეფის დამალვა — USER task-ები 45, 46 (Play-mode). Static atlas: Play-ის შემდეგ `git status` font asset-ს შეცვლილად არ აჩვენებს.
+- **Stage 3 — Game/Editor:** compile check-ები (0/0, Game — `UNITY_EDITOR`-ითაც) + grep-ები (`PROGRESS.md` → G1–G4: legacy Input, ქართული ასოები მხოლოდ `TextTable.Georgian.cs`-ში, ძველი ინგლისური UI სტრიქონები Game/Editor-ში არ არის, legacy `Text`/IMGUI არ არის). font-ის დაფარვას ამოწმებს **Tools → Setup Georgian Font**-ის log (`All UI text characters are covered.`). ვიზუალი, TMP-ის რენდერი, განლაგება სხვადასხვა aspect-ზე, გარდაქმნის ფანჯარა და სარდლის ხედი (მეფე ხილული, არჩევადი) — USER task-ები 45, 46 (Play-mode). Static atlas: Play-ის შემდეგ `git status` font asset-ს შეცვლილად არ აჩვენებს.
 
 ## Realistic Scale
 ერთი მოთამაშე, ერთი პარტია ერთდროულად, ერთი Stockfish პროცესი. წარმადობის მოთხოვნა: perft ტესტები ჯამში დაახლოებით 30 წამამდე, AI-ის სვლა 1–2 წამამდე.
@@ -1317,7 +1317,13 @@ public static TMP_FontAsset Ensure(out bool charactersMissing);    // null only 
 - Reason: `Back to menu` რუკას ფარავდა ფართო Game view-ზე: match 0.5-ით canvas-ის სიმაღლე 1080-ზე ნაკლები ხდება (მაგ. 1600×700 → ≈952) და ქვედა კიდეზე მიბმული ღილაკი/სტატუსი `MapArea`-ში შედის. `Expand`-ით canvas ყოველთვის ≥ 1920×1080-ია, ე.ი. reference-ის განლაგება (გამოთვლით, გადაფარვის გარეშე) ნებისმიერ aspect-ზე ნარჩუნდება — ერთი პარამეტრი anchor-ების გადაწყობის ნაცვლად. HUD (OnGUI, მთელი ეკრანის სიგანე) `InfoText`-ს ფარავდა — ახლა ცალკე ზოლშია. ფიქსირებულ პოზიციებზე დამალული `Continue` 100px-იან ხვრელს ტოვებდა.
 - Trade-off: არა-16:9 ეკრანზე UI ოდნავ პატარაა (reference მთლიანად უნდა ჩაეტიოს).
 
-### 2026-10-26 — Stage 3: სარდლის ხედში საკუთარი მეფე იმალება
+### 2026-10-26 — Stage 3: სარდლის ხედი — კამერა მაღლა/უკან, მეფე ხილული (მომხმარებლის ცვლილება გეგმაში)
+- Decision: მეფე **არ** იმალება. `CameraRig`-ის ნაგულისხმევები: `commanderEyeHeight` 1.4 → 3.0, `commanderBackOffset` 0.6 → 1.6, `commanderPitch` 15 → 30; **Tools → Setup Chess Scene** ამ სამ მნიშვნელობას MainScene-ის `CameraRig`-ზეც წერს. `ViewChanged`/`SetHiddenSquare` არ ემატება; `PiecesView` და `GameController`-ის მეფის ლოგიკა არ იცვლება.
+- Reason: მომხმარებლის მოთხოვნა (`/auto continue`, 2026-10-26): მეფე ხილული უნდა იყოს და სარდლის ხედშიც აირჩეოდეს. გამოთვლა — „UI სტილი (Stage 3)“ → სარდლის ხედი: მეფე ქვედა ნაწილშია, დაფა ჩანს ბოლომდე, მეფის ფიგურაზე click raycast-ით მუშაობს (collider-ები უცვლელია).
+- Assumption: მნიშვნელობები გამოთვლილია vertical FOV 60-ით (Camera-ს ნაგულისხმევი); საბოლოო შეფასება — USER task 46. Trade-off: სარდლის ხედი ნაკლებად „პირველი პირია“ და უფრო მაღლიდან იყურება.
+- How to change: Inspector-ში `CameraRig`-ის სამი ველი (ცდისთვის) და შემდეგ `CameraRig.cs`-ის ნაგულისხმევები + `ChessSceneSetup`-ის მნიშვნელობები.
+
+### 2026-10-26 — Stage 3: სარდლის ხედში საკუთარი მეფე იმალება (ჩანაცვლდა — იხ. ზემოთ „კამერა მაღლა/უკან“)
 - Decision: `CameraRig.ViewChanged` + `PiecesView.SetHiddenSquare`: სარდლის ხედში ადამიანის მეფის ობიექტი inactive-ია (renderer და collider), ტაქტიკურში ჩანს. `CameraRig`-ის offset-ები და ნაგულისხმევები უცვლელია.
 - Reason: კონცეფციით სარდლის ხედი „მეფის თვალით“ ხედვაა; კამერა მეფის 0.6-ით უკან და 1.4 სიმაღლეზეა, ამიტომ მეფე (1.05) ქვედა-ცენტრალურ ნაწილს და მის წინ e2/e3-ს ფარავს. collider-იც ითიშება, თორემ უხილავი მეფე უკან მდებარე უჯრებზე click-ს „დაიჭერდა“. offset-ების შეცვლა სცენაში სერიალიზებულ მნიშვნელობებსაც შეცვლიდა და ხედს მაინც ნაწილობრივ დაფარავდა.
 - Trade-off: სარდლის ხედში საკუთარ მეფეს ვერ აირჩევ (ის „შენ“ ხარ) — მეფის სვლა/როქი ტაქტიკურ ხედში (TAB). თუ მომხმარებელს არ მოეწონება: ალტერნატივა — `commanderEyeHeight`/`commanderBackOffset`-ის გაზრდა (Setup Chess Scene-ით) და მეფე ხილული.
@@ -1351,7 +1357,7 @@ public static TMP_FontAsset Ensure(out bool charactersMissing);    // null only 
 - ვარაუდი (Stage 3): ქართული ტექსტები (API Contract-ის ცხრილი) გუნდის შედგენილია; ტერმინები: ლაზიერი, ეტლი, კუ, მხედარი, პაიკი, შახი, მატი, პატი, ფრე. მომხმარებელს შეუძლია ნებისმიერი ტექსტის შეცვლა — მხოლოდ ცხრილში (`TextTable.Georgian.cs` + ტესტები).
 - ვარაუდი (Stage 3): ინგლისური ცხრილი ინახება, მაგრამ თამაშში ენის არჩევა არ არის.
 - ვარაუდი (Stage 3): ფონტი — `NotoSansGeorgian-Regular.ttf` (static); Bold = synthetic. თუ ლათინური ასოები ფონტში არ არის — fallback `LiberationSans SDF`.
-- ვარაუდი (Stage 3): სარდლის ხედში საკუთარი მეფე იმალება; მეფის სვლა ტაქტიკურ ხედში (TAB).
+- ~~ვარაუდი (Stage 3): სარდლის ხედში საკუთარი მეფე იმალება; მეფის სვლა ტაქტიკურ ხედში (TAB).~~ ჩანაცვლდა: კამერა მაღლა/უკან (3.0 / 1.6 / 30°), მეფე ხილულია და ორივე ხედში აირჩევა.
 - ვარაუდი (Stage 3): HUD ზედა ზოლის ქვეშ, მარცხნივაა (Stage 1–2-ში ზედა-მარცხენა კუთხეში იყო).
 
 ## Accepted Risks
