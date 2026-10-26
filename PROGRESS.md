@@ -77,7 +77,7 @@ Stage 3 — ქართული ინტერფეისი
   - საბოლოო შემოწმება: USER task 45, 46.
 
 ### Finish-check-ის task-ები (Stage 3, 2026-10-26)
-- [ ] 47. (should-fix) TMP ტექსტი escape-ებს (`\n`, `\t`, `\r`, `\v`, `\\`, `\uXXXX`) და rich-text tag-ებს runtime სტრიქონში არ უნდა გარდაქმნიდეს — owner: task-executor — files: Assets/Editor/EditorUi.cs — depends: 41 — done when:
+- [x] 47. (should-fix) TMP ტექსტი escape-ებს (`\n`, `\t`, `\r`, `\v`, `\\`, `\uXXXX`) და rich-text tag-ებს runtime სტრიქონში არ უნდა გარდაქმნიდეს — owner: task-executor — files: Assets/Editor/EditorUi.cs — depends: 41 — done when:
   - პრობლემა (code-reviewer, ორკესტრატორმა TMP source-ში დაადასტურა): `TMP_Text.m_parseCtrlCharacters` ნაგულისხმევად `TMP_Settings.enableParseEscapeCharacters`-იდან მოდის (`Assets/TextMesh Pro/Resources/TMP Settings.asset`: `m_enableParseEscapeCharacters: 1`), ამიტომ `Stockfish ვერ მოიძებნა: C:\nope\stockfish.exe. ...` HUD-ში `C:` + ახალი ხაზი + `ope\...` ჩანს (USER task 46, ნაბიჯი 8). Stage 2-ის `Text`/OnGUI ამას არ აკეთებდა. იგივე რისკი: exception-ის ტექსტში `<...>` rich-text tag-ად იკითხება (security-auditor, nit — კოსმეტიკური).
   - `EditorUi.ConfigureText` (ყველა TMP ტექსტი ორივე Setup ბრძანებაში მასზე გადის): `parseCtrlCharacters = false` და `richText = false`. ცხრილის ტექსტებში `\n` ნამდვილი U+000A-ია და tag-ები არ არის, Bold — `fontStyle`-ით, ამიტომ ხილული ტექსტი არ იცვლება. PROJECT.md → „UI სტილი (Stage 3)“ → Font (განახლებული).
   - `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet build Tests/GameCompileCheck` 0/0; `dotnet test` გადის; G2, G3, G4 `Assets/Editor`-ში → 0. საბოლოო შემოწმება: USER task 45 (სცენები თავიდან იქმნება), 46 (ნაბიჯი 8).
@@ -189,7 +189,7 @@ Stage 3 — ქართული ინტერფეისი
 ## Run State
 - Stage: Stage 3 — ქართული ინტერფეისი
 - Finish-check this stage: done (2026-10-26: code-reviewer + security-auditor → 2 should-fix = task 47, 48; security nit (rich text) შედის 47-ში)
-- Fix rounds this stage: 0/2
+- Fix rounds this stage: 1/2
 - Failed attempts: —
 - Stage start commit: f09c5fa
 

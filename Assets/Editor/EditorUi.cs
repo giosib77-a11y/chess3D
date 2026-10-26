@@ -135,6 +135,8 @@ namespace Chess.Editor
             t.fontStyle = bold ? FontStyles.Bold : FontStyles.Normal;
             t.textWrappingMode = TextWrappingModes.Normal;
             t.raycastTarget = false;
+            t.parseCtrlCharacters = false;
+            t.richText = false;
             if (autoSizeMin > 0f)
             {
                 t.enableAutoSizing = true;
