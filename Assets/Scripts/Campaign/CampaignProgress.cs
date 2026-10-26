@@ -79,6 +79,7 @@ namespace Chess.Campaign
             if (state == RegionState.Locked)
                 throw new InvalidOperationException("Region '" + regionId + "' is locked.");
 
+            TextTable t = TextTable.Active;
             if (!counted)
                 return new BattleSummary(BattleRules.NotCountedTitle, CampaignText.NotCountedMessage, true, false);
 
@@ -87,21 +88,21 @@ namespace Chess.Campaign
             if (outcome == BattleOutcome.Victory)
             {
                 if (state == RegionState.Liberated)
-                    return new BattleSummary(title, region.Name + " remains free.", false, false);
+                    return new BattleSummary(title, t.Format(TextId.RemainsFreeFormat, region.Name), false, false);
 
                 _liberated[index] = true;
-                string message = region.Name + " is liberated!";
+                string message = t.Format(TextId.LiberatedFormat, region.Name);
                 int next = index + 1;
                 if (next < _liberated.Length && !_liberated[next])
-                    message += " " + CampaignRegions.All[next].Name + " is now open.";
+                    message += " " + t.Format(TextId.NextOpenFormat, CampaignRegions.All[next].Name);
                 if (IsComplete)
-                    message += " All regions are liberated! Georgia is free.";
+                    message += " " + t.Get(TextId.AllLiberated);
                 return new BattleSummary(title, message, false, true);
             }
 
             string text = state == RegionState.Liberated
-                ? region.Name + " remains free."
-                : region.Name + " is still under enemy control.";
+                ? t.Format(TextId.RemainsFreeFormat, region.Name)
+                : t.Format(TextId.EnemyControlFormat, region.Name);
             return new BattleSummary(title, text, true, false);
         }
 

@@ -29,16 +29,16 @@ namespace Chess.Tests.Campaign
         [Fact]
         public void GetTitle_AllOutcomes()
         {
-            Assert.Equal("Victory!", BattleRules.GetTitle(BattleOutcome.Victory));
-            Assert.Equal("Defeat", BattleRules.GetTitle(BattleOutcome.Defeat));
-            Assert.Equal("Draw", BattleRules.GetTitle(BattleOutcome.Draw));
+            Assert.Equal("გამარჯვება!", BattleRules.GetTitle(BattleOutcome.Victory));
+            Assert.Equal("მარცხი", BattleRules.GetTitle(BattleOutcome.Defeat));
+            Assert.Equal("ფრე", BattleRules.GetTitle(BattleOutcome.Draw));
             Assert.Throws<ArgumentOutOfRangeException>(() => BattleRules.GetTitle((BattleOutcome)99));
         }
 
         [Fact]
         public void NotCountedTitle_IsGameOver()
         {
-            Assert.Equal("Game over", BattleRules.NotCountedTitle);
+            Assert.Equal("თამაში დასრულდა", BattleRules.NotCountedTitle);
         }
     }
 }

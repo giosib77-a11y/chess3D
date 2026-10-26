@@ -7,7 +7,7 @@ namespace Chess.Campaign
 
     public static class BattleRules
     {
-        public const string NotCountedTitle = "Game over";
+        public static string NotCountedTitle { get { return TextTable.Active.Get(TextId.TitleNotCounted); } }
 
         public static BattleOutcome GetOutcome(GameResult result, Side humanSide)
         {
@@ -28,9 +28,9 @@ namespace Chess.Campaign
         {
             switch (outcome)
             {
-                case BattleOutcome.Victory: return "Victory!";
-                case BattleOutcome.Defeat: return "Defeat";
-                case BattleOutcome.Draw: return "Draw";
+                case BattleOutcome.Victory: return TextTable.Active.Get(TextId.TitleVictory);
+                case BattleOutcome.Defeat: return TextTable.Active.Get(TextId.TitleDefeat);
+                case BattleOutcome.Draw: return TextTable.Active.Get(TextId.TitleDraw);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outcome), outcome, "Unknown battle outcome.");
             }

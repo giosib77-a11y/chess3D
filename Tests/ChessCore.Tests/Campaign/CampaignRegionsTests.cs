@@ -19,11 +19,11 @@ namespace Chess.Tests.Campaign
         {
             var expected = new[]
             {
-                ("kartli", "Kartli", "5th century - King Vakhtang Gorgasali", 800),
-                ("kakheti", "Kakheti", "16th century - King Levan", 1100),
-                ("imereti", "Imereti", "17th century - King Alexander III", 1400),
-                ("svaneti", "Svaneti", "12th century - King David the Builder", 1800),
-                ("khevsureti", "Khevsureti", "18th century - King Erekle II", 2200),
+                ("kartli", "ქართლი", "V საუკუნე - მეფე ვახტანგ გორგასალი", 800),
+                ("kakheti", "კახეთი", "XVI საუკუნე - მეფე ლევანი", 1100),
+                ("imereti", "იმერეთი", "XVII საუკუნე - მეფე ალექსანდრე III", 1400),
+                ("svaneti", "სვანეთი", "XII საუკუნე - მეფე დავით აღმაშენებელი", 1800),
+                ("khevsureti", "ხევსურეთი", "XVIII საუკუნე - მეფე ერეკლე II", 2200),
             };
 
             Assert.Equal(expected.Length, CampaignRegions.All.Count);

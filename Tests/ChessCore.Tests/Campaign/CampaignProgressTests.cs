@@ -64,8 +64,8 @@ namespace Chess.Tests.Campaign
         {
             CampaignProgress p = CampaignProgress.CreateNew();
             BattleSummary s = p.RecordBattle("kartli", BattleOutcome.Victory, true);
-            Assert.Equal("Victory!", s.Title);
-            Assert.Equal("Kartli is liberated! Kakheti is now open.", s.Message);
+            Assert.Equal("გამარჯვება!", s.Title);
+            Assert.Equal("ქართლი გათავისუფლდა! კახეთი ახლა ხელმისაწვდომია.", s.Message);
             Assert.False(s.CanRetry);
             Assert.True(s.ProgressChanged);
             Assert.Equal(RegionState.Liberated, p.GetState("kartli"));
@@ -78,7 +78,7 @@ namespace Chess.Tests.Campaign
         {
             CampaignProgress p = CampaignProgress.FromLiberated(new[] { "kakheti" });
             BattleSummary s = p.RecordBattle("kartli", BattleOutcome.Victory, true);
-            Assert.Equal("Kartli is liberated!", s.Message);
+            Assert.Equal("ქართლი გათავისუფლდა!", s.Message);
             Assert.True(s.ProgressChanged);
         }
 
@@ -87,7 +87,7 @@ namespace Chess.Tests.Campaign
         {
             CampaignProgress p = CampaignProgress.FromLiberated(new[] { "kartli", "kakheti", "imereti", "svaneti" });
             BattleSummary s = p.RecordBattle("khevsureti", BattleOutcome.Victory, true);
-            Assert.Equal("Khevsureti is liberated! All regions are liberated! Georgia is free.", s.Message);
+            Assert.Equal("ხევსურეთი გათავისუფლდა! ყველა რეგიონი გათავისუფლებულია! საქართველო თავისუფალია.", s.Message);
             Assert.True(p.IsComplete);
             Assert.Equal(AllIds, p.LiberatedRegionIds);
         }
@@ -97,22 +97,22 @@ namespace Chess.Tests.Campaign
         {
             CampaignProgress p = CampaignProgress.FromLiberated(new[] { "kartli" });
             BattleSummary s = p.RecordBattle("kartli", BattleOutcome.Victory, true);
-            Assert.Equal("Victory!", s.Title);
-            Assert.Equal("Kartli remains free.", s.Message);
+            Assert.Equal("გამარჯვება!", s.Title);
+            Assert.Equal("ქართლი კვლავ თავისუფალია.", s.Message);
             Assert.False(s.CanRetry);
             Assert.False(s.ProgressChanged);
             Assert.Equal(1, p.LiberatedCount);
         }
 
         [Theory]
-        [InlineData(BattleOutcome.Defeat, "Defeat")]
-        [InlineData(BattleOutcome.Draw, "Draw")]
+        [InlineData(BattleOutcome.Defeat, "მარცხი")]
+        [InlineData(BattleOutcome.Draw, "ფრე")]
         public void DefeatOrDraw_OnAvailable_NoChange(BattleOutcome outcome, string title)
         {
             CampaignProgress p = CampaignProgress.CreateNew();
             BattleSummary s = p.RecordBattle("kartli", outcome, true);
             Assert.Equal(title, s.Title);
-            Assert.Equal("Kartli is still under enemy control.", s.Message);
+            Assert.Equal("ქართლი ჯერ კიდევ მტრის ხელშია.", s.Message);
             Assert.True(s.CanRetry);
             Assert.False(s.ProgressChanged);
             Assert.Equal(0, p.LiberatedCount);
@@ -120,14 +120,14 @@ namespace Chess.Tests.Campaign
         }
 
         [Theory]
-        [InlineData(BattleOutcome.Defeat, "Defeat")]
-        [InlineData(BattleOutcome.Draw, "Draw")]
+        [InlineData(BattleOutcome.Defeat, "მარცხი")]
+        [InlineData(BattleOutcome.Draw, "ფრე")]
         public void DefeatOrDraw_OnLiberated_RemainsFree(BattleOutcome outcome, string title)
         {
             CampaignProgress p = CampaignProgress.FromLiberated(new[] { "kartli" });
             BattleSummary s = p.RecordBattle("kartli", outcome, true);
             Assert.Equal(title, s.Title);
-            Assert.Equal("Kartli remains free.", s.Message);
+            Assert.Equal("ქართლი კვლავ თავისუფალია.", s.Message);
             Assert.True(s.CanRetry);
             Assert.False(s.ProgressChanged);
             Assert.Equal(RegionState.Liberated, p.GetState("kartli"));
@@ -141,8 +141,8 @@ namespace Chess.Tests.Campaign
         {
             CampaignProgress p = CampaignProgress.CreateNew();
             BattleSummary s = p.RecordBattle("kartli", outcome, false);
-            Assert.Equal("Game over", s.Title);
-            Assert.Equal(CampaignText.NotCountedMessage, s.Message);
+            Assert.Equal("თამაში დასრულდა", s.Title);
+            Assert.Equal("AI მოწინააღმდეგე არ იყო აქტიური, ამიტომ ეს შედეგი არ ითვლება.", s.Message);
             Assert.True(s.CanRetry);
             Assert.False(s.ProgressChanged);
             Assert.Equal(0, p.LiberatedCount);

@@ -7,12 +7,17 @@ namespace Chess.Campaign
     {
         private static readonly Region[] Regions =
         {
-            new Region("kartli", "Kartli", "5th century - King Vakhtang Gorgasali", 800),
-            new Region("kakheti", "Kakheti", "16th century - King Levan", 1100),
-            new Region("imereti", "Imereti", "17th century - King Alexander III", 1400),
-            new Region("svaneti", "Svaneti", "12th century - King David the Builder", 1800),
-            new Region("khevsureti", "Khevsureti", "18th century - King Erekle II", 2200),
+            Make("kartli", TextId.RegionKartliName, TextId.RegionKartliEra, 800),
+            Make("kakheti", TextId.RegionKakhetiName, TextId.RegionKakhetiEra, 1100),
+            Make("imereti", TextId.RegionImeretiName, TextId.RegionImeretiEra, 1400),
+            Make("svaneti", TextId.RegionSvanetiName, TextId.RegionSvanetiEra, 1800),
+            Make("khevsureti", TextId.RegionKhevsuretiName, TextId.RegionKhevsuretiEra, 2200),
         };
+
+        private static Region Make(string id, TextId name, TextId era, int elo)
+        {
+            return new Region(id, TextTable.Active.Get(name), TextTable.Active.Get(era), elo);
+        }
 
         public static IReadOnlyList<Region> All => Regions;
 
