@@ -38,7 +38,7 @@ namespace Chess.Tests.Campaign
             (TextId.StateAvailable, "ხელმისაწვდომია", "Available"),
             (TextId.StateLiberated, "გათავისუფლებულია", "Liberated"),
             (TextId.RegionLabelFormat, "{0}\n{1}\nElo {2}\n{3}", "{0}\n{1}\nElo {2}\n{3}"),
-            (TextId.MapStatusFormat, "გათავისუფლებულია {0} რეგიონი {1}-დან. აირჩიე რეგიონი ბრძოლისთვის.", "Liberated {0} of {1}. Choose a region to fight for."),
+            (TextId.MapStatusFormat, "გათავისუფლებულია: {0} / {1}. აირჩიე რეგიონი ბრძოლისთვის.", "Liberated {0} of {1}. Choose a region to fight for."),
             (TextId.AllLiberated, "ყველა რეგიონი გათავისუფლებულია! საქართველო თავისუფალია.", "All regions are liberated! Georgia is free."),
             (TextId.BackToMenu, "მენიუში დაბრუნება", "Back to menu"),
             (TextId.RegionKartliName, "ქართლი", "Kartli"),

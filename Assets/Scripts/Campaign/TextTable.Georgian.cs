@@ -35,7 +35,7 @@ namespace Chess.Campaign
                 { TextId.StateAvailable, "ხელმისაწვდომია" },
                 { TextId.StateLiberated, "გათავისუფლებულია" },
                 { TextId.RegionLabelFormat, "{0}\n{1}\nElo {2}\n{3}" },
-                { TextId.MapStatusFormat, "გათავისუფლებულია {0} რეგიონი {1}-დან. აირჩიე რეგიონი ბრძოლისთვის." },
+                { TextId.MapStatusFormat, "გათავისუფლებულია: {0} / {1}. აირჩიე რეგიონი ბრძოლისთვის." },
                 { TextId.AllLiberated, "ყველა რეგიონი გათავისუფლებულია! საქართველო თავისუფალია." },
                 { TextId.BackToMenu, "მენიუში დაბრუნება" },
                 { TextId.RegionKartliName, "ქართლი" },

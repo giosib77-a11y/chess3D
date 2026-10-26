@@ -30,7 +30,7 @@ namespace Chess.Tests.Campaign
         public void MapStatus_NewAndComplete()
         {
             Assert.Equal(
-                "გათავისუფლებულია 0 რეგიონი 5-დან. აირჩიე რეგიონი ბრძოლისთვის.",
+                "გათავისუფლებულია: 0 / 5. აირჩიე რეგიონი ბრძოლისთვის.",
                 CampaignText.MapStatus(CampaignProgress.CreateNew()));
 
             CampaignProgress full = CampaignProgress.FromLiberated(
@@ -39,7 +39,7 @@ namespace Chess.Tests.Campaign
 
             CampaignProgress two = CampaignProgress.FromLiberated(new[] { "kartli", "kakheti" });
             Assert.Equal(
-                "გათავისუფლებულია 2 რეგიონი 5-დან. აირჩიე რეგიონი ბრძოლისთვის.",
+                "გათავისუფლებულია: 2 / 5. აირჩიე რეგიონი ბრძოლისთვის.",
                 CampaignText.MapStatus(two));
             Assert.Throws<ArgumentNullException>(() => CampaignText.MapStatus(null));
         }
