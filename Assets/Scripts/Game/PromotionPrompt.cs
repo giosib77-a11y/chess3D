@@ -22,6 +22,8 @@ namespace Chess.Game
 
         private Action<PieceType> _onChosen;
         private Action _onCancelled;
+        private bool _showPending;
+        private bool _shown;
 
         public bool IsOpen { get; private set; }
 
@@ -36,7 +38,7 @@ namespace Chess.Game
             Hook(rookButton, "rookButton", OnRook);
             Hook(bishopButton, "bishopButton", OnBishop);
             Hook(knightButton, "knightButton", OnKnight);
-            Hook(cancelButton, "cancelButton", Cancel);
+            Hook(cancelButton, "cancelButton", OnCancelButton);
 
             if (panel != null)
                 panel.SetActive(false);
@@ -48,7 +50,7 @@ namespace Chess.Game
             Unhook(rookButton, OnRook);
             Unhook(bishopButton, OnBishop);
             Unhook(knightButton, OnKnight);
-            Unhook(cancelButton, Cancel);
+            Unhook(cancelButton, OnCancelButton);
         }
 
         private void Hook(Button button, string field, UnityEngine.Events.UnityAction action)
@@ -78,7 +80,9 @@ namespace Chess.Game
             _onCancelled = onCancelled;
             if (titleText != null)
                 titleText.text = GameText.PromotionTitle(side);
-            panel.SetActive(true);
+            // The panel is shown in LateUpdate, after EventSystem.Update, so the press that
+            // opened the prompt cannot reach one of its buttons.
+            _showPending = true;
             IsOpen = true;
         }
 
@@ -88,14 +92,27 @@ namespace Chess.Game
                 Cancel();
         }
 
+        private void LateUpdate()
+        {
+            if (!_showPending)
+                return;
+            _showPending = false;
+            if (IsOpen && panel != null)
+            {
+                panel.SetActive(true);
+                _shown = true;
+            }
+        }
+
         private void OnQueen() { Choose(PieceType.Queen); }
         private void OnRook() { Choose(PieceType.Rook); }
         private void OnBishop() { Choose(PieceType.Bishop); }
         private void OnKnight() { Choose(PieceType.Knight); }
+        private void OnCancelButton() { if (_shown) Cancel(); }
 
         private void Choose(PieceType type)
         {
-            if (!IsOpen)
+            if (!IsOpen || !_shown)
                 return;
             Action<PieceType> callback = _onChosen;
             Close();
@@ -115,6 +132,8 @@ namespace Chess.Game
         private void Close()
         {
             IsOpen = false;
+            _showPending = false;
+            _shown = false;
             LastClosedFrame = Time.frameCount;
             _onChosen = null;
             _onCancelled = null;
