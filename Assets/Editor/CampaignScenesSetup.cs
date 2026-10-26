@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using Chess.Campaign;
+using Chess.Core;
 using Chess.Game;
+using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
 namespace Chess.Editor
@@ -22,18 +21,10 @@ namespace Chess.Editor
         private const string CampaignMapPath = "Assets/Scenes/CampaignMap.unity";
         private const string MainScenePath = "Assets/Scenes/MainScene.unity";
 
-        private static readonly Color Background = Hex("1C1C22", 1f);
-        private static readonly Color PanelColor = Hex("2A2A33", 0.95f);
-        private static readonly Color MapColor = Hex("2F3A2A", 1f);
-        private static readonly Color ButtonColor = Hex("3A4A6B", 1f);
-        private static readonly Color WarningColor = Hex("FFB347", 1f);
-        private static readonly Color DisabledColor = Hex("5A5A5A", 0.5f);
-        private static readonly Color LockedColor = Hex("5A5A5A", 1f);
-
         private static readonly List<string> Created = new List<string>();
         private static readonly List<string> Updated = new List<string>();
         private static bool failed;
-        private static Font font;
+        private static TMP_FontAsset font;
 
         [MenuItem("Tools/Setup Campaign Scenes")]
         public static void Run()
@@ -45,15 +36,16 @@ namespace Chess.Editor
             }
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
-            Created.Clear();
-            Updated.Clear();
-            failed = false;
-            font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            font = GeorgianFontSetup.Ensure(out bool fontCharactersMissing);
             if (font == null)
             {
-                Debug.LogError(Tag + "Built-in font LegacyRuntime.ttf not found.");
+                Debug.LogError(Tag + "Georgian font is not ready, nothing was changed.");
                 return;
             }
+
+            Created.Clear();
+            Updated.Clear();
+            failed = fontCharactersMissing;
 
             var scene = OpenOrCreate(MainMenuPath, "MainMenu");
             BuildCameraAndEventSystem();
@@ -83,6 +75,11 @@ namespace Chess.Editor
                 + "Created: " + (Created.Count == 0 ? "-" : string.Join(", ", Created)) + ";\n"
                 + "Updated: " + (Updated.Count == 0 ? "-" : string.Join(", ", Updated)) + ";\n"
                 + "Build scenes: MainMenu, CampaignMap, MainScene");
+        }
+
+        private static string Get(TextId id)
+        {
+            return TextTable.Active.Get(id);
         }
 
         // ------------------------------------------------------------ scenes
@@ -126,32 +123,9 @@ namespace Chess.Editor
             if (cam == null) cam = camGo.AddComponent<Camera>();
             if (camGo.GetComponent<AudioListener>() == null) camGo.AddComponent<AudioListener>();
             cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = Background;
+            cam.backgroundColor = EditorUi.Background;
 
-            EnsureEventSystem();
-        }
-
-        private static void EnsureEventSystem()
-        {
-            EventSystem[] all = UnityEngine.Object.FindObjectsByType<EventSystem>(FindObjectsInactive.Include);
-            EventSystem es = null;
-            foreach (EventSystem e in all)
-            {
-                if (es == null) es = e;
-                else UnityEngine.Object.DestroyImmediate(e.gameObject);
-            }
-            if (es == null)
-            {
-                es = new GameObject("EventSystem").AddComponent<EventSystem>();
-                Created.Add("EventSystem");
-            }
-            foreach (StandaloneInputModule old in es.GetComponents<StandaloneInputModule>())
-            {
-                UnityEngine.Object.DestroyImmediate(old);
-            }
-            var module = es.GetComponent<InputSystemUIInputModule>();
-            if (module == null) module = es.gameObject.AddComponent<InputSystemUIInputModule>();
-            module.AssignDefaultActions();
+            EditorUi.EnsureEventSystem(Created);
         }
 
         private static IEnumerable<GameObject> RootObjects()
@@ -159,53 +133,66 @@ namespace Chess.Editor
             return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
         }
 
-        private static void DeleteRoots(string name)
-        {
-            foreach (GameObject r in RootObjects())
-            {
-                if (r.name != name) continue;
-                UnityEngine.Object.DestroyImmediate(r);
-                Updated.Add(name + " (recreated)");
-            }
-        }
-
         // ------------------------------------------------------------ MainMenu
 
         private static void BuildMainMenu()
         {
-            DeleteRoots("MainMenuCanvas");
-            GameObject canvas = NewCanvas("MainMenuCanvas", 0);
+            EditorUi.DeleteRoots("MainMenuCanvas", Updated);
+            GameObject canvas = EditorUi.NewCanvas("MainMenuCanvas", 0);
             Created.Add("MainMenuCanvas");
             var controller = canvas.AddComponent<MainMenuController>();
 
-            MakeText("TitleText", canvas.transform, "Georgian Battle Chess", 64,
-                Top(new Vector2(0f, -140f), new Vector2(1400f, 100f)), TextAnchor.MiddleCenter, Color.white);
+            EditorUi.MakeText("TitleText", canvas.transform, font, Get(TextId.MenuTitle), 64f,
+                EditorUi.Top(new Vector2(0f, -140f), new Vector2(1400f, 100f)), TextAlignmentOptions.Center, Color.white, false, 40f);
 
-            GameObject mainPanel = NewRect("MainPanel", canvas.transform, Center(new Vector2(0f, -40f), new Vector2(400f, 380f)));
-            Button newCampaign = MakeButton("NewCampaignButton", mainPanel.transform, "New Campaign", Center(new Vector2(0f, 150f), new Vector2(400f, 80f)), 32, out _);
-            Button cont = MakeButton("ContinueButton", mainPanel.transform, "Continue", Center(new Vector2(0f, 50f), new Vector2(400f, 80f)), 32, out _);
-            Button quick = MakeButton("QuickGameButton", mainPanel.transform, "Quick Game", Center(new Vector2(0f, -50f), new Vector2(400f, 80f)), 32, out _);
-            Button quit = MakeButton("QuitButton", mainPanel.transform, "Quit", Center(new Vector2(0f, -150f), new Vector2(400f, 80f)), 32, out _);
+            // MainPanel positions its buttons itself: a hidden Continue button leaves no gap.
+            GameObject mainPanel = EditorUi.NewRect("MainPanel", canvas.transform,
+                EditorUi.Center(new Vector2(0f, -40f), new Vector2(400f, 380f)));
+            var layout = mainPanel.AddComponent<VerticalLayoutGroup>();
+            layout.spacing = 20f;
+            layout.childAlignment = TextAnchor.UpperCenter;
+            layout.childControlWidth = false;
+            layout.childControlHeight = false;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+            var buttonSize = new Vector2(400f, 80f);
+            Button newCampaign = EditorUi.MakeButton("NewCampaignButton", mainPanel.transform, font, Get(TextId.MenuNewCampaign),
+                EditorUi.Top(Vector2.zero, buttonSize), 32f, out _);
+            Button cont = EditorUi.MakeButton("ContinueButton", mainPanel.transform, font, Get(TextId.MenuContinue),
+                EditorUi.Top(Vector2.zero, buttonSize), 32f, out _);
+            Button quick = EditorUi.MakeButton("QuickGameButton", mainPanel.transform, font, Get(TextId.MenuQuickGame),
+                EditorUi.Top(Vector2.zero, buttonSize), 32f, out _);
+            Button quit = EditorUi.MakeButton("QuitButton", mainPanel.transform, font, Get(TextId.MenuQuit),
+                EditorUi.Top(Vector2.zero, buttonSize), 32f, out _);
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)mainPanel.transform);
 
-            Text warning = MakeText("WarningText", canvas.transform, "", 28,
-                Bottom(new Vector2(0f, 120f), new Vector2(1400f, 120f)), TextAnchor.MiddleCenter, WarningColor);
+            // Outside MainPanel so it never takes part in the layout.
+            TextMeshProUGUI warning = EditorUi.MakeText("WarningText", canvas.transform, font, "", 28f,
+                EditorUi.Bottom(new Vector2(0f, 120f), new Vector2(1400f, 120f)), TextAlignmentOptions.Center, EditorUi.WarningColor, false, 20f);
 
-            GameObject confirm = NewPanel("ConfirmPanel", canvas.transform, new Vector2(800f, 300f));
-            MakeText("ConfirmText", confirm.transform, "Start a new campaign? Current progress will be lost.", 28,
-                Center(new Vector2(0f, 60f), new Vector2(740f, 120f)), TextAnchor.MiddleCenter, Color.white);
-            Button yes = MakeButton("ConfirmYesButton", confirm.transform, "Start new", Center(new Vector2(-185f, -90f), new Vector2(350f, 80f)), 32, out _);
-            Button no = MakeButton("ConfirmNoButton", confirm.transform, "Cancel", Center(new Vector2(185f, -90f), new Vector2(350f, 80f)), 32, out _);
+            GameObject confirm = EditorUi.NewPanel("ConfirmPanel", canvas.transform, new Vector2(800f, 300f));
+            EditorUi.MakeText("ConfirmText", confirm.transform, font, Get(TextId.ConfirmNewCampaign), 28f,
+                EditorUi.Center(new Vector2(0f, 60f), new Vector2(740f, 120f)), TextAlignmentOptions.Center, Color.white, false, 20f);
+            Button yes = EditorUi.MakeButton("ConfirmYesButton", confirm.transform, font, Get(TextId.ConfirmYes),
+                EditorUi.Center(new Vector2(-185f, -90f), new Vector2(350f, 80f)), 32f, out _);
+            Button no = EditorUi.MakeButton("ConfirmNoButton", confirm.transform, font, Get(TextId.Cancel),
+                EditorUi.Center(new Vector2(185f, -90f), new Vector2(350f, 80f)), 32f, out _);
             confirm.SetActive(false);
 
-            GameObject quickPanel = NewPanel("QuickGamePanel", canvas.transform, new Vector2(600f, 520f));
-            MakeText("QuickGameTitleText", quickPanel.transform, "Quick Game", 40,
-                Center(new Vector2(0f, 200f), new Vector2(560f, 60f)), TextAnchor.MiddleCenter, Color.white);
-            Button color = MakeButton("ColorButton", quickPanel.transform, "Color: White", Center(new Vector2(0f, 100f), new Vector2(400f, 80f)), 32, out Text colorLabel);
+            GameObject quickPanel = EditorUi.NewPanel("QuickGamePanel", canvas.transform, new Vector2(600f, 520f));
+            EditorUi.MakeText("QuickGameTitleText", quickPanel.transform, font, Get(TextId.QuickGameTitle), 40f,
+                EditorUi.Center(new Vector2(0f, 200f), new Vector2(560f, 60f)), TextAlignmentOptions.Center, Color.white, false, 28f);
+            Button color = EditorUi.MakeButton("ColorButton", quickPanel.transform, font, GameText.QuickColorLabel(Side.White),
+                EditorUi.Center(new Vector2(0f, 100f), buttonSize), 32f, out TMP_Text colorLabel);
             colorLabel.gameObject.name = "ColorLabel";
-            Button difficulty = MakeButton("DifficultyButton", quickPanel.transform, "Difficulty: Medium", Center(new Vector2(0f, 0f), new Vector2(400f, 80f)), 32, out Text difficultyLabel);
+            Button difficulty = EditorUi.MakeButton("DifficultyButton", quickPanel.transform, font,
+                GameText.QuickDifficultyLabel(Get(TextId.DifficultyMedium)),
+                EditorUi.Center(new Vector2(0f, 0f), buttonSize), 32f, out TMP_Text difficultyLabel);
             difficultyLabel.gameObject.name = "DifficultyLabel";
-            Button start = MakeButton("StartQuickGameButton", quickPanel.transform, "Start", Center(new Vector2(0f, -100f), new Vector2(400f, 80f)), 32, out _);
-            Button back = MakeButton("BackFromQuickGameButton", quickPanel.transform, "Back", Center(new Vector2(0f, -200f), new Vector2(400f, 80f)), 32, out _);
+            Button start = EditorUi.MakeButton("StartQuickGameButton", quickPanel.transform, font, Get(TextId.QuickStart),
+                EditorUi.Center(new Vector2(0f, -100f), buttonSize), 32f, out _);
+            Button back = EditorUi.MakeButton("BackFromQuickGameButton", quickPanel.transform, font, Get(TextId.Back),
+                EditorUi.Center(new Vector2(0f, -200f), buttonSize), 32f, out _);
             quickPanel.SetActive(false);
 
             using (var so = new SerializedObject(controller))
@@ -248,21 +235,21 @@ namespace Chess.Editor
 
         private static void BuildCampaignMap()
         {
-            DeleteRoots("CampaignMapCanvas");
-            GameObject canvas = NewCanvas("CampaignMapCanvas", 0);
+            EditorUi.DeleteRoots("CampaignMapCanvas", Updated);
+            GameObject canvas = EditorUi.NewCanvas("CampaignMapCanvas", 0);
             Created.Add("CampaignMapCanvas");
             var controller = canvas.AddComponent<CampaignMapController>();
 
-            GameObject map = NewRect("MapArea", canvas.transform, Center(new Vector2(0f, -50f), new Vector2(1500f, 660f)));
+            // x 210-1710, y 260-920 (reference 1920x1080, y from the top).
+            GameObject map = EditorUi.NewRect("MapArea", canvas.transform,
+                EditorUi.Center(new Vector2(0f, -50f), new Vector2(1500f, 660f)));
             Image mapImage = map.AddComponent<Image>();
-            mapImage.color = MapColor;
+            mapImage.color = EditorUi.MapColor;
             mapImage.raycastTarget = false;
 
-            // Created after MapArea so it draws on top. Center is 70 from the top edge.
-            var topMid = new Vector2(0.5f, 1f);
-            MakeText("TitleText", canvas.transform, "Campaign Map", 64,
-                new Placement(topMid, topMid, new Vector2(0.5f, 0.5f), new Vector2(0f, -70f), new Vector2(1400f, 90f)),
-                TextAnchor.MiddleCenter, Color.white);
+            // y 25-115, created after MapArea so it draws on top.
+            EditorUi.MakeText("TitleText", canvas.transform, font, Get(TextId.MapTitle), 64f,
+                EditorUi.Top(new Vector2(0f, -25f), new Vector2(1400f, 90f)), TextAlignmentOptions.Center, Color.white, false, 40f);
 
             var buttons = new List<RegionButton>();
             foreach (Region region in CampaignRegions.All)
@@ -274,17 +261,17 @@ namespace Chess.Editor
                     Debug.LogError(Tag + "No map anchor defined for region '" + region.Id + "'");
                     continue;
                 }
-                Button button = MakeButton("Region_" + region.Id, map.transform, region.Name, Anchored(anchor.Value, new Vector2(400f, 190f)), 28, out Text label);
-                label.fontStyle = FontStyle.Bold;
-                label.resizeTextForBestFit = true;
-                label.resizeTextMinSize = 22;
-                label.resizeTextMaxSize = 28;
-                label.horizontalOverflow = HorizontalWrapMode.Wrap;
-                label.verticalOverflow = VerticalWrapMode.Truncate;
+                Button button = EditorUi.MakeButton("Region_" + region.Id, map.transform, font, region.Name,
+                    EditorUi.Anchored(anchor.Value, new Vector2(400f, 190f)), 28f, out TMP_Text label);
+                label.fontStyle = FontStyles.Bold;
+                label.fontSizeMin = 18f;
+                label.fontSizeMax = 28f;
+                label.textWrappingMode = TextWrappingModes.Normal;
+                label.overflowMode = TextOverflowModes.Truncate;
                 label.rectTransform.offsetMin = new Vector2(8f, 8f);
                 label.rectTransform.offsetMax = new Vector2(-8f, -8f);
                 Image bg = button.GetComponent<Image>();
-                bg.color = LockedColor;
+                bg.color = EditorUi.LockedColor;
                 var rb = button.gameObject.AddComponent<RegionButton>();
                 using (var so = new SerializedObject(rb))
                 {
@@ -298,11 +285,12 @@ namespace Chess.Editor
                 buttons.Add(rb);
             }
 
-            Text status = MakeText("StatusText", canvas.transform, "", 28,
-                new Placement(new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0.5f), new Vector2(0f, 100f), new Vector2(1000f, 90f)),
-                TextAnchor.MiddleCenter, Color.white);
-            Button back = MakeButton("BackButton", canvas.transform, "Back to menu",
-                new Placement(Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(40f, 40f), new Vector2(400f, 80f)), 32, out _);
+            // x 460-1460, y 935-1025.
+            TextMeshProUGUI status = EditorUi.MakeText("StatusText", canvas.transform, font, "", 28f,
+                EditorUi.Bottom(new Vector2(0f, 55f), new Vector2(1000f, 90f)), TextAlignmentOptions.Center, Color.white, false, 20f);
+            // x 40-440, y 960-1040.
+            Button back = EditorUi.MakeButton("BackButton", canvas.transform, font, Get(TextId.BackToMenu),
+                EditorUi.BottomLeft(new Vector2(40f, 40f), new Vector2(400f, 80f)), 32f, out _);
 
             using (var so = new SerializedObject(controller))
             {
@@ -337,26 +325,32 @@ namespace Chess.Editor
                 return;
             }
 
-            EnsureEventSystem();
+            EditorUi.EnsureEventSystem(Created);
 
-            DeleteRoots("BattleCanvas");
-            GameObject canvas = NewCanvas("BattleCanvas", 10);
+            EditorUi.DeleteRoots("BattleCanvas", Updated);
+            GameObject canvas = EditorUi.NewCanvas("BattleCanvas", 10);
             Created.Add("BattleCanvas");
             var panel = canvas.AddComponent<BattlePanel>();
 
-            Text info = MakeText("InfoText", canvas.transform, "", 28,
-                Top(new Vector2(0f, -24f), new Vector2(1200f, 60f)), TextAnchor.UpperCenter, Color.white);
-            Button leave = MakeButton("LeaveButton", canvas.transform, "Back", new Placement(Vector2.one, Vector2.one, Vector2.one, new Vector2(-24f, -24f), new Vector2(260f, 70f)), 32, out Text leaveLabel);
+            // x 410-1510, y 24-94.
+            TextMeshProUGUI info = EditorUi.MakeText("InfoText", canvas.transform, font, "", 28f,
+                EditorUi.Top(new Vector2(0f, -24f), new Vector2(1100f, 70f)), TextAlignmentOptions.Top, Color.white, false, 20f);
+            // x 1576-1896, y 24-94.
+            Button leave = EditorUi.MakeButton("LeaveButton", canvas.transform, font, Get(TextId.BackToMap),
+                EditorUi.TopRight(new Vector2(-24f, -24f), new Vector2(320f, 70f)), 32f, out TMP_Text leaveLabel);
             leaveLabel.gameObject.name = "LeaveLabel";
 
-            GameObject result = NewPanel("ResultPanel", canvas.transform, new Vector2(700f, 360f));
-            Text title = MakeText("TitleText", result.transform, "", 40,
-                Center(new Vector2(0f, 130f), new Vector2(660f, 60f)), TextAnchor.MiddleCenter, Color.white);
-            Text message = MakeText("MessageText", result.transform, "", 28,
-                Center(new Vector2(0f, 30f), new Vector2(660f, 120f)), TextAnchor.MiddleCenter, Color.white);
-            Button retry = MakeButton("RetryButton", result.transform, "Retry", Center(new Vector2(-150f, -120f), new Vector2(260f, 70f)), 32, out Text retryLabel);
+            // x 580-1340, y 340-740.
+            GameObject result = EditorUi.NewPanel("ResultPanel", canvas.transform, new Vector2(760f, 400f));
+            TextMeshProUGUI title = EditorUi.MakeText("TitleText", result.transform, font, "", 40f,
+                EditorUi.Center(new Vector2(0f, 140f), new Vector2(700f, 70f)), TextAlignmentOptions.Center, Color.white, false, 28f);
+            TextMeshProUGUI message = EditorUi.MakeText("MessageText", result.transform, font, "", 28f,
+                EditorUi.Center(new Vector2(0f, 30f), new Vector2(700f, 140f)), TextAlignmentOptions.Center, Color.white, false, 20f);
+            Button retry = EditorUi.MakeButton("RetryButton", result.transform, font, Get(TextId.Retry),
+                EditorUi.Center(new Vector2(-170f, -130f), new Vector2(320f, 70f)), 32f, out TMP_Text retryLabel);
             retryLabel.gameObject.name = "RetryLabel";
-            Button back = MakeButton("BackButton", result.transform, "Back", Center(new Vector2(150f, -120f), new Vector2(260f, 70f)), 32, out Text backLabel);
+            Button back = EditorUi.MakeButton("BackButton", result.transform, font, Get(TextId.BackToMap),
+                EditorUi.Center(new Vector2(170f, -130f), new Vector2(320f, 70f)), 32f, out TMP_Text backLabel);
             backLabel.gameObject.name = "BackLabel";
             result.SetActive(false);
 
@@ -383,134 +377,6 @@ namespace Chess.Editor
             }
             EditorUtility.SetDirty(game);
             Updated.Add("GameController.battlePanel");
-        }
-
-        // ------------------------------------------------------------ UI builders
-
-        private readonly struct Placement
-        {
-            public readonly Vector2 AnchorMin;
-            public readonly Vector2 AnchorMax;
-            public readonly Vector2 Pivot;
-            public readonly Vector2 Position;
-            public readonly Vector2 Size;
-
-            public Placement(Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 size)
-            {
-                AnchorMin = anchorMin;
-                AnchorMax = anchorMax;
-                Pivot = pivot;
-                Position = position;
-                Size = size;
-            }
-        }
-
-        private static Placement Center(Vector2 pos, Vector2 size)
-        {
-            var half = new Vector2(0.5f, 0.5f);
-            return new Placement(half, half, half, pos, size);
-        }
-
-        private static Placement Top(Vector2 pos, Vector2 size)
-        {
-            return new Placement(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), pos, size);
-        }
-
-        private static Placement Bottom(Vector2 pos, Vector2 size)
-        {
-            return new Placement(new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), pos, size);
-        }
-
-        private static Placement Anchored(Vector2 anchor, Vector2 size)
-        {
-            return new Placement(anchor, anchor, new Vector2(0.5f, 0.5f), Vector2.zero, size);
-        }
-
-        private static GameObject NewCanvas(string name, int sortingOrder)
-        {
-            var go = new GameObject(name, typeof(RectTransform));
-            var canvas = go.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = sortingOrder;
-            var scaler = go.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
-            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 0.5f;
-            go.AddComponent<GraphicRaycaster>();
-            return go;
-        }
-
-        private static GameObject NewRect(string name, Transform parent, Placement p)
-        {
-            var go = new GameObject(name, typeof(RectTransform));
-            go.transform.SetParent(parent, false);
-            Apply((RectTransform)go.transform, p);
-            return go;
-        }
-
-        private static void Apply(RectTransform rt, Placement p)
-        {
-            rt.anchorMin = p.AnchorMin;
-            rt.anchorMax = p.AnchorMax;
-            rt.pivot = p.Pivot;
-            rt.anchoredPosition = p.Position;
-            rt.sizeDelta = p.Size;
-        }
-
-        private static GameObject NewPanel(string name, Transform parent, Vector2 size)
-        {
-            GameObject go = NewRect(name, parent, Center(Vector2.zero, size));
-            go.AddComponent<Image>().color = PanelColor;
-            return go;
-        }
-
-        private static Text MakeText(string name, Transform parent, string text, int fontSize, Placement p, TextAnchor alignment, Color color)
-        {
-            GameObject go = NewRect(name, parent, p);
-            return ConfigureText(go.AddComponent<Text>(), text, fontSize, alignment, color);
-        }
-
-        private static Text ConfigureText(Text t, string text, int fontSize, TextAnchor alignment, Color color)
-        {
-            t.font = font;
-            t.text = text;
-            t.fontSize = fontSize;
-            t.alignment = alignment;
-            t.horizontalOverflow = HorizontalWrapMode.Wrap;
-            t.color = color;
-            t.raycastTarget = false;
-            return t;
-        }
-
-        private static Button MakeButton(string name, Transform parent, string labelText, Placement p, int fontSize, out Text label)
-        {
-            GameObject go = NewRect(name, parent, p);
-            var image = go.AddComponent<Image>();
-            image.color = ButtonColor;
-            var button = go.AddComponent<Button>();
-            button.targetGraphic = image;
-            button.transition = Selectable.Transition.ColorTint;
-            ColorBlock cb = button.colors;
-            cb.normalColor = Color.white;
-            cb.highlightedColor = new Color(1.15f, 1.15f, 1.15f, 1f);
-            cb.pressedColor = new Color(0.85f, 0.85f, 0.85f, 1f);
-            cb.selectedColor = Color.white;
-            cb.disabledColor = DisabledColor;
-            cb.colorMultiplier = 1f;
-            cb.fadeDuration = 0.1f;
-            button.colors = cb;
-
-            GameObject labelGo = NewRect("Label", go.transform, new Placement(Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero));
-            label = ConfigureText(labelGo.AddComponent<Text>(), labelText, fontSize, TextAnchor.MiddleCenter, Color.white);
-            return button;
-        }
-
-        private static Color Hex(string hex, float alpha)
-        {
-            ColorUtility.TryParseHtmlString("#" + hex, out Color c);
-            c.a = alpha;
-            return c;
         }
 
         // ------------------------------------------------------------ SerializedObject helpers

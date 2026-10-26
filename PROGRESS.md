@@ -68,7 +68,7 @@ Stage 3 — ქართული ინტერფეისი
   - `git status --porcelain` — მხოლოდ ეს ფაილი (სცენებს USER-ის მიერ გაშვებული ბრძანება ცვლის).
   - საბოლოო შემოწმება: USER task 45 (ნაბიჯები 5, 7), 46.
 
-- [ ] 43. Editor: Setup Campaign Scenes → TMP, ტექსტები ცხრილიდან, Expand, MainPanel layout, ბრძოლის ახალი ზომები — owner: task-executor — files: Assets/Editor/CampaignScenesSetup.cs — depends: 36, 38, 41 — done when:
+- [x] 43. Editor: Setup Campaign Scenes → TMP, ტექსტები ცხრილიდან, Expand, MainPanel layout, ბრძოლის ახალი ზომები — owner: task-executor — files: Assets/Editor/CampaignScenesSetup.cs — depends: 36, 38, 41 — done when:
   - ზუსტად API Contract → Stage 3 → „CampaignScenesSetup — Stage 3 ცვლილებები“ (1–5) და „UI სტილი (Stage 3)“: font-ის შემოწმება ნაბიჯ 1-ის შემდეგ; ყველა ტექსტი TMP (`EditorUi`), `LegacyRuntime.ttf` და `UnityEngine.UI.Text` აღარ არის; ლოკალური `Placement`/`Center`/.../`MakeText`/`MakeButton`/`NewCanvas`/`EnsureEventSystem` წაშლილია და `EditorUi`-ით ჩანაცვლებულია; ყველა Canvas Expand; `MainPanel` + `VerticalLayoutGroup`; რეგიონის label Bold auto 18–28, Wrap, 8px inset; `BattleCanvas` ახალი ზომებით; სტატიკური ტექსტები ცხრილიდან (mapping — ნაბიჯი 5).
   - სცენების სახელები, ობიექტების სახელები, ველების მიბმა, ConfirmPanel/QuickGamePanel/ResultPanel inactive, EventSystem, Build Settings და შემაჯამებელი log უცვლელია; `HudCanvas`/`StatusHud`/`PromotionPrompt`-ს არ ეხება.
   - report-ში გამოთვლა (reference 1920×1080, x/y პიქსელები): CampaignMap — `TitleText`, `StatusText`, `BackButton` არ კვეთს `MapArea`-ს; MainScene — `InfoText`, `LeaveButton`, `HudPanel`, `ResultPanel` ერთმანეთს არ კვეთს, `PromotionPanel` არ კვეთს `HudPanel`-ს; და ახსნა, რატომ ინარჩუნებს Expand ამას სხვა aspect-ზე.
