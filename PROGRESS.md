@@ -47,7 +47,7 @@ Stage 3 — ქართული ინტერფეისი
   - `dotnet build Tests/GameCompileCheck` 0/0; `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet test` გადის. `OnGUI|\bGUI\.|GUIStyle|GUILayout` მთელ `Assets/Scripts/Game`-ში → 0; ამ ორ ფაილში G1, G2, G3, G4 → 0.
   - საბოლოო შემოწმება: USER task 46 (ნაბიჯები 5–6).
 
-- [ ] 40. Game: GameController-ის ტექსტები ცხრილიდან + სარდლის ხედის კამერა მაღლა/უკან — owner: task-executor — files: Assets/Scripts/Game/GameController.cs, Assets/Scripts/Game/CameraRig.cs — depends: 36, 38 — done when:
+- [x] 40. Game: GameController-ის ტექსტები ცხრილიდან + სარდლის ხედის კამერა მაღლა/უკან — owner: task-executor — files: Assets/Scripts/Game/GameController.cs, Assets/Scripts/Game/CameraRig.cs — depends: 36, 38 — done when:
   - ზუსტად API Contract → Stage 3 → „GameController — Stage 3“ და `CameraRig` სტრიქონი: `CameraRig.cs`-ში იცვლება მხოლოდ სამი ნაგულისხმევი (`commanderEyeHeight` 3.0, `commanderBackOffset` 1.6, `commanderPitch` 30); მეფე არ იმალება, `PiecesView.cs` არ იცვლება, GameController-ში მეფის ხილვადობის ლოგიკა არ არის. `BuildStatus` → `GameText.Status`; `[DEBUG FEN]` → `GameText.WithDebugFen`; შეცდომები → `GameText.StockfishNotFound` / `AiError`; info/ღილაკების ტექსტები → `CampaignText`/`GameText`/`TextTable.Active`/`DifficultyText`.
   - Stage 1–2-ის ყველა Inspector ველი (სახელი, ტიპი, ნაგულისხმევი), ნაკადი, შედეგის დამუშავება, `Debug.Log*` ტექსტები (მათ შორის `[GameController] AI difficulty: ...` ფორმატი) და `CameraRig`-ის ველები/ნაგულისხმევები უცვლელია.
   - `dotnet build Tests/GameCompileCheck` 0/0 **და** `dotnet build Tests/GameCompileCheck -p:DefineConstants=UNITY_EDITOR` 0 შეცდომა (ბოლოს ისევ ჩვეულებრივი build); `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet test Tests/ChessCore.Tests` გადის.

@@ -138,11 +138,11 @@ namespace Chess.Game
                 if (_region != null)
                 {
                     _launchDifficulty = AIDifficulty.FromElo(_region.Elo);
-                    ShowInGame(CampaignText.BattleInfo(_region), "Back to map");
+                    ShowInGame(CampaignText.BattleInfo(_region), TextTable.Active.Get(TextId.BackToMap));
                 }
                 else
                 {
-                    ShowInGame("Campaign", "Back to map");
+                    ShowInGame(TextTable.Active.Get(TextId.BattleInfoUnknown), TextTable.Active.Get(TextId.BackToMap));
                 }
             }
             else if (_mode == LaunchMode.QuickGame)
@@ -150,8 +150,8 @@ namespace Chess.Game
                 humanSide = GameSession.HumanSide;
                 playAgainstAI = true;
                 _launchDifficulty = AIDifficulty.FromPreset(GameSession.QuickDifficulty);
-                ShowInGame("Quick Game - " + GameSession.QuickDifficulty + " - you play "
-                    + (humanSide == Side.White ? "White" : "Black"), "Back to menu");
+                ShowInGame(GameText.QuickGameInfo(DifficultyText.Name(GameSession.QuickDifficulty), humanSide),
+                    TextTable.Active.Get(TextId.BackToMenu));
             }
             else if (battlePanel != null)
             {
@@ -209,7 +209,8 @@ namespace Chess.Game
                 if (campaign == null || _region == null)
                 {
                     // Invalid launch (already logged in Start): show the outcome, record nothing.
-                    ShowResult(BattleRules.GetTitle(outcome), BuildStatus(), true, "Retry", "Back to map");
+                    ShowResult(BattleRules.GetTitle(outcome), BuildStatus(), true,
+                        TextTable.Active.Get(TextId.Retry), TextTable.Active.Get(TextId.BackToMap));
                     return;
                 }
 
@@ -217,11 +218,13 @@ namespace Chess.Game
                 string message = summary.Message;
                 if (summary.ProgressChanged && !GameSession.TrySaveCampaign())
                     message += "\n" + CampaignText.SaveFailedWarning;
-                ShowResult(summary.Title, message, summary.CanRetry, "Retry", "Back to map");
+                ShowResult(summary.Title, message, summary.CanRetry,
+                    TextTable.Active.Get(TextId.Retry), TextTable.Active.Get(TextId.BackToMap));
             }
             else
             {
-                ShowResult(BattleRules.GetTitle(outcome), BuildStatus(), true, "Play again", "Back to menu");
+                ShowResult(BattleRules.GetTitle(outcome), BuildStatus(), true,
+                    TextTable.Active.Get(TextId.PlayAgain), TextTable.Active.Get(TextId.BackToMenu));
             }
         }
 
@@ -459,8 +462,8 @@ namespace Chess.Game
         {
             Debug.LogException(ex);
             _error = ex is StockfishNotFoundException notFound
-                ? "Stockfish not found: " + notFound.Path + ". Human vs human mode."
-                : "AI error: " + ex.Message.TrimEnd('.') + ". Human vs human mode.";
+                ? GameText.StockfishNotFound(notFound.Path)
+                : GameText.AiError(ex.Message);
         }
 
         private void Refresh()
@@ -489,30 +492,14 @@ namespace Chess.Game
             string status = BuildStatus();
 #if UNITY_EDITOR
             if (DebugFenActive)
-                status += "  [DEBUG FEN]";
+                status = GameText.WithDebugFen(status);
 #endif
             hud.Show(status, _error);
         }
 
         private string BuildStatus()
         {
-            switch (_state.Status)
-            {
-                case GameStatus.Checkmate:
-                    return "Checkmate - " + (_state.SideToMove == Side.White ? "Black" : "White") + " wins";
-                case GameStatus.Stalemate:
-                    return "Stalemate - draw";
-                case GameStatus.FiftyMoveRule:
-                    return "Draw - 50-move rule";
-                case GameStatus.ThreefoldRepetition:
-                    return "Draw - threefold repetition";
-                case GameStatus.InsufficientMaterial:
-                    return "Draw - insufficient material";
-            }
-            if (_thinking)
-                return "AI thinking...";
-            string text = (_state.SideToMove == Side.White ? "White" : "Black") + " to move";
-            return _state.IsCheck ? text + "  Check!" : text;
+            return GameText.Status(_state.Status, _state.SideToMove, _state.IsCheck, _thinking);
         }
     }
 }
