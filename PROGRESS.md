@@ -1,9 +1,198 @@
 # Progress
 
 ## Current Stage
-Stage 2 — Campaign (Done)
+Stage 3 — ქართული ინტერფეისი
 
 ## Tasks
+<!-- ფორმატი: - [ ] N. Title — owner: task-executor | USER — files: ... — depends: ... — done when: ...
+     task-executor = სუფთა C# (Campaign), Unity სკრიპტები (Game) და Editor სკრიპტები; USER = ფონტის ჩამოტვირთვა/TMP Essentials (44) და Play-mode შემოწმება Unity Editor-ში (45, 46; ინსტრუქცია task-ის ქვეშაა).
+     API-ს, ველების სახელების, ტექსტების, განლაგების და ქცევის ერთადერთი წყარო: PROJECT.md → ## API Contract → „Stage 3 — ქართული ინტერფეისი“ (+ Decision Log 2026-10-26).
+     Game/Editor task-ები (37–43) dotnet-ით მხოლოდ კომპილაციაზე და grep-ით მოწმდება; საბოლოო შემოწმება = USER task-ები 45, 46.
+     Stage 1–2-ის ქცევა უცვლელია: gameplay, წესები, კამპანიის პროგრესი, schema v1, AI, სცენების ნაკადი, Inspector ველების სახელები.
+     grep-ები (Grep/rg, *.cs):
+       G1 legacy Input: `UnityEngine\.Input\b|\bInput\.(Get|mouse|any)` — Assets/Scripts/Game → 0.
+       G2 ქართული ასოები: `[\x{10D0}-\x{10FF}]` — Assets/Scripts და Assets/Editor → ფაილებიდან მხოლოდ Assets/Scripts/Campaign/TextTable.Georgian.cs.
+       G3 ძველი UI სტრიქონები: `"(Back to map|Back to menu|Retry|Play again|Cancel|Campaign|Start|Start new|Back|Quit|Continue|New Campaign|Quick Game|Campaign Map|Georgian Battle Chess|Victory!|Defeat|Draw|Game over)"|you play|to move"|AI thinking|Checkmate - |Stalemate - |Draw - |Human vs human|Click: select|Promote pawn|Color: |Difficulty: ` — Assets/Scripts/Game და Assets/Editor → 0.
+       G4 legacy Text / IMGUI: `UnityEngine\.UI\.Text\b|[<( ]Text[ >);,]|LegacyRuntime|OnGUI|\bGUI\.|GUIStyle|GUILayout` — Assets/Scripts/Game და Assets/Editor → 0.
+     Stage 2-ის task-ები (20–34) — ## Stage 2 — Done, Stage 1-ის (1–19) — ## Stage 1 — Done (ფაილის ბოლოს). -->
+
+- [ ] 35. Campaign: სტრიქონების ცხრილი (`TextId`, `TextTable` ქართული + ინგლისური) და `GameText` — owner: task-executor — files: Assets/Scripts/Campaign/TextId.cs, Assets/Scripts/Campaign/TextTable.cs, Assets/Scripts/Campaign/TextTable.Georgian.cs, Assets/Scripts/Campaign/TextTable.English.cs, Assets/Scripts/Campaign/GameText.cs, Tests/ChessCore.Tests/Campaign/TextTableTests.cs, Tests/ChessCore.Tests/Campaign/GameTextTests.cs — depends: — — done when:
+  - `dotnet build Tests/ChessCore.Tests` და `dotnet test Tests/ChessCore.Tests` გადის (ყველა ძველი ტესტი უცვლელად + ახლები).
+  - ტიპები და ხელმოწერები ზუსტად API Contract → Stage 3 → „სტრიქონების ცხრილი“: `TextId` (73 მნიშვნელობა, ცხრილის რიგით) → TextId.cs; `TextTable` (`sealed partial`) → TextTable.cs (API, `AtlasCharacters`, `IsSupportedChar`, ვალიდაცია) + TextTable.Georgian.cs / TextTable.English.cs (მხოლოდ მონაცემები); `GameText` → GameText.cs. ყოველი ტექსტი ენიჭება ცხადი `TextId`-ით (არა პოზიციური მასივით); აკლია/ცარიელია → `InvalidOperationException` type init-ზე. `Format` = `string.Format(CultureInfo.InvariantCulture, ...)`. ფაილები UTF-8.
+  - `TextTableTests`: `Georgian_IsActive` (`Assert.Same(TextTable.Georgian, TextTable.Active)`, LanguageCode `ka`/`en`); `EveryId_HasText_InBothTables` (`Enum.GetValues(typeof(TextId))`, 73); `Georgian_ExactTexts` და `English_ExactTexts` (Theory — contract-ის ცხრილის ყველა 73 სტრიქონი ზუსტად, `\n` და ორმაგი space-ების ჩათვლით); `Placeholders_MatchBetweenTables` (`{n}` ინდექსების სიმრავლე ერთნაირია; `Format` შესაბამისი რაოდენობის არგუმენტით არ ვარდება); `AllTexts_UseSupportedCharsOnly` (ორივე ცხრილი); `IsSupportedChar_Rules` (true: `' '`, `'a'`, `'~'`, `'\n'`, U+10D0, U+10F0, U+10FF; false: `'\t'`, `'\r'`, U+00A0, U+2013, U+2014, U+2019, U+00AB, U+10A0, U+10CF, U+1C90, U+2D00); `AtlasCharacters_AsciiThenMkhedruli` (სიგრძე 143, უნიკალური, [0] = `' '`, [94] = `'~'`, [95] = U+10D0, [142] = U+10FF, `'\n'` არ შედის); `Get_UndefinedId_Throws` (`(TextId)9999` → ArgumentOutOfRangeException); `Format_NullArgs_Throws`.
+  - `GameTextTests`: `Status` Theory — (InProgress, White, false, false) → `თეთრის სვლაა`; (InProgress, Black, true, false) → `შავის სვლაა  შახი!`; (InProgress, White, false, true) და (InProgress, White, true, true) → `AI ფიქრობს...`; (Checkmate, Black, true, false) → `მატი - თეთრმა მოიგო`; (Checkmate, White, true, true) → `მატი - შავმა მოიგო`; Stalemate → `პატი - ფრე`; FiftyMoveRule → `ფრე - 50 სვლის წესი`; ThreefoldRepetition → `ფრე - სამჯერადი გამეორება`; InsufficientMaterial (aiThinking true-თიც) → `ფრე - მასალის ნაკლებობა`; `(GameStatus)99` → ArgumentOutOfRangeException. `SideName` (ორივე + `(Side)5` throw); `PieceName` (4 ფიგურა; King, Pawn, None → throw); `PromotionTitle(White)`, `QuickColorLabel`, `QuickDifficultyLabel`, `QuickGameInfo`, `StockfishNotFound`, `AiError` (`"Engine crashed."` → წერტილი ერთხელ), `WithDebugFen`, `HelpLine` — ზუსტად contract-ის „ზუსტი შედეგებით“; null არგუმენტები → ArgumentNullException; `AllOutputs_UseSupportedCharsOnly` (ყველა ზემოთ ჩამოთვლილი შედეგი).
+  - Grep `Assets/Scripts/Campaign`-ში: `UnityEngine|\brecord\b|\binit;|System\.Text\.Json` → 0. `BuildTargetTests.CampaignReferencesOnlyCore` კვლავ გადის. `.meta` ხელით არ შექმნილა.
+
+- [ ] 36. Campaign: რეგიონები, `CampaignText`, `BattleRules`, `RecordBattle` — ტექსტები ცხრილიდან — owner: task-executor — files: Assets/Scripts/Campaign/CampaignRegions.cs, Assets/Scripts/Campaign/CampaignText.cs, Assets/Scripts/Campaign/BattleRules.cs, Assets/Scripts/Campaign/CampaignProgress.cs, Tests/ChessCore.Tests/Campaign/CampaignRegionsTests.cs, Tests/ChessCore.Tests/Campaign/CampaignTextTests.cs, Tests/ChessCore.Tests/Campaign/BattleRulesTests.cs, Tests/ChessCore.Tests/Campaign/CampaignProgressTests.cs — depends: 35 — done when:
+  - `dotnet test Tests/ChessCore.Tests` გადის. ხელმოწერები და ტექსტები ზუსტად API Contract → Stage 3 → „Chess.Campaign — Stage 3 ცვლილებები“ და „ზუსტი შედეგები“: `CampaignText.SaveFailedWarning` / `CorruptedSaveWarning` / `NotCountedMessage` და `BattleRules.NotCountedTitle` — `const` → static get-only property (`TextTable.Active`-იდან); `CampaignRegions` Name/Era ცხრილიდან (id, Elo, რიგი უცვლელი); `RecordBattle`-ის ლოგიკა და ფლაგები უცვლელია, მხოლოდ ტექსტის აწყობა იცვლება. exception-ების შეტყობინებები ინგლისურად რჩება.
+  - ძველი ტესტების ყველა შემთხვევა რჩება, ინგლისური მოლოდინები შეიცვალა contract-ის ქართული ტექსტებით (შემოწმება არ წაშლილა): `CampaignRegionsTests.All_MatchContractTable` (ქართული Name/Era), `CampaignTextTests` (StateName სამივე, RegionLabel, MapStatus 0/2/სრული, BattleInfo, სამი property), `BattleRulesTests` (GetTitle სამივე, `NotCountedTitle == "თამაში დასრულდა"`), `CampaignProgressTests` (ყველა RecordBattle-ის Title/Message).
+  - ახალი: `CampaignTextTests.AllFormattedOutputs_UseSupportedCharsOnly` — RegionLabel (5 რეგიონი × 3 მდგომარეობა), BattleInfo (5), MapStatus (0..5 გათავისუფლებული, კამპანიის რიგით), სამი property, RecordBattle-ის ყოველი შეტყობინება (ყოველი რეგიონი × Victory/Defeat/Draw × Available/Liberated, + counted false) → ყველა სიმბოლო `TextTable.IsSupportedChar`.
+  - `CampaignSaveStore.cs`, `CampaignSaveSerializer.cs`, `JsonReader.cs`, `Region.cs` და მათი ტესტები უცვლელია და გადის (schema v1, id-ები).
+  - G2 → მხოლოდ `TextTable.Georgian.cs`. Grep Campaign: `UnityEngine|\brecord\b|\binit;` → 0.
+
+- [ ] 37. TMP-ის მიერთება: asmdef-ები და compile-check პროექტები — owner: task-executor — files: Assets/Scripts/Game/Chess.Game.asmdef, Assets/Editor/Chess.Editor.asmdef, Tests/GameCompileCheck/GameCompileCheck.csproj, Tests/EditorCompileCheck/EditorCompileCheck.csproj — depends: — — done when:
+  - `Chess.Game.asmdef` references = `["Chess.Core","Chess.AI","Chess.Campaign","Unity.InputSystem","UnityEngine.UI","Unity.TextMeshPro"]`; `Chess.Editor.asmdef` references = `["Chess.Core","Chess.AI","Chess.Campaign","Chess.Game","Unity.InputSystem","UnityEngine.UI","Unity.TextMeshPro"]`; სხვა ველები უცვლელია.
+  - ორივე csproj: + `<Reference Include="../../Library/ScriptAssemblies/Unity.TextMeshPro.dll" Private="false" />`; სხვა უცვლელია (`Unity.TextMeshPro.Editor.dll` არ ემატება — საჭირო არ არის).
+  - `dotnet build Tests/GameCompileCheck` და `dotnet build Tests/EditorCompileCheck` → 0 შეცდომა, 0 warning; `dotnet test Tests/ChessCore.Tests` გადის. `.cs` ფაილები არ შეცვლილა.
+
+- [ ] 38. Game UI: MainMenu, RegionButton, CampaignMap, BattlePanel → `TMP_Text` + ტექსტები ცხრილიდან; `DifficultyText` — owner: task-executor — files: Assets/Scripts/Game/UI/MainMenuController.cs, Assets/Scripts/Game/UI/RegionButton.cs, Assets/Scripts/Game/UI/CampaignMapController.cs, Assets/Scripts/Game/UI/BattlePanel.cs, Assets/Scripts/Game/UI/DifficultyText.cs — depends: 36, 37 — done when:
+  - ზუსტად API Contract → Stage 3 → „Chess.Game — Stage 3“: ველების ტიპები `Text` → `TMP_Text` (სახელები უცვლელი, `[SerializeField] private`); `DifficultyText.Name`; MainMenu-ის `colorLabel`/`difficultyLabel` → `GameText.QuickColorLabel` / `QuickDifficultyLabel(DifficultyText.Name(...))`. ნაკადი, listener-ები, LogError-ები და ფერები უცვლელია.
+  - `dotnet build Tests/GameCompileCheck` → 0 შეცდომა, 0 warning; `dotnet build Tests/EditorCompileCheck` → 0/0 (Editor ჯერ ძველ `Text`-ს აბამს — კომპილირდება; runtime-ზე ამას task 43 ასწორებს); `dotnet test Tests/ChessCore.Tests` გადის.
+  - ამ 5 ფაილში: G1, G2, G3, G4 → 0; UI სტრიქონის literal არ არის (მხოლოდ log-ები).
+  - საბოლოო შემოწმება: USER task 45.
+
+- [ ] 39. Game: `StatusHud` და `PromotionPrompt` — OnGUI → uGUI/TMP — owner: task-executor — files: Assets/Scripts/Game/StatusHud.cs, Assets/Scripts/Game/PromotionPrompt.cs — depends: 35, 37 — done when:
+  - ზუსტად API Contract → Stage 3 → Chess.Game ცხრილის `StatusHud` და `PromotionPrompt` სტრიქონები: ახალი Inspector ველები (`statusText`, `errorText`; `panel`, `titleText`, `queenButton`, `rookButton`, `bishopButton`, `knightButton`, `cancelButton`), public API უცვლელი (`Show`, `IsOpen`, `LastClosedFrame`, `Open`), Esc = Cancel, `IsOpen = false` callback-მდე, `panel == null`-ზე `Open` → LogError + `onCancelled` (ფიგურა ჩუმად არ ირჩევა), `Close`-ში `EventSystem.current?.SetSelectedGameObject(null)`, listener-ები `Awake`/`OnDestroy`-ში, null ველზე NRE არა.
+  - `SelectionController.cs` არ შეცვლილა (press/release-ის წესი — PROJECT.md Decision Log „HUD და გარდაქმნა uGUI-ზე“).
+  - `dotnet build Tests/GameCompileCheck` 0/0; `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet test` გადის. `OnGUI|\bGUI\.|GUIStyle|GUILayout` მთელ `Assets/Scripts/Game`-ში → 0; ამ ორ ფაილში G1, G2, G3, G4 → 0.
+  - საბოლოო შემოწმება: USER task 46 (ნაბიჯები 5–6).
+
+- [ ] 40. Game: GameController-ის ტექსტები ცხრილიდან + სარდლის ხედში საკუთარი მეფის დამალვა — owner: task-executor — files: Assets/Scripts/Game/GameController.cs, Assets/Scripts/Game/CameraRig.cs, Assets/Scripts/Game/PiecesView.cs — depends: 36, 38 — done when:
+  - ზუსტად API Contract → Stage 3 → „GameController — Stage 3“, `CameraRig` (`ViewChanged`) და `PiecesView` (`SetHiddenSquare`) სტრიქონები. `BuildStatus` → `GameText.Status`; `[DEBUG FEN]` → `GameText.WithDebugFen`; შეცდომები → `GameText.StockfishNotFound` / `AiError`; info/ღილაკების ტექსტები → `CampaignText`/`GameText`/`TextTable.Active`/`DifficultyText`.
+  - Stage 1–2-ის ყველა Inspector ველი (სახელი, ტიპი, ნაგულისხმევი), ნაკადი, შედეგის დამუშავება, `Debug.Log*` ტექსტები (მათ შორის `[GameController] AI difficulty: ...` ფორმატი) და `CameraRig`-ის ველები/ნაგულისხმევები უცვლელია.
+  - `dotnet build Tests/GameCompileCheck` 0/0 **და** `dotnet build Tests/GameCompileCheck -p:DefineConstants=UNITY_EDITOR` 0 შეცდომა (ბოლოს ისევ ჩვეულებრივი build); `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet test Tests/ChessCore.Tests` გადის.
+  - მთელ `Assets/Scripts/Game`-ში: G1, G3, G4 → 0; G2 → 0 (Game-ში ქართული ასო არ არის).
+  - საბოლოო შემოწმება: USER task 46.
+
+- [ ] 41. Editor: `EditorUi` (საერთო TMP builder-ები) და **Tools → Setup Georgian Font** — owner: task-executor — files: Assets/Editor/EditorUi.cs, Assets/Editor/GeorgianFontSetup.cs — depends: 35, 37 — done when:
+  - ზუსტად API Contract → Stage 3 → „Editor — Stage 3“: `GeorgianFontSetup` (const-ები, MenuItem, `Ensure(out bool charactersMissing)`, ნაბიჯები 1–6, log-ების ზუსტი ტექსტები, Dynamic → `TryAddCharacters(TextTable.AtlasCharacters)` → Static, atlas და material `AddObjectToAsset`-ით, fallback `LiberationSans SDF`, არსებული asset არ იცვლება) და `EditorUi` (Placement-ები, ფერები, `NewCanvas` Expand-ით, `MakeText`/`MakeButton` TMP-ით და auto-size-ით, `EnsureEventSystem`, `DeleteRoots`; `enableWordWrapping` არ გამოიყენება).
+  - `ChessSceneSetup.cs` და `CampaignScenesSetup.cs` ამ task-ში არ იცვლება (ისინი ჯერ ძველ helper-ებს იყენებს; task 42/43).
+  - `dotnet build Tests/EditorCompileCheck` → 0 შეცდომა, 0 warning; `dotnet build Tests/GameCompileCheck` 0/0; `dotnet test` გადის. ამ 2 ფაილში G2, G3, G4 → 0 (log-ები ინგლისურად).
+  - საბოლოო შემოწმება: USER task 45 (ნაბიჯები 2–4).
+
+- [ ] 42. Editor: Setup Chess Scene → `HudCanvas` (HUD + გარდაქმნის ფანჯარა) და EventSystem — owner: task-executor — files: Assets/Editor/ChessSceneSetup.cs — depends: 39, 41 — done when:
+  - ზუსტად API Contract → Stage 3 → „ChessSceneSetup — Stage 3 დამატებები“ (ნაბიჯები 1–5) და „UI სტილი (Stage 3)“ → `HudCanvas`: font-ის შემოწმება სცენის გახსნამდე (null → LogError, არაფერი იცვლება), `EditorUi.EnsureEventSystem`, `HudCanvas` წაშლა+შექმნა, `HudPanel` (VerticalLayoutGroup; `StatusText`, `ErrorText`, `HelpText` = `GameText.HelpLine`), `PromotionPanel` (inactive; `TitleText` + 5 ღილაკი, label-ები `GameText.PieceName` / `Cancel`), `StatusHud`/`PromotionPrompt` ველების მიბმა `SerializedObject`-ით (ვერ ნაპოვნი → LogError + WITH ERRORS).
+  - Stage 1-ის ნაბიჯები, მასალები, `GameController`-ის ველები და ნაგულისხმევები უცვლელია; `battlePanel`-ს და `BattleCanvas`-ს არ ეხება.
+  - `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet build Tests/GameCompileCheck` 0/0. ამ ფაილში G2, G3, G4 → 0.
+  - `git status --porcelain` — მხოლოდ ეს ფაილი (სცენებს USER-ის მიერ გაშვებული ბრძანება ცვლის).
+  - საბოლოო შემოწმება: USER task 45 (ნაბიჯები 5, 7), 46.
+
+- [ ] 43. Editor: Setup Campaign Scenes → TMP, ტექსტები ცხრილიდან, Expand, MainPanel layout, ბრძოლის ახალი ზომები — owner: task-executor — files: Assets/Editor/CampaignScenesSetup.cs — depends: 36, 38, 41 — done when:
+  - ზუსტად API Contract → Stage 3 → „CampaignScenesSetup — Stage 3 ცვლილებები“ (1–5) და „UI სტილი (Stage 3)“: font-ის შემოწმება ნაბიჯ 1-ის შემდეგ; ყველა ტექსტი TMP (`EditorUi`), `LegacyRuntime.ttf` და `UnityEngine.UI.Text` აღარ არის; ლოკალური `Placement`/`Center`/.../`MakeText`/`MakeButton`/`NewCanvas`/`EnsureEventSystem` წაშლილია და `EditorUi`-ით ჩანაცვლებულია; ყველა Canvas Expand; `MainPanel` + `VerticalLayoutGroup`; რეგიონის label Bold auto 18–28, Wrap, 8px inset; `BattleCanvas` ახალი ზომებით; სტატიკური ტექსტები ცხრილიდან (mapping — ნაბიჯი 5).
+  - სცენების სახელები, ობიექტების სახელები, ველების მიბმა, ConfirmPanel/QuickGamePanel/ResultPanel inactive, EventSystem, Build Settings და შემაჯამებელი log უცვლელია; `HudCanvas`/`StatusHud`/`PromotionPrompt`-ს არ ეხება.
+  - report-ში გამოთვლა (reference 1920×1080, x/y პიქსელები): CampaignMap — `TitleText`, `StatusText`, `BackButton` არ კვეთს `MapArea`-ს; MainScene — `InfoText`, `LeaveButton`, `HudPanel`, `ResultPanel` ერთმანეთს არ კვეთს, `PromotionPanel` არ კვეთს `HudPanel`-ს; და ახსნა, რატომ ინარჩუნებს Expand ამას სხვა aspect-ზე.
+  - `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet build Tests/GameCompileCheck` 0/0; `dotnet test` გადის. მთელ `Assets/Editor`-ში: G2, G3, G4 → 0.
+  - `git status --porcelain` — მხოლოდ ეს ფაილი.
+  - საბოლოო შემოწმება: USER task 45, 46.
+
+- [ ] 44. USER: Noto Sans Georgian ფონტის ჩამოტვირთვა და TMP Essential Resources-ის იმპორტი — owner: USER — files: Assets/Fonts/NotoSansGeorgian-Regular.ttf, Assets/Fonts/OFL.txt, Assets/TextMesh Pro/** (+ `.meta`-ები, Unity ქმნის) — depends: — — done when: ფონტი და ლიცენზია `Assets/Fonts`-შია, `Assets/TextMesh Pro` არსებობს, Console = 0 წითელი შეცდომა
+    **რატომ:** ქართული ასოების საჩვენებლად თამაშს სჭირდება ფონტის ფაილი (ის კოდში არ არის) და TextMeshPro-ს ძირითადი ფაილები (shader-ები, პარამეტრები). ეს task ნებისმიერ დროს შეგიძლია გააკეთო — სასურველია ახლავე.
+    1. ბრაუზერში გახსენი **https://fonts.google.com/noto/specimen/Noto+Sans+Georgian** (Google Fonts — ოფიციალური საიტი; სხვა საიტიდან არ ჩამოტვირთო).
+    2. ზედა-მარჯვნივ დააჭირე **Get font**, შემდეგ **Download all** (ზოგ ვერსიაში ღილაკს ჰქვია **Download family**). ჩამოიტვირთება `.zip` ფაილი (მაგ. `Noto_Sans_Georgian.zip`).
+    3. `.zip`-ზე მარჯვენა click → **Extract All** → **Extract**.
+    4. გახსნილ საქაღალდეში არის ფაილი `OFL.txt` (ლიცენზია) და საქაღალდე `static`. გახსენი `static` და იპოვე ზუსტად **`NotoSansGeorgian-Regular.ttf`** (არა `Bold`, `Condensed`, `Light` და არა ზედა საქაღალდის `...VariableFont...ttf`).
+    5. Windows Explorer-ში გახსენი `D:\yvelaperi\saitebi\chess\chess3D\chess3D\Assets\` → ცარიელ ადგილას მარჯვენა click → **New → Folder** → სახელი ზუსტად **`Fonts`**.
+    6. დააკოპირე `NotoSansGeorgian-Regular.ttf` და `OFL.txt` საქაღალდეში `Assets\Fonts\`. ფაილებს სახელი არ გადაარქვა.
+    7. გადადი Unity-ზე და დაელოდე იმპორტს (ქვედა-მარჯვენა პროგრესის ზოლი). **Project** ფანჯარაში `Assets/Fonts`-ში ჩანს `NotoSansGeorgian-Regular` (ხატულა „Aa“) და `OFL`.
+    8. ზედა მენიუ **Window → TextMeshPro → Import TMP Essential Resources**. იხსნება ფანჯარა **Import Unity Package** ფაილების სიით → ქვედა-მარჯვნივ **Import**. დაელოდე. Project-ში გაჩნდება საქაღალდე `Assets/TextMesh Pro` (შიგნით `Fonts`, `Resources`, `Shaders`, `Sprites`). თუ ამის ნაცვლად თავისით გაიხსნა ფანჯარა **TMP Importer** — დააჭირე მასში **Import TMP Essentials** და შემდეგ დახურე. **Import TMP Examples & Extras** არ არის საჭირო.
+    9. Console (**Window → General → Console**) → **Clear** → წითელი შეცდომების მთვლელი = **0**.
+    10. უთხარი გუნდს, რომ დაკომიტდეს: `Assets/Fonts.meta`, `Assets/Fonts/NotoSansGeorgian-Regular.ttf` (+ `.meta`), `Assets/Fonts/OFL.txt` (+ `.meta`), `Assets/TextMesh Pro.meta` და მთელი `Assets/TextMesh Pro/` საქაღალდე `.meta`-ებით. მათ გარეშე სხვა კომპიუტერზე ქართული ტექსტი არ გამოჩნდება. (ლიცენზია OFL ფონტის თამაშთან ერთად გავრცელების ნებას იძლევა, თუ `OFL.txt` თან ახლავს.)
+
+- [ ] 45. USER: ფონტის asset, სცენების განახლება, მენიუ და რუკა ქართულად — owner: USER — files: Assets/Fonts/NotoSansGeorgian SDF.asset (ქმნის Tools → Setup Georgian Font), Assets/Scenes/MainMenu.unity, Assets/Scenes/CampaignMap.unity, Assets/Scenes/MainScene.unity, ProjectSettings/EditorBuildSettings.asset (ცვლის Tools → Setup Chess Scene / Setup Campaign Scenes) — depends: 40, 42, 43, 44 — done when: ყველა შემოწმება გადის; Console = 0 წითელი შეცდომა და 0 გაფრთხილება `was not found in the`
+    1. გადადი Unity-ზე, დაელოდე კომპილაციას (ქვედა-მარჯვენა პროგრესის ზოლი ქრება). Console → **Clear** → 0 წითელი. **Play-ს ჯერ ნუ დააჭერ** — ჯერ სცენები უნდა განახლდეს (ნაბიჯები 2–7).
+    2. ზედა მენიუ **Tools → Setup Georgian Font**. Console-ში: `[GeorgianFont] Created Assets/Fonts/NotoSansGeorgian SDF.asset: ...` და `[GeorgianFont] All UI text characters are covered.` შეიძლება იყოს ხაზიც `UI characters taken from fallback LiberationSans SDF: ...` — ესეც ნორმალურია (ლათინური ასოები სხვა ფონტიდან მოდის). წითელი ხაზი არ უნდა იყოს. თუ წითელია `Font file not found` → გაიმეორე task 44, ნაბიჯები 1–7; თუ `TMP Essential Resources are not imported` → task 44, ნაბიჯი 8.
+    3. Project → `Assets/Fonts` → დააჭირე `NotoSansGeorgian SDF`-ს. Inspector-ში **Atlas Population Mode** = `Static`. Project-ში ამ ფაილის მარცხნივ პატარა ისარს (▸) დააჭირე: შიგნით ჩანს `NotoSansGeorgian SDF Atlas` და `NotoSansGeorgian SDF Material` (ე.ი. ასოების სურათი ფაილშია შენახული).
+    4. ისევ **Tools → Setup Georgian Font** → ახლა `[GeorgianFont] Using existing Assets/Fonts/NotoSansGeorgian SDF.asset.` (ახალი ფაილი არ იქმნება).
+    5. **Tools → Setup Chess Scene** (თუ შენახვას გკითხავს — **Save**) → Console: `[ChessSceneSetup] Done.` (`WITH ERRORS`-ის გარეშე); `Created:`-ში ჩანს `HudCanvas`.
+    6. **Tools → Setup Campaign Scenes** → `[CampaignScenesSetup] Done.` (`WITH ERRORS`-ის გარეშე) და ბოლო ხაზი `Build scenes: MainMenu, CampaignMap, MainScene`.
+    7. გაუშვი ორივე მეორედ: ჯერ **Tools → Setup Chess Scene**, შემდეგ **Tools → Setup Campaign Scenes**. Project → `Assets/Scenes` → ორჯერ დააჭირე `MainScene`-ს: Hierarchy-ში ზუსტად ერთი `HudCanvas`, ერთი `BattleCanvas`, ერთი `EventSystem`, ერთი `ChessGame`. დააჭირე `ChessGame`-ს → Inspector: **Status Hud**-ში **Status Text** და **Error Text** შევსებულია; **Promotion Prompt**-ში **Panel**, **Title Text** და 5 ღილაკი შევსებულია (არცერთი `None`). შემდეგ ორჯერ დააჭირე `Assets/Scenes/MainMenu`-ს.
+    8. **`გაგრძელება`-ს დამალვის შესამოწმებლად შენახვა დროებით გადამალე:** Windows Explorer-ის მისამართის ზოლში ჩასვი `%USERPROFILE%\AppData\LocalLow\DefaultCompany\chess3D` → Enter. თუ იქ არის `campaign.json` → მარჯვენა click → **Rename** → `campaign.backup.json`. (ფაილი არ იშლება — ნაბიჯ 11-ში დავაბრუნებთ.)
+    9. დააჭირე **Play**: მუქი ფონი, სათაური `ქართული საბრძოლო ჭადრაკი`, ღილაკები ზემოდან ქვემოთ `ახალი კამპანია`, `სწრაფი თამაში`, `გასვლა` — თანაბარი დაშორებით, **ცარიელი ადგილის გარეშე** (`გაგრძელება` არ ჩანს). ყველა ასო ქართულად კარგად იკითხება, კვადრატები (□) არსად ჩანს.
+    10. `სწრაფი თამაში` → პანელი: სათაური `სწრაფი თამაში`, ღილაკები `ფერი: თეთრი`, `სირთულე: საშუალო`, `დაწყება`, `უკან`. დააჭირე `ფერი`-ს → `ფერი: შავი`. `სირთულე`-ს სამჯერ → `რთული` → `ოსტატი` → `მარტივი`. ტექსტი ღილაკს არ სცდება. `უკან` → მენიუ. **არ დააჭირო** `ახალი კამპანია`-ს. გააჩერე Play.
+    11. Explorer-ში `campaign.backup.json` → **Rename** → ისევ `campaign.json`.
+    12. **Play**: ახლა ჩანს `გაგრძელება` (`ახალი კამპანია`-ს ქვეშ). დააჭირე `ახალი კამპანია` → კითხვა `დავიწყოთ ახალი კამპანია? მიმდინარე პროგრესი დაიკარგება.` და ღილაკები `ახლის დაწყება` / `გაუქმება` → დააჭირე `გაუქმება` → მთავარი მენიუ.
+    13. `გაგრძელება` → რუკა: სათაური `კამპანიის რუკა` მწვანე არის ზემოთ; 5 ღილაკი, თითოში 4 ხაზი: სახელი (`ქართლი`, `კახეთი`, `იმერეთი`, `სვანეთი`, `ხევსურეთი`), ეპოქა (მაგ. `V საუკუნე - მეფე ვახტანგ გორგასალი`), `Elo ...` და მდგომარეობა (`გათავისუფლებულია` / `ხელმისაწვდომია` / `ჩაკეტილია`); ბოლო ხაზი არ არის მოჭრილი. ქვემოთ: `გათავისუფლებულია N რეგიონი 5-დან. აირჩიე რეგიონი ბრძოლისთვის.`; ქვედა-მარცხნივ `მენიუში დაბრუნება`.
+    14. **სხვადასხვა ეკრანის ფორმა:** Game ფანჯრის ზედა ზოლში არის ჩამოსაშლელი სია (ჩვეულებრივ წერია `Free Aspect`). აირჩიე `16:9 Aspect`, შემდეგ `4:3 Aspect`, შემდეგ ისევ `Free Aspect` და Game ფანჯრის კიდე მაუსით გაწიე, რომ ძალიან ფართო და დაბალი გახდეს. ყველა შემთხვევაში: სათაური რუკის (მწვანე არის) ზემოთაა, `მენიუში დაბრუნება` და სტატუსის ტექსტი — მის **ქვემოთ** და მწვანე არეს არ ფარავს.
+    15. `მენიუში დაბრუნება` → მენიუ. გააჩერე Play. Console: 0 წითელი და არცერთი ყვითელი ხაზი სიტყვებით `was not found in the` (ასეთი ხაზი ნიშნავს ასოს, რომელიც ფონტში არ არის).
+    16. უთხარი გუნდს, რომ დაკომიტდეს: `Assets/Fonts/NotoSansGeorgian SDF.asset` (+ `.meta`), `Assets/Scenes/*.unity`, `ProjectSettings/EditorBuildSettings.asset` (თუ შეიცვალა) და Unity-ის მიერ შექმნილი ახალი `.meta` ფაილები: `Assets/Scripts/Campaign/TextId.cs.meta`, `TextTable.cs.meta`, `TextTable.Georgian.cs.meta`, `TextTable.English.cs.meta`, `GameText.cs.meta`, `Assets/Scripts/Game/UI/DifficultyText.cs.meta`, `Assets/Editor/EditorUi.cs.meta`, `Assets/Editor/GeorgianFontSetup.cs.meta`. თუ რამე არ ემთხვევა — screenshot და Console-ის ტექსტი გადაეცი გუნდს.
+
+- [ ] 46. USER: ბრძოლა ქართულად — HUD, გარდაქმნის ფანჯარა, სარდლის ხედი, კამპანიის შედეგები — owner: USER — files: Assets/Scenes/MainScene.unity (Start Fen / Debug Campaign Start Fen / Stockfish Path Override დროებით; ბოლოს ცარიელი) — depends: 45 — done when: ყველა შემოწმება გადის; Console = 0 წითელი შეცდომა და 0 `was not found in the`; ბოლოს სამივე ველი ცარიელია; `stockfish.exe` არ რჩება
+    **შეხსენება:** Inspector-ის ველებს ყოველთვის Play-ის **გაჩერებულ** მდგომარეობაში ცვლი და შემდეგ **Ctrl+S** (სცენის შენახვა).
+    1. Console → **Clear**. ღიაა MainMenu → **Play** → `სწრაფი თამაში` → `ფერი: შავი`, `სირთულე: მარტივი` → `დაწყება`.
+    2. ზემოთ ცენტრში `სწრაფი თამაში - მარტივი - შენი ფერი: შავი`; ზედა-მარჯვნივ `მენიუში დაბრუნება`; ამ ზოლის **ქვემოთ**, მარცხნივ: სტატუსი (`AI ფიქრობს...` ან `შავის სვლაა`) და დახმარება `მაუსი: არჩევა/სვლა  TAB: ხედი  R: თავიდან`. სტატუსი ზედა ტექსტს არ ფარავს.
+    3. **სარდლის ხედი:** კამერა შენი (შავი) მეფის ადგილიდან იყურება და შენი მეფე **არ ჩანს** — დაფა წინ თავისუფლად ჩანს. დააჭირე **TAB** → კამერა ზემოთ ადის და შავი მეფე e8-ზე ჩანს. ისევ **TAB** → სარდლის ხედი, მეფე ისევ არ ჩანს. სარდლის ხედში გააკეთე სვლა პაიკით (დააჭირე e7-ს, შემდეგ e5-ს) — მუშაობს. (სარდლის ხედში საკუთარ მეფეს ვერ აირჩევ — „შენ“ ხარ ის; მეფის სვლისთვის გადადი TAB-ით ტაქტიკურ ხედზე.)
+    4. Game view-ში აირჩიე `4:3 Aspect`, შემდეგ `Free Aspect` და ფანჯარა გახადე ძალიან ფართო: ზედა ზოლი (ტექსტი + ღილაკი) და მარცხენა სტატუსი არცერთ ზომაზე ერთმანეთს არ ფარავს. `მენიუში დაბრუნება` → მენიუ. გააჩერე Play.
+    5. **MainScene ცალკე + გარდაქმნა:** ორჯერ დააჭირე `Assets/Scenes/MainScene`-ს. Hierarchy → `ChessGame` → **Game Controller** → **Start Fen** = `8/P6k/8/8/8/8/8/K7 w - - 0 1` → **Ctrl+S** → **Play**. ზედა ზოლი (ტექსტი/ღილაკი) არ ჩანს; მარცხნივ ჩანს `თეთრის სვლაა` და დახმარების ხაზი.
+    6. დააჭირე **TAB** (ტაქტიკური ხედი) → თეთრი პაიკი a7-ზე → a8: ეკრანის ცენტრში ფანჯარა `პაიკის გარდაქმნა (თეთრი)` და ღილაკები `ლაზიერი`, `ეტლი`, `კუ`, `მხედარი`, `გაუქმება`. დააჭირე `გაუქმება` → ფანჯარა ქრება, პაიკი a7-ზე რჩება. ისევ a7 → a8 → **Esc** → ფანჯარა ქრება. ისევ a7 → a8 → `მხედარი` → a8-ზე მხედარია, ფანჯარა ქრება და დაფაზე სხვა არაფერი შეცვლილა (ღილაკზე დაჭერამ დაფაზე არც სვლა, არც მონიშვნა არ გამოიწვია). შავი (AI) პასუხობს. გააჩერე Play.
+    7. **პატი:** **Start Fen** = `7k/8/8/5Q2/8/8/8/K7 w - - 0 1` → **Ctrl+S** → Play → f5 → f7 → სტატუსი `პატი - ფრე`. გააჩერე Play.
+    8. **Stockfish-ის გარეშე:** **Start Fen** = `6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1`, **Stockfish Path Override** = `C:\nope\stockfish.exe` → **Ctrl+S** → Play → მარცხნივ, სტატუსის ქვეშ ყვითლად `Stockfish ვერ მოიძებნა: C:\nope\stockfish.exe. ორი მოთამაშის რეჟიმი.`, მის ქვეშ დახმარების ხაზი (ტექსტები ერთმანეთს არ ედება). a1 → a8 → `მატი - თეთრმა მოიგო`. გააჩერე Play. **Start Fen** და **Stockfish Path Override** გაასუფთავე → **Ctrl+S**.
+    9. **კამპანია:** **Debug Campaign Start Fen** = `6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1` → **Ctrl+S**. ორჯერ დააჭირე `Assets/Scenes/MainMenu`-ს → **Play** → `გაგრძელება` → `ქართლი`.
+    10. ზემოთ `ქართლი - V საუკუნე - მეფე ვახტანგ გორგასალი - მოწინააღმდეგის Elo 800`, ზედა-მარჯვნივ `რუკაზე დაბრუნება`, მარცხენა სტატუსის ბოლოს `[DEBUG FEN]`. a1 → a8 → სტატუსი `მატი - თეთრმა მოიგო`; ცენტრში პანელი `გამარჯვება!` და `ქართლი კვლავ თავისუფალია.` (თუ ქართლი ჯერ არ იყო გათავისუფლებული — `ქართლი გათავისუფლდა! კახეთი ახლა ხელმისაწვდომია.`); მხოლოდ ღილაკი `რუკაზე დაბრუნება` (`თავიდან ცდა` არ ჩანს). პანელი მარცხენა სტატუსს არ ფარავს.
+    11. `რუკაზე დაბრუნება` → რუკა. გააჩერე Play. **Debug Campaign Start Fen** = `7k/8/8/8/8/8/1q6/K7 w - - 0 1` → **Ctrl+S** → MainMenu → **Play** → `გაგრძელება` → `ქართლი` → სტატუსი `თეთრის სვლაა  შახი!  [DEBUG FEN]` → a1 → b2 → `ფრე - მასალის ნაკლებობა`; პანელი `ფრე` + `ქართლი კვლავ თავისუფალია.` (ან `ქართლი ჯერ კიდევ მტრის ხელშია.`), ღილაკები `თავიდან ცდა` და `რუკაზე დაბრუნება`. დააჭირე `თავიდან ცდა` → პანელი ქრება, პოზიცია თავიდან იწყება. `რუკაზე დაბრუნება` → `მენიუში დაბრუნება`. გააჩერე Play.
+    12. MainScene → **Debug Campaign Start Fen** გაასუფთავე; დარწმუნდი, რომ **Start Fen** და **Stockfish Path Override** ცარიელია → **Ctrl+S**.
+    13. Task Manager (Ctrl+Shift+Esc) → **Details**: `stockfish.exe` არ არის. Console: 0 წითელი, არცერთი `was not found in the`.
+    14. უთხარი გუნდს: `git status`-ში `Assets/Fonts/NotoSansGeorgian SDF.asset` და `Assets/TextMesh Pro/**` **არ** უნდა იყოს შეცვლილი (Play-მ ფონტი არ უნდა შეცვალოს); `Assets/Scenes/MainScene.unity` დაკომიტდეს, თუ შეიცვალა. თუ რამე არ ემთხვევა — screenshot და Console-ის ტექსტი გადაეცი გუნდს.
+
+## Shared files
+<!-- ფაილები, რომლებიც რამდენიმე task-ის files-ში შეიძლება იყოს (shared). წესი: მხოლოდ დამატება (ახალი dependency, ტიპი, route), სხვისი ჩანაწერის შეცვლა ან წაშლა არა; ერთ საერთო ფაილზე ორი task ერთდროულად არ მუშაობს. -->
+- Stage 3-ში არცერთი: ყოველ ფაილს ერთი task ეკუთვნის. `TextId.cs` / `TextTable*.cs` / `GameText.cs` — მხოლოდ 35 (ახალი ტექსტი სჭირდება? → ჯერ API Contract-ის ცხრილის განახლება და ცალკე task); asmdef-ები და compile-check csproj-ები — მხოლოდ 37; `GameController.cs` — მხოლოდ 40; `ChessSceneSetup.cs` — მხოლოდ 42; `CampaignScenesSetup.cs` — მხოლოდ 43. ახალი NuGet/Unity package არცერთ task-ს არ სჭირდება.
+- რიგი (რეკომენდებული — თანმიმდევრული, რადგან `GameCompileCheck`/`EditorCompileCheck` მთელ Game/Editor საქაღალდეს აკომპილირებს და პარალელური ნახევრად დასრულებული ცვლილება სხვის build-ს ჩააგდებს): 35 → 36 → 37 → 38 → 39 → 40 → 41 → 42 → 43 → USER 45 → USER 46. task 37 შეიძლება 35/36-ის პარალელურად. USER 44 — ნებისმიერ დროს, 45-მდე (აგენტის task-ებს არ აჩერებს).
+- აგენტი არ ცვლის: `Assets/Scenes/*.unity`, `ProjectSettings/**`, `Assets/Fonts/**`, `Assets/TextMesh Pro/**`, `.meta` ფაილებს — მათ ქმნის/ცვლის USER ან USER-ის მიერ გაშვებული Editor ბრძანება (44, 45, 46).
+
+## Backlog (needs user decision)
+### ფაზა 2 — Art & Sound (კონცეფციით ~1.5 თვე)
+- ქართული ისტორიული 3D მოდელები primitive-ების ნაცვლად (მეფე, ლაზიერი/მთავარსარდალი, ეტლი/კოშკი, მხედარი/აბჯროსანი ცხენოსანი, ოფიცერი/ეპისკოპოსი, პაიკი/მებრძოლი).
+- კამპანიის რუკის ნამდვილი art (Stage 2-ში სქემატური ღილაკებია); რეგიონების ეპოქების საბოლოო ტექსტი.
+- ხმოვანი ბრძანებები („ლაზიერი c5-ზე, შეტევაზე!“), ჯარისკაცების პასუხები, აუდიო მენეჯერი კოორდინატების მიხედვით.
+- კუთხური დიალექტები (ხევსურული, კახური, სვანური).
+- გარემოები: კახეთი (ალაზნის ველი, ქვევრები, გალავანი), სვანეთი (თოვლი, კოშკები); ველის ტიპები (ქვიშა, ბალახი, თოვლი).
+### ფაზა 3 — Polish & FX (კონცეფციით ~1 თვე)
+- მოკვლის კინემატოგრაფიული სცენები (Fatal Captures, 2–3 წამი).
+- განათება და post-processing.
+- ბალანსის ტესტირება, სირთულის Elo-ს გაზომვა (მათ შორის `AIDifficulty.FromElo`-ს ზოლები და რეგიონების Elo).
+- სარდლის ხედში ხელები/აბჯარი.
+### გადადებული (Stage 1-დან)
+- Mac/Linux Stockfish და პლატფორმის ავტომატური არჩევა; build-ის/installer-ის მომზადება; Stockfish-ის build-ში გავრცელება + GPLv3 compliance.
+- სვლის ანიმაცია, მოჭრილი ფიგურების ჩვენება, ბოლო სვლის და შახის (წითელი) განათება.
+- Undo, PGN export/import, საათები/დროის კონტროლი, დანებება, ფრეს შეთავაზება, claim-ის რეჟიმი (50/3-ჯერადი), 75 სვლის / 5-ჯერადი წესები.
+- კამერის orbit/zoom მარჯვენა ღილაკით; hot-seat-ში კამერის მობრუნება მოთამაშის მიხედვით.
+- Stockfish full-strength preset.
+- Unity Test Framework / Play-mode ავტომატური ტესტები.
+- nit (finish-check, security): `StockfishAI.GetBestMoveAsync` engine-ს უგზავნის შემოსულ `fen`-ს და არა `state.ToFen()`-ს (ნორმალიზებული); `ProcessUciTransport.SendLine` არ უარყოფს `\r`/`\n`-ს. რეალური ზიანი არ არის (Game ყოველთვის `ToFen()`-ს აგზავნის).
+- nit (finish-check, security): `StockfishAI`/`ProcessUciTransport` — `Path.GetFullPath` ერთხელ, რომ `File.Exists` და გაშვება ერთსა და იმავე ფაილს ეხებოდეს (მხოლოდ inspector-ის override-ზე).
+- nit (finish-check): `StockfishAI` timeout-ები ყოველ ხაზზეა და არა მთელ ლოდინზე (engine, რომელიც მუდმივად `info`-ს ბეჭდავს, timeout-ს ვერ მიიღებს; preset-ებს არ ეხება) — deadline ერთხელ.
+- nit (finish-check): `StockfishAI` — `GetBestMoveAsync`-ის ct shared init-ის დროს არ მოწმდება (გაუქმება init-ის დასრულებამდე ჩერდება); Game-ს არ ეხება.
+- nit (finish-check): `StockfishAITests.GetBestMove_Cancel_DiscardsStaleBestmove...` იყენებს SearchTimeout 500 ms-ს — დატვირთვისას შეიძლება flaky იყოს; 30 s.
+- nit (fix round 1 re-review): `GameController.StopAi` არ იძახებს `UpdateHud()`/`UpdateInteractable()`-ს — inspector-ში კომპონენტის disable/enable AI-ის ფიქრისას ტოვებს „AI thinking...“-ს და დაბლოკილ input-ს R-მდე (მხოლოდ Editor-ის debug სცენარი).
+- nit (fix round 1 re-review): domain reload-ის შემდეგ AI ჩუმად ქრება (hot-seat) — HUD-ზე შენიშვნა არ ჩანს (მაგ. `Scripts reloaded. Human vs human mode.`).
+- nit: README.md არ არსებობს — გაშვების ინსტრუქცია ახლა CLAUDE.md-ის Commands-სა და PROGRESS.md-ის USER task-ებშია.
+- nit: `EnsureNonEmptyCompile` target-ის მოშორება `Tests/ChessCore.Build` და `Tests/ChessAI.Build` csproj-ებიდან, როცა Core-სა და AI-ში რეალური `.cs` ფაილებია (ცარიელი Compile set-ის დროს SDK `TargetFrameworkAttribute`-ს არ აგენერირებს).
+### Stage 2-ის გარეთ დარჩენილი (გადაწყვეტილება საჭიროა)
+- `SquarePicker` არ ამოწმებს, UI-ზე ხომ არ არის მაუსი (`EventSystem.IsPointerOverGameObject`) — `Back to map`-ზე დაჭერა დაფაზეც „დააჭერს“ (სცენა მაშინვე იცვლება, ზიანი არ არის). (Stage 3: გარდაქმნის ფანჯარას არ ეხება — `SquarePicker` press-ზე ირჩევს, ღილაკი release-ზე, ფანჯრის ღიაობისას click იგნორირდება; იხ. PROJECT.md Decision Log 2026-10-26.)
+- ფერის არჩევა კამპანიაში; რამდენიმე save slot; კამპანიის დასრულების ეკრანი.
+- nit (finish-check Stage 2, ორივე reviewer): `CampaignSaveStore.Load` — თუ ფაილი გაშვებისას სხვა პროცესს უჭირავს, წაკითხვაც და backup-ის გადატანაც ჩავარდება (ჩუმად), გაფრთხილება მაინც წერს „It was kept as campaign.corrupt.json“, ხოლო შემდეგი `New Campaign` (დადასტურების გარეშე, რადგან `Campaign == null`) ვალიდურ ფაილს გადააწერს. გამოსწორება: `TryBackUpCorruptFile` → bool; ჩავარდნისას სხვა გაფრთხილება / ჩაწერის დაბლოკვა. ძალიან იშვიათია.
+- nit (finish-check Stage 2): `CampaignMapController.Start` — `regionButtons == null`-ზე ბრუნდება `backButton`-ის მიბმამდე (მხოლოდ არასწორად აწყობილ სცენაზე).
+- nit (finish-check Stage 2, შესამოწმებელი): `InputSystemUIInputModule.AssignDefaultActions()` Editor-ში ქმნის არამუდმივ actions asset-ს — სცენის ფაილში reference შეიძლება null იყოს; runtime-ზე `OnEnable` აღადგენს. USER task 28-ის შემდეგ სცენის ფაილი გადასახედია.
+- nit (fix round 1 re-review): `Save_TargetLocked_ThrowsAndKeepsOldSave` ძველ კოდზეც გადიოდა; `Save`-ის ტოტი „tmp რჩება, როცა target აღარ არსებობს“ პირდაპირ ტესტით არ მოწმდება (იდეა: `campaign.json` სახელის საქაღალდე → `File.Move` ვარდება → tmp რჩება). 64 KB-ის ზუსტი ზღვარი (65536 / 65537) არ ტესტირდება.
+- nit (fix round 1 re-review): პირველი ჩაწერისას ნაწილობრივ ჩაწერილი tmp (მაგ. disk full) შემდეგ გაშვებაზე აღდგება და „damaged“ გაფრთხილებას აჩვენებს `NoSave`-ის ნაცვლად (უვნებელია; შესაძლო `tempWritten` flag).
+### Stage 3-ის გარეთ დარჩენილი (გადაწყვეტილება საჭიროა)
+- ენის არჩევა მენიუში (ქართული / English) — `TextTable.English` უკვე არსებობს; საჭიროა `Active`-ის არჩევა და შენახვა.
+- ქართული Bold ფაილი (`NotoSansGeorgian-Bold.ttf`) synthetic bold-ის ნაცვლად, თუ სათაურები საკმარისად მკვეთრი არ იქნება.
+- სარდლის ხედში მეფის არჩევა (ახლა მხოლოდ ტაქტიკურ ხედში) — თუ მომხმარებელს დასჭირდება, ალტერნატივა: კამერის offset-ები + მეფე ხილული.
+
+## Blockers
+- (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
+- (მოგვარდა) USER task-ები 10, 12, 14, 16 მომხმარებელმა დაადასტურა 2026-10-25.
+- (მოგვარდა `de73a20`-ში) Game სკრიპტების `.meta` ფაილები.
+- (მოგვარდა `a16b924`-ში) `Assets/Scenes/MainScene.unity` და `Assets/Materials/**` დაკომიტებულია.
+
+## Run State
+- Stage: Stage 3 — ქართული ინტერფეისი
+- Finish-check this stage: not run
+- Fix rounds this stage: 0/2
+- Failed attempts: —
+- Stage start commit: f09c5fa
+
+## Last Session
+- Date: 2026-10-26
+- Status: **Stage 2 — Campaign: Done.** ყველა task (20–34) `[x]`, 0 ღია critical/should-fix. USER task-ები 28 და 29 მომხმარებელმა დაადასტურა 2026-10-26: რუკა (სათაური, ტექსტი), მოგება Kartli/Kakheti, Imereti UCI_Elo 1400, წაგება + Retry, ფრე, Stockfish not found → შედეგი არ ითვლება, Quick Game debug FEN-ს არ იყენებს, შენახვა Play-ებს შორის (მათ შორის `File.Replace` Unity Mono-ზე), დაზიანებული ფაილი → `campaign.corrupt.json` + გაფრთხილება, MainScene ცალკე Stage 1-ივით, `stockfish.exe` არ რჩება, Console = 0 შეცდომა. ხელახლა გენერირებული სცენები დაკომიტდა (MainScene-ში `startFen`, `debugCampaignStartFen`, `stockfishPathOverride` ცარიელია; მასალებში შინაარსობრივი ცვლილება არ იყო).
+- Done (ისტორია): Stage 2 — Campaign, agent task-ები 20–27 და finish-check-ის 30–32 `[x]` (ბრენჩი `team/stage2-campaign`). finish-check: code-reviewer + security-auditor → 3 should-fix (შენახვის ჩავარდნისას ორივე ასლის დაკარგვა, `Continue` დამალვა, რეგიონის label-ის ჩამოჭრა) → გასწორდა fix round 1-ში, re-review: სამივე მოგვარებულია, ახალი critical/should-fix არ არის. USER task 28 გავიდა (სცენები და `.meta`-ები დაკომიტდა `bc04739`-ში). მომხმარებლის შენიშვნებით: T33 — Editor-only `debugCampaignStartFen` (`startFen` ახლა მხოლოდ Mode None-ში), T34 — რუკის სათაური MapArea-ს ზემოთ, რეგიონის label Bold 22–28, ღილაკი 400×190; task 29-ის ინსტრუქცია თავიდან დაიწერა (მოგება/წაგება/ფრე debug FEN-ით).
+- Verification: `dotnet test Tests/ChessCore.Tests` 411/411; `dotnet build Tests/ChessCore.Tests`, `Tests/GameCompileCheck`, `Tests/EditorCompileCheck` — 0 warning / 0 error; legacy Input grep → 0; Campaign-ში UnityEngine/record/init → 0. STOCKFISH_PATH integration არ გაშვებულა.
+- Known issues / blockers: არცერთი. ვიზუალური წვრილმანები და nit-ები Backlog-შია. T33/T34 ცალკე reviewer-ით არ შემოწმებულა (diff ორკესტრატორმა გადახედა; Play-mode-ში USER task 29-მა დაადასტურა).
+- Next: Stage 3-ის არჩევა მომხმარებლის გადაწყვეტილებაა (Backlog → ფაზა 2 Art & Sound / ფაზა 3 Polish & FX / ვიზუალური წვრილმანები).
+- 2026-10-26 (plan): Stage 3 — ქართული ინტერფეისი დაიგეგმა (`/auto plan:`), ბრენჩი `team/stage3-georgian-ui`. task-ები 35–46 (agent 35–43, USER 44–46). გაგრძელება: `/auto continue` (task 35-იდან; USER task 44 შეიძლება ახლავე).
+
+## Stage 2 — Done
 <!-- ფორმატი: - [ ] N. Title — owner: task-executor | USER — files: ... — depends: ... — done when: ...
      task-executor = სუფთა C#, Unity სკრიპტები (Game, UI) და Editor სკრიპტი; USER = Play-mode შემოწმება Unity Editor-ში (დეტალური ინსტრუქცია task-ის ქვეშაა).
      API-ს, ველების სახელების, ტექსტების და ქცევის ერთადერთი წყარო: PROJECT.md → ## API Contract და ## Business Rules → Stage 2.
@@ -171,74 +360,10 @@ Stage 2 — Campaign (Done)
     20. Task Manager (Ctrl+Shift+Esc) → **Details**: `stockfish.exe` არ არის.
     21. შეამოწმე, რომ GameController-ში **Debug Campaign Start Fen**, **Start Fen** და **Stockfish Path Override** ცარიელია და სცენა შენახულია (**Ctrl+S**). ნაბიჯ 1-მა ხელახლა შექმნა სცენები — უთხარი გუნდს, რომ `Assets/Scenes/*.unity` დაკომიტდეს. თუ რამე არ ემთხვევა — screenshot და Console-ის ტექსტი გადაეცი გუნდს.
 
-## Shared files
-<!-- ფაილები, რომლებიც რამდენიმე task-ის files-ში შეიძლება იყოს (shared). წესი: მხოლოდ დამატება (ახალი dependency, ტიპი, route), სხვისი ჩანაწერის შეცვლა ან წაშლა არა; ერთ საერთო ფაილზე ორი task ერთდროულად არ მუშაობს. -->
+### Stage 2-ის Shared files შენიშვნა (არქივი)
 - Stage 2-ში არცერთი: ყოველ ფაილს ერთი task ეკუთვნის. `Tests/ChessCore.Tests/ChessCore.Tests.csproj` და `BuildTargetTests.cs` — მხოლოდ task 20; `Chess.Game.asmdef` და `GameCompileCheck.csproj` — მხოლოდ 24; `Chess.Editor.asmdef` და `EditorCompileCheck.csproj` — მხოლოდ 27; `GameController.cs` — მხოლოდ 26; `AIDifficulty.cs` — მხოლოდ 23. ახალი NuGet პაკეტი არცერთ task-ს არ სჭირდება.
 - რიგი: 20 → 21 → 22 → 24 → (25 ∥ 26) → 27 → USER 28 → USER 29. task 23 შეიძლება 20–22-ის პარალელურად (ფაილები არ ემთხვევა). Campaign-ის ტესტები `Tests/ChessCore.Tests/Campaign/`-ში ცალ-ცალკე ფაილებშია.
 - `ProjectSettings/EditorBuildSettings.asset` და `Assets/Scenes/*.unity` აგენტი არ ცვლის — მხოლოდ USER-ის მიერ გაშვებული Editor ბრძანებები (task 28/29).
-
-## Backlog (needs user decision)
-### ფაზა 2 — Art & Sound (კონცეფციით ~1.5 თვე)
-- ქართული ისტორიული 3D მოდელები primitive-ების ნაცვლად (მეფე, ლაზიერი/მთავარსარდალი, ეტლი/კოშკი, მხედარი/აბჯროსანი ცხენოსანი, ოფიცერი/ეპისკოპოსი, პაიკი/მებრძოლი).
-- კამპანიის რუკის ნამდვილი art (Stage 2-ში სქემატური ღილაკებია); რეგიონების ეპოქების საბოლოო ტექსტი.
-- ხმოვანი ბრძანებები („ლაზიერი c5-ზე, შეტევაზე!“), ჯარისკაცების პასუხები, აუდიო მენეჯერი კოორდინატების მიხედვით.
-- კუთხური დიალექტები (ხევსურული, კახური, სვანური).
-- გარემოები: კახეთი (ალაზნის ველი, ქვევრები, გალავანი), სვანეთი (თოვლი, კოშკები); ველის ტიპები (ქვიშა, ბალახი, თოვლი).
-- ქართული UI ტექსტი (TextMeshPro + ქართული font asset).
-### ფაზა 3 — Polish & FX (კონცეფციით ~1 თვე)
-- მოკვლის კინემატოგრაფიული სცენები (Fatal Captures, 2–3 წამი).
-- განათება და post-processing.
-- ბალანსის ტესტირება, სირთულის Elo-ს გაზომვა (მათ შორის `AIDifficulty.FromElo`-ს ზოლები და რეგიონების Elo).
-- სარდლის ხედში ხელები/აბჯარი.
-### გადადებული (Stage 1-დან)
-- Mac/Linux Stockfish და პლატფორმის ავტომატური არჩევა; build-ის/installer-ის მომზადება; Stockfish-ის build-ში გავრცელება + GPLv3 compliance.
-- სვლის ანიმაცია, მოჭრილი ფიგურების ჩვენება, ბოლო სვლის და შახის (წითელი) განათება.
-- Undo, PGN export/import, საათები/დროის კონტროლი, დანებება, ფრეს შეთავაზება, claim-ის რეჟიმი (50/3-ჯერადი), 75 სვლის / 5-ჯერადი წესები.
-- კამერის orbit/zoom მარჯვენა ღილაკით; hot-seat-ში კამერის მობრუნება მოთამაშის მიხედვით.
-- Stockfish full-strength preset.
-- Unity Test Framework / Play-mode ავტომატური ტესტები.
-- nit (finish-check, security): `StockfishAI.GetBestMoveAsync` engine-ს უგზავნის შემოსულ `fen`-ს და არა `state.ToFen()`-ს (ნორმალიზებული); `ProcessUciTransport.SendLine` არ უარყოფს `\r`/`\n`-ს. რეალური ზიანი არ არის (Game ყოველთვის `ToFen()`-ს აგზავნის).
-- nit (finish-check, security): `StockfishAI`/`ProcessUciTransport` — `Path.GetFullPath` ერთხელ, რომ `File.Exists` და გაშვება ერთსა და იმავე ფაილს ეხებოდეს (მხოლოდ inspector-ის override-ზე).
-- nit (finish-check): `StockfishAI` timeout-ები ყოველ ხაზზეა და არა მთელ ლოდინზე (engine, რომელიც მუდმივად `info`-ს ბეჭდავს, timeout-ს ვერ მიიღებს; preset-ებს არ ეხება) — deadline ერთხელ.
-- nit (finish-check): `StockfishAI` — `GetBestMoveAsync`-ის ct shared init-ის დროს არ მოწმდება (გაუქმება init-ის დასრულებამდე ჩერდება); Game-ს არ ეხება.
-- nit (finish-check): `StockfishAITests.GetBestMove_Cancel_DiscardsStaleBestmove...` იყენებს SearchTimeout 500 ms-ს — დატვირთვისას შეიძლება flaky იყოს; 30 s.
-- nit (fix round 1 re-review): `GameController.StopAi` არ იძახებს `UpdateHud()`/`UpdateInteractable()`-ს — inspector-ში კომპონენტის disable/enable AI-ის ფიქრისას ტოვებს „AI thinking...“-ს და დაბლოკილ input-ს R-მდე (მხოლოდ Editor-ის debug სცენარი).
-- nit (fix round 1 re-review): domain reload-ის შემდეგ AI ჩუმად ქრება (hot-seat) — HUD-ზე შენიშვნა არ ჩანს (მაგ. `Scripts reloaded. Human vs human mode.`).
-- nit: README.md არ არსებობს — გაშვების ინსტრუქცია ახლა CLAUDE.md-ის Commands-სა და PROGRESS.md-ის USER task-ებშია.
-- nit: `EnsureNonEmptyCompile` target-ის მოშორება `Tests/ChessCore.Build` და `Tests/ChessAI.Build` csproj-ებიდან, როცა Core-სა და AI-ში რეალური `.cs` ფაილებია (ცარიელი Compile set-ის დროს SDK `TargetFrameworkAttribute`-ს არ აგენერირებს).
-### Stage 2-ის გარეთ დარჩენილი (გადაწყვეტილება საჭიროა)
-- `SquarePicker` არ ამოწმებს, UI-ზე ხომ არ არის მაუსი (`EventSystem.IsPointerOverGameObject`) — `Back to map`-ზე დაჭერა დაფაზეც „დააჭერს“ (სცენა მაშინვე იცვლება, ზიანი არ არის).
-- ფერის არჩევა კამპანიაში; რამდენიმე save slot; კამპანიის დასრულების ეკრანი.
-- nit (finish-check Stage 2, ორივე reviewer): `CampaignSaveStore.Load` — თუ ფაილი გაშვებისას სხვა პროცესს უჭირავს, წაკითხვაც და backup-ის გადატანაც ჩავარდება (ჩუმად), გაფრთხილება მაინც წერს „It was kept as campaign.corrupt.json“, ხოლო შემდეგი `New Campaign` (დადასტურების გარეშე, რადგან `Campaign == null`) ვალიდურ ფაილს გადააწერს. გამოსწორება: `TryBackUpCorruptFile` → bool; ჩავარდნისას სხვა გაფრთხილება / ჩაწერის დაბლოკვა. ძალიან იშვიათია.
-- nit (finish-check Stage 2): `CampaignMapController.Start` — `regionButtons == null`-ზე ბრუნდება `backButton`-ის მიბმამდე (მხოლოდ არასწორად აწყობილ სცენაზე).
-- nit (finish-check Stage 2, შესამოწმებელი): `InputSystemUIInputModule.AssignDefaultActions()` Editor-ში ქმნის არამუდმივ actions asset-ს — სცენის ფაილში reference შეიძლება null იყოს; runtime-ზე `OnEnable` აღადგენს. USER task 28-ის შემდეგ სცენის ფაილი გადასახედია.
-- nit (fix round 1 re-review): `Save_TargetLocked_ThrowsAndKeepsOldSave` ძველ კოდზეც გადიოდა; `Save`-ის ტოტი „tmp რჩება, როცა target აღარ არსებობს“ პირდაპირ ტესტით არ მოწმდება (იდეა: `campaign.json` სახელის საქაღალდე → `File.Move` ვარდება → tmp რჩება). 64 KB-ის ზუსტი ზღვარი (65536 / 65537) არ ტესტირდება.
-- nit (fix round 1 re-review): პირველი ჩაწერისას ნაწილობრივ ჩაწერილი tmp (მაგ. disk full) შემდეგ გაშვებაზე აღდგება და „damaged“ გაფრთხილებას აჩვენებს `NoSave`-ის ნაცვლად (უვნებელია; შესაძლო `tempWritten` flag).
-- nit (fix round 1 re-review): დამალული `Continue`-ს ადგილას მთავარ მენიუში 100px ცარიელი ადგილი რჩება (ფიქსირებული პოზიციები) — `VerticalLayoutGroup` `MainPanel`-ზე.
-### ვიზუალური წვრილმანები Stage 3-ისთვის (USER task 29-ის შენიშვნები, 2026-10-26)
-- CampaignMap: `Back to menu` ღილაკი რუკის (`MapArea`) ქვედა-მარცხენა კუთხეს ფარავს (შესაძლოა Game view-ის aspect-ზე დამოკიდებული; reference 1920×1080-ზე გამოთვლით არ ფარავდა).
-- ბრძოლა: ზედა-მარცხენა სტატუსი (`StatusHud`, მაგ. `[DEBUG FEN]` ან გრძელი ტექსტი) ზედა ცენტრის რეგიონის წარწერას (`BattlePanel.infoText`) ფარავს.
-- სარდლის ხედში (`CameraRig`, commander view) საკუთარი მეფის ფიგურა კამერასთან ძალიან ახლოსაა და ხედს ფარავს (`commanderBackOffset` / `commanderEyeHeight` ან მეფის დამალვა ამ ხედში).
-
-## Blockers
-- (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
-- (მოგვარდა) USER task-ები 10, 12, 14, 16 მომხმარებელმა დაადასტურა 2026-10-25.
-- (მოგვარდა `de73a20`-ში) Game სკრიპტების `.meta` ფაილები.
-- (მოგვარდა `a16b924`-ში) `Assets/Scenes/MainScene.unity` და `Assets/Materials/**` დაკომიტებულია.
-
-## Run State
-- Stage: Stage 2 — Campaign (Done)
-- Finish-check this stage: done (task-ები 33–34 — მომხმარებლის მოთხოვნა USER task 28-ის შემდეგ)
-- Fix rounds this stage: 1/2
-- Failed attempts: —
-
-## Last Session
-- Date: 2026-10-26
-- Status: **Stage 2 — Campaign: Done.** ყველა task (20–34) `[x]`, 0 ღია critical/should-fix. USER task-ები 28 და 29 მომხმარებელმა დაადასტურა 2026-10-26: რუკა (სათაური, ტექსტი), მოგება Kartli/Kakheti, Imereti UCI_Elo 1400, წაგება + Retry, ფრე, Stockfish not found → შედეგი არ ითვლება, Quick Game debug FEN-ს არ იყენებს, შენახვა Play-ებს შორის (მათ შორის `File.Replace` Unity Mono-ზე), დაზიანებული ფაილი → `campaign.corrupt.json` + გაფრთხილება, MainScene ცალკე Stage 1-ივით, `stockfish.exe` არ რჩება, Console = 0 შეცდომა. ხელახლა გენერირებული სცენები დაკომიტდა (MainScene-ში `startFen`, `debugCampaignStartFen`, `stockfishPathOverride` ცარიელია; მასალებში შინაარსობრივი ცვლილება არ იყო).
-- Done (ისტორია): Stage 2 — Campaign, agent task-ები 20–27 და finish-check-ის 30–32 `[x]` (ბრენჩი `team/stage2-campaign`). finish-check: code-reviewer + security-auditor → 3 should-fix (შენახვის ჩავარდნისას ორივე ასლის დაკარგვა, `Continue` დამალვა, რეგიონის label-ის ჩამოჭრა) → გასწორდა fix round 1-ში, re-review: სამივე მოგვარებულია, ახალი critical/should-fix არ არის. USER task 28 გავიდა (სცენები და `.meta`-ები დაკომიტდა `bc04739`-ში). მომხმარებლის შენიშვნებით: T33 — Editor-only `debugCampaignStartFen` (`startFen` ახლა მხოლოდ Mode None-ში), T34 — რუკის სათაური MapArea-ს ზემოთ, რეგიონის label Bold 22–28, ღილაკი 400×190; task 29-ის ინსტრუქცია თავიდან დაიწერა (მოგება/წაგება/ფრე debug FEN-ით).
-- Verification: `dotnet test Tests/ChessCore.Tests` 411/411; `dotnet build Tests/ChessCore.Tests`, `Tests/GameCompileCheck`, `Tests/EditorCompileCheck` — 0 warning / 0 error; legacy Input grep → 0; Campaign-ში UnityEngine/record/init → 0. STOCKFISH_PATH integration არ გაშვებულა.
-- Known issues / blockers: არცერთი. ვიზუალური წვრილმანები და nit-ები Backlog-შია. T33/T34 ცალკე reviewer-ით არ შემოწმებულა (diff ორკესტრატორმა გადახედა; Play-mode-ში USER task 29-მა დაადასტურა).
-- Next: Stage 3-ის არჩევა მომხმარებლის გადაწყვეტილებაა (Backlog → ფაზა 2 Art & Sound / ფაზა 3 Polish & FX / ვიზუალური წვრილმანები).
 
 ## Stage 1 — Done
 - [x] 1. Test infrastructure, .gitignore, asmdef skeleton — owner: task-executor — files: .gitignore, Tests/ChessCore.Build/ChessCore.Build.csproj, Tests/ChessAI.Build/ChessAI.Build.csproj, Tests/ChessCore.Tests/ChessCore.Tests.csproj, Tests/ChessCore.Tests/BuildTargetTests.cs, Assets/Scripts/Core/Chess.Core.asmdef, Assets/Scripts/AI/Chess.AI.asmdef, Assets/Scripts/Game/Chess.Game.asmdef, Assets/StreamingAssets/Stockfish/README.md — depends: — — done when:

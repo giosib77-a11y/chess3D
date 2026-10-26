@@ -5,7 +5,11 @@
 
 **Stage 1 (MVP)** ამოწმებს მთავარ ტექნიკურ საფუძველს: სწორი წესები, 3D ველი და ბადე, სვლა მაუსით, ორი კამერა და Stockfish-ის მიერთება. გრაფიკა დროებითია (Unity primitive-ები). **სტატუსი: Done.**
 
-**Stage 2 (Campaign)** ამატებს თამაშის „გარსს“: მთავარი მენიუ, კამპანიის სქემატური რუკა 5 ქართული რეგიონით (ქართლი, კახეთი, იმერეთი, სვანეთი, ხევსურეთი), ბრძოლა რეგიონის Elo-ს მიხედვით, რეგიონის განთავისუფლება და პროგრესის შენახვა JSON ფაილში. Quick Game = ერთი პარტია ფერის და სირთულის არჩევით. ვიზუალი ისევ მარტივია (uGUI ღილაკები, ინგლისური ტექსტი); რუკის art და ქართული font — Stage 3.
+**Stage 2 (Campaign)** ამატებს თამაშის „გარსს“: მთავარი მენიუ, კამპანიის სქემატური რუკა 5 ქართული რეგიონით (ქართლი, კახეთი, იმერეთი, სვანეთი, ხევსურეთი), ბრძოლა რეგიონის Elo-ს მიხედვით, რეგიონის განთავისუფლება და პროგრესის შენახვა JSON ფაილში. Quick Game = ერთი პარტია ფერის და სირთულის არჩევით. ვიზუალი ისევ მარტივია (uGUI ღილაკები, ინგლისური ტექსტი); რუკის art და ქართული font — Stage 3. **სტატუსი: Done.**
+
+**Stage 3 (ქართული ინტერფეისი)** თამაშის ყველა UI ტექსტს ქართულად აჩვენებს (მენიუ, რუკა, ბრძოლის პანელები, HUD, გარდაქმნის ფანჯარა) Noto Sans Georgian ფონტით და TextMeshPro-თი. ტექსტები ერთ ცხრილშია (`Chess.Campaign` → `TextTable`), რომ მომავალში ინგლისურის დაბრუნება მარტივი იყოს. HUD და გარდაქმნის ფანჯარა OnGUI-დან uGUI-ზე გადადის. გასწორდება 4 ვიზუალური წვრილმანი (რუკის `Back to menu`, HUD-ის და ბრძოლის წარწერის გადაფარვა, სარდლის ხედში საკუთარი მეფე, მენიუში დამალული `Continue`-ს ცარიელი ადგილი). წესები, კამპანიის პროგრესი, შენახვის ფორმატი, AI და სცენების ნაკადი უცვლელია.
+
+> დამწყებისთვის: **TextMeshPro (TMP)** არის Unity-ის ტექსტის სისტემა, რომელიც ფონტიდან წინასწარ „ახატავს“ ასოებს ერთ სურათზე (atlas). ჩვენ ამ სურათს ერთხელ ვქმნით Editor-ის ბრძანებით, ქართული და ლათინური ასოებით, ამიტომ თამაშის დროს ის აღარ იცვლება.
 
 > დამწყებისთვის: პროექტი ოთხ ნაწილად იყოფა. **Core** არის „ჭადრაკის ტვინი“ (წესები, სვლები, FEN) Unity-ის გარეშე, ამიტომ მის შემოწმებას ტესტებით Unity-ის გახსნა არ სჭირდება. **AI** ელაპარაკება Stockfish პროგრამას. **Campaign** (Stage 2) არის „კამპანიის ტვინი“: რეგიონები, განბლოკვის წესები და შენახვა — ისიც Unity-ის გარეშე და ტესტებით შემოწმებადი. **Game** არის Unity-ის ნაწილი: ხატავს ველს, ფიგურებს და მენიუებს და კითხულობს მაუსს და კლავიატურას. Game თავად არასდროს წყვეტს, სვლა დასაშვებია თუ არა ან რეგიონი გაიხსნა თუ არა; ამას ყოველთვის Core-ს ან Campaign-ს ეკითხება.
 
@@ -13,7 +17,7 @@
 - ერთი ადამიანი, თავის Windows PC-ზე (ლოკალურად, ინტერნეტის გარეშე). როლები, ანგარიშები ან ავტორიზაცია არ არსებობს.
 
 ## Current Stage
-Stage 2 — Campaign (Done, 2026-10-26; Stage 3 — მომხმარებლის არჩევანი)
+Stage 3 — ქართული ინტერფეისი (დაგეგმილია 2026-10-26; Stage 1 და Stage 2 — Done)
 
 ## Scope
 ### In scope (Stage 1) — Done
@@ -52,6 +56,20 @@ Stage 2 — Campaign (Done, 2026-10-26; Stage 3 — მომხმარებ�
 - კამპანიაში ფერის არჩევა (კამპანიაში ადამიანი ყოველთვის თეთრია).
 - build / installer, Stockfish-ის გავრცელება.
 
+### In scope (Stage 3)
+- სტრიქონების ცხრილი `Chess.Campaign`-ში (`TextId`, `TextTable`, `GameText`): ყველა UI ტექსტი ქართულად (აქტიური), Stage 2-ის ინგლისური ტექსტები — მეორე ცხრილად (runtime-ზე არ ჩანს). რეგიონების სახელები და ეპოქები ქართულია (id-ები, Elo და რიგი უცვლელია → შენახვა თავსებადია). ყველაფერი იტესტება `dotnet test`-ით, მათ შორის სიმბოლოების უსაფრთხოება (მხოლოდ ASCII + მხედრული).
+- TextMeshPro (უკვე `com.unity.ugui` 2.6.0-ში): ყველა uGUI `Text` → `TMP_Text`; ფონტი Noto Sans Georgian Regular (OFL), font asset იქმნება Editor ბრძანებით (**Tools → Setup Georgian Font**, Static atlas: ASCII + მხედრული).
+- `StatusHud` და `PromotionPrompt`: OnGUI → uGUI/TMP (`HudCanvas`, აწყობს **Tools → Setup Chess Scene**). public API უცვლელია.
+- განლაგება: CanvasScaler `Expand` (ნებისმიერ aspect-ზე არაფერი გადაიფარება), მენიუს ღილაკები `VerticalLayoutGroup`-ით, ბრძოლის ეკრანის ზოლები (ზედა ზოლში ინფო + გასვლის ღილაკი, მის ქვეშ მარცხნივ — HUD), სარდლის ხედში საკუთარი მეფე იმალება.
+- Setup ბრძანებების განახლება (ახალი სცენის ბრძანება არ ემატება): Setup Chess Scene, Setup Campaign Scenes + ახალი Setup Georgian Font.
+
+### Out of scope (Stage 3)
+- ენის არჩევა თამაშში / runtime-ზე ენის გადართვა; localization package, Addressables, ახალი NuGet.
+- ქართული Bold ფაილი (გამოიყენება TMP-ის synthetic bold), მთავრული (uppercase) ასოები.
+- რუკის art, 3D მოდელები, ხმა, გარემოები, ანიმაციები — Backlog (ფაზა 2/3).
+- `SquarePicker`-ის UI-ზე დაჭერის ფილტრი (Backlog-ში რჩება; გარდაქმნის ფანჯარას არ ეხება — იხ. Decision Log).
+- gameplay-ის, კამპანიის წესების, შენახვის schema-ს, AI-ის და სცენების ნაკადის ცვლილება.
+
 ## Core Flows
 1. **თამაშის დაწყება:** Play → ველი, ბადე და 32 ფიგურა → კამერა სარდლის ხედშია (ადამიანის მეფის უკან) → Stockfish-ის ინიციალიზაცია ფონურად.
 2. **ადამიანის სვლა:** დააჭერ საკუთარ ფიგურას → ფიგურის უჯრა მოინიშნება და დასაშვები უჯრები ანათებს → დააჭერ დასაშვებ უჯრას → სვლა სრულდება → (თუ ვარიანტი ჩართულია) კამერა სარდლის ხედს უბრუნდება.
@@ -72,6 +90,11 @@ Stage 2 — Campaign (Done, 2026-10-26; Stage 3 — მომხმარებ�
 12. **MainScene პირდაპირ (Editor-ში):** `GameSession.Mode == None` → Stage 1-ის ქცევა (inspector-ის ველები, ინფო ხაზის, ღილაკების და შედეგის პანელის გარეშე).
 13. **დაზიანებული შენახვა:** ფაილი გადაირქმევა `campaign.corrupt.json`-ად → მენიუ აჩვენებს გაფრთხილებას → `New Campaign` იწყებს ახალს (დადასტურების გარეშე, რადგან მოქმედი კამპანია არ არის).
 
+### Stage 3
+ნაკადები 1–13 უცვლელია; იცვლება მხოლოდ ტექსტები (ქართული, `TextTable`) და ორი რამ:
+14. **სარდლის ხედი:** სარდლის ხედში ადამიანის საკუთარი მეფე დამალულია (კამერა „მეფის თვალით“ იყურება); ტაქტიკურ ხედში (TAB) ჩანს. მეფის არჩევა და სვლა — ტაქტიკურ ხედში.
+15. **გარდაქმნა:** იგივე არჩევანი (ლაზიერი / ეტლი / კუ / მხედარი / გაუქმება, Esc = გაუქმება), uGUI ფანჯარაში ეკრანის ცენტრში.
+
 ## Business Rules
 - წესები FIDE-ს მიხედვით, ორი გამარტივებით (Decision Log):
   - 50 სვლის წესი: ფრე ავტომატურად, როცა `HalfmoveClock >= 100`.
@@ -89,6 +112,7 @@ Stage 2 — Campaign (Done, 2026-10-26; Stage 3 — მომხმარებ�
 
 ### Stage 2 — Campaign
 **რეგიონები (კამპანიის რიგი = ცხრილის რიგი; ეპოქის ტექსტი placeholder-ია, იხ. Decision Log):**
+> Stage 3: Name და Era ქართულია (`TextTable`, იხ. API Contract → Stage 3); ქვემოთ მოცემული ინგლისური ტექსტები = `TextTable.English`. Id, Elo, რიგი და anchor-ები უცვლელია.
 
 | # | Id | Name | Era | Elo | რუკაზე (anchor x, y) |
 |---|---|---|---|---|---|
@@ -115,6 +139,7 @@ Stage 2 — Campaign (Done, 2026-10-26; Stage 3 — მომხმარებ�
 - `New Campaign`, როცა კამპანია არსებობს → დადასტურება; `Start new` გადააწერს შენახვას ცარიელი პროგრესით.
 
 **`CampaignProgress.RecordBattle(regionId, outcome, counted)` → `BattleSummary` (ზუსტი ტექსტები):**
+> Stage 3: ფლაგები და ლოგიკა უცვლელია; Title/Message ქართულია — `TextId`-ები და ზუსტი შედეგები იხ. API Contract → Stage 3. ქვემოთ მოცემული ინგლისური = `TextTable.English`.
 
 | შემთხვევა | Title | Message | CanRetry | ProgressChanged |
 |---|---|---|---|---|
@@ -174,7 +199,8 @@ Stage 2 — Campaign (Done, 2026-10-26; Stage 3 — მომხმარებ�
 - **ენა:** C# 9. Core და AI იწერება netstandard2.1 API-ზე (Unity-ის Api Compatibility Level = .NET Standard 2.1).
 - **ტესტები:** xUnit 2.x, net10.0 (ერთადერთი დაყენებული SDK: .NET 10.0.402).
 - **AI:** Stockfish, UCI, `System.Diagnostics.Process`.
-- **UI (Stage 2):** uGUI (`com.unity.ugui` 2.6.0, უკვე `Packages/manifest.json`-შია): Canvas + legacy `UnityEngine.UI.Text` (`LegacyRuntime.ttf`), EventSystem + `InputSystemUIInputModule`. TextMeshPro არ გამოიყენება. MainScene-ის HUD და გარდაქმნის ფანჯარა რჩება IMGUI.
+- **UI (Stage 2):** uGUI (`com.unity.ugui` 2.6.0, უკვე `Packages/manifest.json`-შია): Canvas + legacy `UnityEngine.UI.Text` (`LegacyRuntime.ttf`), EventSystem + `InputSystemUIInputModule`. TextMeshPro არ გამოიყენება. MainScene-ის HUD და გარდაქმნის ფანჯარა რჩება IMGUI. *(Stage 3-ში ჩანაცვლდა — იხ. შემდეგი პუნქტი.)*
+- **UI (Stage 3):** uGUI + **TextMeshPro** (`Unity.TextMeshPro`, იგივე `com.unity.ugui` 2.6.0; ახალი package არ არის). ყველა ტექსტი `TMP_Text` (`TextMeshProUGUI`), ფონტი `Assets/Fonts/NotoSansGeorgian SDF.asset` (Static atlas, წყარო `NotoSansGeorgian-Regular.ttf`, OFL; fallback — TMP Essentials-ის `LiberationSans SDF`). TMP Essential Resources იმპორტირებულია `Assets/TextMesh Pro/`-ში (git-შია). IMGUI (OnGUI) პროექტში აღარ გამოიყენება. ტექსტები — `Chess.Campaign.TextTable` (ქართული აქტიურია).
 - **Storage (Stage 2):** ერთი ლოკალური JSON ფაილი `Application.persistentDataPath`-ში.
 - **Frontend / Backend / Database / Auth / Hosting:** არ არის (ლოკალური თამაში).
 
@@ -183,9 +209,10 @@ Stage 2 — Campaign (Done, 2026-10-26; Stage 3 — მომხმარებ�
 Chess.Core     (Assets/Scripts/Core,     noEngineReferences)  ← არაფერზეა დამოკიდებული
 Chess.AI       (Assets/Scripts/AI,       noEngineReferences)  ← Chess.Core
 Chess.Campaign (Assets/Scripts/Campaign, noEngineReferences)  ← Chess.Core            (Stage 2)
-Chess.Game     (Assets/Scripts/Game,     UnityEngine)         ← Chess.Core, Chess.AI, Chess.Campaign, Unity.InputSystem, UnityEngine.UI
-Chess.Editor   (Assets/Editor,           Editor-only)         ← Chess.Core, Chess.AI, Chess.Campaign, Chess.Game, Unity.InputSystem, UnityEngine.UI
+Chess.Game     (Assets/Scripts/Game,     UnityEngine)         ← Chess.Core, Chess.AI, Chess.Campaign, Unity.InputSystem, UnityEngine.UI, Unity.TextMeshPro (Stage 3)
+Chess.Editor   (Assets/Editor,           Editor-only)         ← Chess.Core, Chess.AI, Chess.Campaign, Chess.Game, Unity.InputSystem, UnityEngine.UI, Unity.TextMeshPro (Stage 3)
 ```
+Stage 3: UI ტექსტების ცხრილი `Chess.Campaign`-შია (სუფთა C#, იტესტება) და Core-ის ტიპებს (`GameStatus`, `Side`, `PieceType`) იყენებს HUD-ის ტექსტებისთვის. Core-მა UI-ის შესახებ არაფერი იცის. `DifficultyPreset` (AI) → ტექსტი — Game-შია (`DifficultyText`), რადგან Campaign AI-ს არ იცნობს.
 მიმართულება მხოლოდ ასეთია. Core-მა არ იცის AI-ის, Campaign-ის ან Unity-ის შესახებ. AI-მა და Campaign-მა ერთმანეთის და Unity-ის შესახებ არ იციან. Elo → AI პარამეტრების გადაყვანა AI-შია (`AIDifficulty.FromElo`); Game აერთებს: `AIDifficulty.FromElo(CampaignRegions.Get(id).Elo)`.
 
 ### Folder tree
@@ -197,6 +224,11 @@ Assets/
     MainScene.unity                   # თამაშის სცენა (Tools → Setup Chess Scene; ბრძოლის UI — Setup Campaign Scenes)
     SampleScene.unity                 # Unity-ის შაბლონი, არ გამოიყენება (Build Settings-იდან ამოღებულია)
   Materials/                          # Tools → Setup Chess Scene ქმნის (M_Ground, M_Tile, ...)
+  Fonts/                              # Stage 3
+    NotoSansGeorgian-Regular.ttf      # USER დებს (Google Fonts zip → static/); git-შია
+    OFL.txt                           # ფონტის ლიცენზია (იმავე zip-იდან); git-შია
+    NotoSansGeorgian SDF.asset        # Tools → Setup Georgian Font ქმნის (atlas + material sub-asset-ებად); git-შია
+  TextMesh Pro/                       # Stage 3: TMP Essential Resources (USER-ის იმპორტი: Window → TextMeshPro → ...); git-შია
   StreamingAssets/Stockfish/
     README.md                         # სად დადო stockfish.exe
     stockfish.exe                     # USER დებს; git-ში არ ინახება
@@ -206,12 +238,16 @@ Assets/
     Campaign/  Chess.Campaign.asmdef + *.cs   # Stage 2: რეგიონები, პროგრესი, ტექსტები, JSON შენახვა (namespace Chess.Campaign)
       Region.cs, CampaignRegions.cs, CampaignProgress.cs, BattleRules.cs, CampaignText.cs,
       JsonReader.cs (internal), CampaignSaveSerializer.cs, CampaignSaveStore.cs
+      TextId.cs, TextTable.cs, TextTable.Georgian.cs, TextTable.English.cs, GameText.cs   # Stage 3: UI ტექსტების ცხრილი
     Game/      Chess.Game.asmdef     + *.cs   # MonoBehaviour-ები (namespace Chess.Game)
       Session/GameSession.cs                  # Stage 2: static launch პარამეტრები + ნავიგაცია + შენახვა
-      UI/MainMenuController.cs, UI/CampaignMapController.cs, UI/RegionButton.cs, UI/BattlePanel.cs   # Stage 2, uGUI
+      UI/MainMenuController.cs, UI/CampaignMapController.cs, UI/RegionButton.cs, UI/BattlePanel.cs   # Stage 2, uGUI (Stage 3: TMP)
+      UI/DifficultyText.cs                    # Stage 3: DifficultyPreset → ტექსტი
   Editor/
-    Chess.Editor.asmdef, ChessSceneSetup.cs   # Tools → Setup Chess Scene
-    CampaignScenesSetup.cs                    # Stage 2: Tools → Setup Campaign Scenes
+    Chess.Editor.asmdef, ChessSceneSetup.cs   # Tools → Setup Chess Scene (Stage 3: + HudCanvas)
+    CampaignScenesSetup.cs                    # Stage 2: Tools → Setup Campaign Scenes (Stage 3: TMP + განლაგება)
+    EditorUi.cs                               # Stage 3: საერთო uGUI/TMP builder-ები ორივე Setup ბრძანებისთვის (internal)
+    GeorgianFontSetup.cs                      # Stage 3: Tools → Setup Georgian Font (TMP font asset)
 Tests/
   ChessCore.Build/ChessCore.Build.csproj         # netstandard2.1, AssemblyName Chess.Core,     აკომპილირებს Assets/Scripts/Core/**
   ChessAI.Build/ChessAI.Build.csproj             # netstandard2.1, AssemblyName Chess.AI,       აკომპილირებს Assets/Scripts/AI/**
@@ -221,8 +257,8 @@ Tests/
     Core/*.cs                                    # Core-ის ტესტები
     AI/*.cs                                      # AI-ის ტესტები
     Campaign/*.cs                                # Stage 2: Campaign-ის ტესტები
-  GameCompileCheck/GameCompileCheck.csproj       # Game-ის კომპილაცია Unity DLL-ებით (+ UnityEngine.UI.dll, + ChessCampaign.Build Stage 2-დან)
-  EditorCompileCheck/EditorCompileCheck.csproj   # Editor-ის კომპილაცია (+ UnityEngine.UI.dll, Unity.InputSystem.dll, ChessCampaign.Build Stage 2-დან)
+  GameCompileCheck/GameCompileCheck.csproj       # Game-ის კომპილაცია Unity DLL-ებით (+ UnityEngine.UI.dll, + ChessCampaign.Build Stage 2-დან, + Unity.TextMeshPro.dll Stage 3-დან)
+  EditorCompileCheck/EditorCompileCheck.csproj   # Editor-ის კომპილაცია (+ UnityEngine.UI.dll, Unity.InputSystem.dll, ChessCampaign.Build Stage 2-დან, + Unity.TextMeshPro.dll Stage 3-დან)
 ```
 
 ## API Contract
@@ -532,6 +568,7 @@ public sealed class BattleSummary
     public bool ProgressChanged { get; }   // caller must save
 }
 
+// Stage 3: CampaignText/BattleRules const-ები → static property-ები, ტექსტები TextTable-იდან — იხ. API Contract → Stage 3.
 public static class CampaignText
 {
     public const string SaveFailedWarning = "Warning: progress could not be saved.";
@@ -617,7 +654,7 @@ public sealed class CampaignSaveStore
 
 collider-ები ბავშვ primitive-ებზე რჩება; root-ზე დევს `SquareRef`, ხოლო raycast იყენებს `GetComponentInParent<SquareRef>()`-ს.
 
-**Status ტექსტები (MVP, ინგლისურად):**
+**Status ტექსტები (MVP, ინგლისურად; Stage 3-დან = `TextTable.English`, აქტიური ქართული ტექსტები და `GameText.Status` — იხ. „Stage 3 — ქართული ინტერფეისი“). `StatusHud`/`PromotionPrompt`-ის OnGUI ზემოთ ცხრილში Stage 3-ში ჩანაცვლდა uGUI-ით:**
 - `White to move` / `Black to move`, დამატებით `Check!`;
 - `AI thinking...`;
 - `Checkmate - White wins`, `Stalemate - draw`, `Draw - 50-move rule`, `Draw - threefold repetition`, `Draw - insufficient material`;
@@ -685,7 +722,7 @@ public static class GameSession
 | `CampaignMapController` (`UI/CampaignMapController.cs`) | `CampaignMapCanvas` (CampaignMap) | რუკის შევსება, ბრძოლის დაწყება | `regionButtons` (RegionButton[], 5, კამპანიის რიგით), `statusText` (Text), `backButton` (Button) |
 | `BattlePanel` (`UI/BattlePanel.cs`) | `BattleCanvas` (MainScene) | ინფო ხაზი, გასვლის ღილაკი, შედეგის პანელი (მხოლოდ view) | `infoText` (Text), `leaveButton` (Button), `leaveLabel` (Text), `resultRoot` (GameObject), `titleText`, `messageText` (Text), `retryButton` (Button), `retryLabel` (Text), `backButton` (Button), `backLabel` (Text). API: `event Action RetryClicked`, `event Action BackClicked` (leaveButton-იც მას იძახებს), `ShowInGame(string info, string leaveLabel)`, `ShowResult(string title, string message, bool showRetry, string retryLabel, string backLabel)` (გასვლის ღილაკს მალავს), `HideResult()` (გასვლის ღილაკი ბრუნდება, თუ `ShowInGame` გამოძახებული იყო), `HideAll()`. `Awake`: ყველაფერი დამალულია, `onClick.AddListener` კოდით (persistent listener-ები არ გამოიყენება) |
 
-**UI ტექსტები (ზუსტად, ინგლისურად):**
+**UI ტექსტები (ზუსტად, ინგლისურად; Stage 3-დან = `TextTable.English`, runtime-ზე ჩანს ქართული — იხ. „Stage 3 — ქართული ინტერფეისი“; ველების ტიპი `Text` → `TMP_Text`):**
 - MainMenu: სათაური `Georgian Battle Chess`; ღილაკები `New Campaign`, `Continue`, `Quick Game`, `Quit`; დადასტურება `Start a new campaign? Current progress will be lost.` + `Start new` / `Cancel`; Quick Game პანელი: სათაური `Quick Game`, `Color: White` / `Color: Black`, `Difficulty: Easy` / `Difficulty: Medium` / `Difficulty: Hard` / `Difficulty: Master`, `Start`, `Back`; `warningText` = `GameSession.LoadWarning` (როცა `Campaign == null`) და/ან `CampaignText.SaveFailedWarning` (როცა `LastSaveFailed`), ხაზით გამოყოფილი; სხვა შემთხვევაში ცარიელი.
 - CampaignMap: სათაური `Campaign Map`; ღილაკის ტექსტი `CampaignText.RegionLabel`; `statusText` = `CampaignText.MapStatus(progress)` + (თუ `LastSaveFailed`) `"\n" + CampaignText.SaveFailedWarning`; `Back to menu`.
 - MainScene (Campaign): `infoText` = `CampaignText.BattleInfo(region)`; გასვლა `Back to map`; შედეგი — `BattleSummary`, ღილაკები `Retry` / `Back to map`.
@@ -694,7 +731,7 @@ public static class GameSession
 
 **რეგიონის ღილაკის ფერი (`background.color`):** Locked `#5A5A5A` (`button.interactable = false`), Available `#C8962D`, Liberated `#3C8C3C`. ტექსტი თეთრი.
 
-**UI სტილი (Stage 2, DESIGN.md-ის ნაცვლად; ყველაფერს `CampaignScenesSetup` აწყობს):**
+**UI სტილი (Stage 2, DESIGN.md-ის ნაცვლად; ყველაფერს `CampaignScenesSetup` აწყობს; Stage 3-ში font, CanvasScaler-ის რეჟიმი, ბრძოლის ეკრანის ზომები და MainPanel-ის განლაგება შეიცვალა — იხ. „UI სტილი (Stage 3)“; ფერები და დანარჩენი ზომები რჩება):**
 - Canvas: Screen Space - Overlay; `CanvasScaler` Scale With Screen Size, reference 1920×1080, match 0.5. ყველა ზომა ქვემოთ reference პიქსელებშია.
 - ფერები:
   - ფონი (კამერა, MainMenu/CampaignMap): `#1C1C22`;
@@ -742,6 +779,230 @@ public static class GameSession
 9. სცენები ინახება; ბოლოს იხსნება MainMenu; ერთი `Debug.Log("[CampaignScenesSetup] Done[ WITH ERRORS (see above)].\nCreated: ...;\nUpdated: ...;\nBuild scenes: MainMenu, CampaignMap, MainScene")`.
 10. მეორედ გაშვება დუბლიკატებს არ ქმნის: თითო სცენაში ერთი Main Camera, ერთი EventSystem, ერთი გენერირებული Canvas.
 
+### Stage 3 — ქართული ინტერფეისი
+Stage 1–2-ის ქცევა (წესები, კამპანიის პროგრესი, შენახვის schema v1, AI, სცენების ნაკადი, Inspector ველების სახელები) უცვლელია. ეს სექცია **ჩანაცვლებს**: „Status ტექსტები (MVP)“, Stage 2-ის „UI ტექსტები“, „UI სტილი (Stage 2)“-ის font/scaler/ბრძოლის ზომებს, `StatusHud`/`PromotionPrompt`-ის OnGUI-ს, `CampaignText`/`BattleRules`-ის `const`-ებს, რეგიონების Name/Era-ს და `RecordBattle`-ის ტექსტებს. Stage 1–2-ის ინგლისური ტექსტები ზუსტად ინახება `TextTable.English`-ში.
+
+#### სტრიქონების ცხრილი (`Chess.Campaign`, namespace `Chess.Campaign`)
+```csharp
+// TextId.cs — declaration order = order of the table below (73 values)
+public enum TextId { MenuTitle, MenuNewCampaign, /* ... */ PieceKnight }
+
+// TextTable.cs (+ TextTable.Georgian.cs, TextTable.English.cs — partial, data only)
+public sealed partial class TextTable
+{
+    public static TextTable Georgian { get; }   // LanguageCode "ka" — the active UI language
+    public static TextTable English { get; }    // LanguageCode "en" — Stage 1-2 texts, kept for a future language option; not shown at runtime
+    public static TextTable Active { get; }     // always Georgian; read-only (no setter, no mutable global state)
+    public string LanguageCode { get; }
+    public string Get(TextId id);               // undefined enum value → ArgumentOutOfRangeException
+    public string Format(TextId id, params object[] args);
+    // string.Format(CultureInfo.InvariantCulture, Get(id), args); args null → ArgumentNullException
+    public static string AtlasCharacters { get; }   // U+0020..U+007E, then U+10D0..U+10FF, in this order (95 + 48 = 143 chars)
+    public static bool IsSupportedChar(char c);     // true only for '\n' and AtlasCharacters members
+}
+// Construction: each entry is assigned by explicit TextId key (no positional array). A table missing any
+// TextId, or with a null/empty entry, throws InvalidOperationException at type initialization.
+
+// GameText.cs — HUD / promotion / quick game texts, all via TextTable.Active
+public static class GameText
+{
+    public static string HelpLine { get; }
+    public static string Status(GameStatus status, Side sideToMove, bool isCheck, bool aiThinking);
+    // Checkmate → winner = sideToMove.Opposite(): CheckmateWhiteWins | CheckmateBlackWins; Stalemate; FiftyMoveRule → DrawFiftyMove;
+    // ThreefoldRepetition → DrawThreefold; InsufficientMaterial → DrawInsufficient (game-over texts win over aiThinking/isCheck).
+    // InProgress: aiThinking → AiThinking; else WhiteToMove | BlackToMove, wrapped in CheckFormat when isCheck.
+    // undefined status → ArgumentOutOfRangeException
+    public static string SideName(Side side);                      // SideWhite | SideBlack; undefined → ArgumentOutOfRangeException
+    public static string PieceName(PieceType type);                // Queen/Rook/Bishop/Knight only; others → ArgumentOutOfRangeException
+    public static string PromotionTitle(Side side);                // PromotionTitleFormat(SideName(side))
+    public static string QuickColorLabel(Side side);               // QuickColorFormat(SideName(side))
+    public static string QuickDifficultyLabel(string difficultyName);          // QuickDifficultyFormat; null → ArgumentNullException
+    public static string QuickGameInfo(string difficultyName, Side humanSide); // QuickGameInfoFormat(difficultyName, SideName(humanSide)); null → ArgumentNullException
+    public static string StockfishNotFound(string path);           // StockfishNotFoundFormat; null → ArgumentNullException
+    public static string AiError(string message);                  // AiErrorFormat(message.TrimEnd('.')); null → ArgumentNullException
+    public static string WithDebugFen(string status);              // DebugFenFormat; null → ArgumentNullException
+}
+```
+**წესები:**
+- Game-ის და Editor-ის ყოველი UI ტექსტი მოდის მხოლოდ `TextTable.Active`-იდან (პირდაპირ ან `CampaignText` / `GameText` / `BattleRules`-ით). Game/Editor-ში UI სტრიქონის literal არ არის. `Debug.Log*` და exception-ების ტექსტები ინგლისურად რჩება (UI არ არის).
+- ქართული ასოები მთელ კოდში მხოლოდ `Assets/Scripts/Campaign/TextTable.Georgian.cs`-შია (ფაილი UTF-8). ქართული ტექსტის შეცვლა = ამ ფაილის + ტესტების (`TextTableTests` და ზუსტი ტექსტების ტესტები) შეცვლა.
+- **სიმბოლოები:** ცხრილის ყოველ ტექსტში და ყოველ აწყობილ შედეგში მხოლოდ `\n`, ASCII 0x20–0x7E და მხედრული U+10D0–U+10FF. აკრძალულია: em/en dash (`—`, `–`; გამოიყენე `-`), curly quotes, NBSP, tab, `\r`, მთავრული (U+1C90–U+1CBF), ასომთავრული/ნუსხური (U+10A0–U+10CF, U+2D00–U+2D2F). TMP-ის `UpperCase`/`SmallCaps` style არ გამოიყენება.
+- ახალი ენის დამატება = ახალი partial ფაილი (`TextTable.<Lang>.cs`) + static property + ტესტები; Active-ის არჩევა — მომავალი ეტაპი (ახლა ენის გადართვა/პარამეტრი არ არის).
+- Format-ის argument-ები: მთელი რიცხვები და უკვე მზა სტრიქონები; წინადადებები ერთმანეთს ერთი space-ით უერთდება.
+
+**ცხრილი (ზუსტი ტექსტები; `\n` = ახალი ხაზის სიმბოლო; `··` = ზედიზედ ორი ჩვეულებრივი space (U+0020) — `·` მხოლოდ აქ, ხილვადობისთვისაა და კოდში არ იწერება):**
+
+| # | TextId | ქართული (`TextTable.Georgian`, აქტიური) | English (`TextTable.English`) |
+|---|---|---|---|
+| 1 | `MenuTitle` | `ქართული საბრძოლო ჭადრაკი` | `Georgian Battle Chess` |
+| 2 | `MenuNewCampaign` | `ახალი კამპანია` | `New Campaign` |
+| 3 | `MenuContinue` | `გაგრძელება` | `Continue` |
+| 4 | `MenuQuickGame` | `სწრაფი თამაში` | `Quick Game` |
+| 5 | `MenuQuit` | `გასვლა` | `Quit` |
+| 6 | `ConfirmNewCampaign` | `დავიწყოთ ახალი კამპანია? მიმდინარე პროგრესი დაიკარგება.` | `Start a new campaign? Current progress will be lost.` |
+| 7 | `ConfirmYes` | `ახლის დაწყება` | `Start new` |
+| 8 | `Cancel` | `გაუქმება` | `Cancel` |
+| 9 | `QuickGameTitle` | `სწრაფი თამაში` | `Quick Game` |
+| 10 | `QuickColorFormat` | `ფერი: {0}` | `Color: {0}` |
+| 11 | `QuickDifficultyFormat` | `სირთულე: {0}` | `Difficulty: {0}` |
+| 12 | `QuickStart` | `დაწყება` | `Start` |
+| 13 | `Back` | `უკან` | `Back` |
+| 14 | `SideWhite` | `თეთრი` | `White` |
+| 15 | `SideBlack` | `შავი` | `Black` |
+| 16 | `DifficultyEasy` | `მარტივი` | `Easy` |
+| 17 | `DifficultyMedium` | `საშუალო` | `Medium` |
+| 18 | `DifficultyHard` | `რთული` | `Hard` |
+| 19 | `DifficultyMaster` | `ოსტატი` | `Master` |
+| 20 | `SaveFailedWarning` | `გაფრთხილება: პროგრესი ვერ შეინახა.` | `Warning: progress could not be saved.` |
+| 21 | `CorruptedSaveWarning` | `შენახული კამპანია დაზიანებულია და ვერ ჩაიტვირთა. ფაილი შენახულია სახელით campaign.corrupt.json. დაიწყე ახალი კამპანია.` | `The saved campaign was damaged and could not be loaded. It was kept as campaign.corrupt.json. Start a new campaign.` |
+| 22 | `MapTitle` | `კამპანიის რუკა` | `Campaign Map` |
+| 23 | `StateLocked` | `ჩაკეტილია` | `Locked` |
+| 24 | `StateAvailable` | `ხელმისაწვდომია` | `Available` |
+| 25 | `StateLiberated` | `გათავისუფლებულია` | `Liberated` |
+| 26 | `RegionLabelFormat` | `{0}\n{1}\nElo {2}\n{3}` | `{0}\n{1}\nElo {2}\n{3}` |
+| 27 | `MapStatusFormat` | `გათავისუფლებულია {0} რეგიონი {1}-დან. აირჩიე რეგიონი ბრძოლისთვის.` | `Liberated {0} of {1}. Choose a region to fight for.` |
+| 28 | `AllLiberated` | `ყველა რეგიონი გათავისუფლებულია! საქართველო თავისუფალია.` | `All regions are liberated! Georgia is free.` |
+| 29 | `BackToMenu` | `მენიუში დაბრუნება` | `Back to menu` |
+| 30 | `RegionKartliName` | `ქართლი` | `Kartli` |
+| 31 | `RegionKartliEra` | `V საუკუნე - მეფე ვახტანგ გორგასალი` | `5th century - King Vakhtang Gorgasali` |
+| 32 | `RegionKakhetiName` | `კახეთი` | `Kakheti` |
+| 33 | `RegionKakhetiEra` | `XVI საუკუნე - მეფე ლევანი` | `16th century - King Levan` |
+| 34 | `RegionImeretiName` | `იმერეთი` | `Imereti` |
+| 35 | `RegionImeretiEra` | `XVII საუკუნე - მეფე ალექსანდრე III` | `17th century - King Alexander III` |
+| 36 | `RegionSvanetiName` | `სვანეთი` | `Svaneti` |
+| 37 | `RegionSvanetiEra` | `XII საუკუნე - მეფე დავით აღმაშენებელი` | `12th century - King David the Builder` |
+| 38 | `RegionKhevsuretiName` | `ხევსურეთი` | `Khevsureti` |
+| 39 | `RegionKhevsuretiEra` | `XVIII საუკუნე - მეფე ერეკლე II` | `18th century - King Erekle II` |
+| 40 | `BattleInfoFormat` | `{0} - {1} - მოწინააღმდეგის Elo {2}` | `{0} - {1} - enemy Elo {2}` |
+| 41 | `BattleInfoUnknown` | `კამპანია` | `Campaign` |
+| 42 | `BackToMap` | `რუკაზე დაბრუნება` | `Back to map` |
+| 43 | `Retry` | `თავიდან ცდა` | `Retry` |
+| 44 | `PlayAgain` | `ხელახლა თამაში` | `Play again` |
+| 45 | `QuickGameInfoFormat` | `სწრაფი თამაში - {0} - შენი ფერი: {1}` | `Quick Game - {0} - you play {1}` |
+| 46 | `TitleVictory` | `გამარჯვება!` | `Victory!` |
+| 47 | `TitleDefeat` | `მარცხი` | `Defeat` |
+| 48 | `TitleDraw` | `ფრე` | `Draw` |
+| 49 | `TitleNotCounted` | `თამაში დასრულდა` | `Game over` |
+| 50 | `NotCountedMessage` | `AI მოწინააღმდეგე არ იყო აქტიური, ამიტომ ეს შედეგი არ ითვლება.` | `The AI opponent was not active, so this result does not count.` |
+| 51 | `LiberatedFormat` | `{0} გათავისუფლდა!` | `{0} is liberated!` |
+| 52 | `NextOpenFormat` | `{0} ახლა ხელმისაწვდომია.` | `{0} is now open.` |
+| 53 | `RemainsFreeFormat` | `{0} კვლავ თავისუფალია.` | `{0} remains free.` |
+| 54 | `EnemyControlFormat` | `{0} ჯერ კიდევ მტრის ხელშია.` | `{0} is still under enemy control.` |
+| 55 | `WhiteToMove` | `თეთრის სვლაა` | `White to move` |
+| 56 | `BlackToMove` | `შავის სვლაა` | `Black to move` |
+| 57 | `CheckFormat` | `{0}··შახი!` (ორი space) | `{0}··Check!` (ორი space) |
+| 58 | `AiThinking` | `AI ფიქრობს...` | `AI thinking...` |
+| 59 | `CheckmateWhiteWins` | `მატი - თეთრმა მოიგო` | `Checkmate - White wins` |
+| 60 | `CheckmateBlackWins` | `მატი - შავმა მოიგო` | `Checkmate - Black wins` |
+| 61 | `Stalemate` | `პატი - ფრე` | `Stalemate - draw` |
+| 62 | `DrawFiftyMove` | `ფრე - 50 სვლის წესი` | `Draw - 50-move rule` |
+| 63 | `DrawThreefold` | `ფრე - სამჯერადი გამეორება` | `Draw - threefold repetition` |
+| 64 | `DrawInsufficient` | `ფრე - მასალის ნაკლებობა` | `Draw - insufficient material` |
+| 65 | `StockfishNotFoundFormat` | `Stockfish ვერ მოიძებნა: {0}. ორი მოთამაშის რეჟიმი.` | `Stockfish not found: {0}. Human vs human mode.` |
+| 66 | `AiErrorFormat` | `AI-ის შეცდომა: {0}. ორი მოთამაშის რეჟიმი.` | `AI error: {0}. Human vs human mode.` |
+| 67 | `HelpLine` | `მაუსი: არჩევა/სვლა··TAB: ხედი··R: თავიდან` (ორ-ორი space) | `Click: select/move··TAB: view··R: restart` (ორ-ორი space) |
+| 68 | `DebugFenFormat` | `{0}··[DEBUG FEN]` (ორი space) | `{0}··[DEBUG FEN]` (ორი space) |
+| 69 | `PromotionTitleFormat` | `პაიკის გარდაქმნა ({0})` | `Promote pawn ({0})` |
+| 70 | `PieceQueen` | `ლაზიერი` | `Queen` |
+| 71 | `PieceRook` | `ეტლი` | `Rook` |
+| 72 | `PieceBishop` | `კუ` | `Bishop` |
+| 73 | `PieceKnight` | `მხედარი` | `Knight` |
+
+#### Chess.Campaign — Stage 3 ცვლილებები (ხელმოწერები; ლოგიკა უცვლელია)
+```csharp
+public static class CampaignText
+{
+    public static string SaveFailedWarning { get; }     // was const → TextId.SaveFailedWarning
+    public static string CorruptedSaveWarning { get; }  // was const → TextId.CorruptedSaveWarning
+    public static string NotCountedMessage { get; }     // was const → TextId.NotCountedMessage
+    public static string StateName(RegionState state);                  // StateLocked | StateAvailable | StateLiberated (undefined → ArgumentOutOfRangeException)
+    public static string RegionLabel(Region region, RegionState state); // RegionLabelFormat(Name, Era, Elo, StateName)
+    public static string MapStatus(CampaignProgress progress);          // complete: AllLiberated; else MapStatusFormat(LiberatedCount, total)
+    public static string BattleInfo(Region region);                     // BattleInfoFormat(Name, Era, Elo)
+}
+public static class BattleRules
+{
+    public static string NotCountedTitle { get; }                       // was const → TextId.TitleNotCounted
+    public static string GetTitle(BattleOutcome outcome);               // TitleVictory | TitleDefeat | TitleDraw
+}
+// CampaignRegions: Name/Era = TextTable.Active.Get(Region<Id>Name / Region<Id>Era); ids, Elo, order unchanged (saves stay compatible).
+// CampaignProgress.RecordBattle: flags unchanged; Title = BattleRules.GetTitle / NotCountedTitle; Message:
+//   Victory on Available: LiberatedFormat(Name) [+ " " + NextOpenFormat(NextName)] [+ " " + AllLiberated]
+//   Victory on Liberated / Defeat|Draw on Liberated: RemainsFreeFormat(Name); Defeat|Draw on Available: EnemyControlFormat(Name)
+// Exception messages ("Unknown region id: '<id>'", "Region '<id>' is locked.", JSON errors) stay English.
+```
+**ზუსტი შედეგები (ტესტები ამათ ამოწმებს):**
+- `RegionLabel(kartli, Available)` = `ქართლი\nV საუკუნე - მეფე ვახტანგ გორგასალი\nElo 800\nხელმისაწვდომია`
+- `MapStatus(new)` = `გათავისუფლებულია 0 რეგიონი 5-დან. აირჩიე რეგიონი ბრძოლისთვის.`; 2 გათავისუფლებული → `გათავისუფლებულია 2 რეგიონი 5-დან. აირჩიე რეგიონი ბრძოლისთვის.`; სრული → `ყველა რეგიონი გათავისუფლებულია! საქართველო თავისუფალია.`
+- `BattleInfo(kartli)` = `ქართლი - V საუკუნე - მეფე ვახტანგ გორგასალი - მოწინააღმდეგის Elo 800`
+- `RecordBattle`: kartli Victory (ახალი) → `გამარჯვება!` / `ქართლი გათავისუფლდა! კახეთი ახლა ხელმისაწვდომია.`; kakheti უკვე Liberated + kartli Victory → `ქართლი გათავისუფლდა!`; ბოლო რეგიონი → `ხევსურეთი გათავისუფლდა! ყველა რეგიონი გათავისუფლებულია! საქართველო თავისუფალია.`; Liberated + Victory → `ქართლი კვლავ თავისუფალია.`; Defeat/Draw Available → `მარცხი` / `ფრე` + `ქართლი ჯერ კიდევ მტრის ხელშია.`; Defeat/Draw Liberated → `ქართლი კვლავ თავისუფალია.`; `counted == false` → `თამაში დასრულდა` / `AI მოწინააღმდეგე არ იყო აქტიური, ამიტომ ეს შედეგი არ ითვლება.`
+- `GameText.Status(InProgress, Black, true, false)` = `შავის სვლაა  შახი!` (ორი space); `(InProgress, White, true, true)` = `AI ფიქრობს...`; `(Checkmate, Black, true, false)` = `მატი - თეთრმა მოიგო`; `(Checkmate, White, true, true)` = `მატი - შავმა მოიგო`.
+- `GameText.PromotionTitle(White)` = `პაიკის გარდაქმნა (თეთრი)`; `QuickGameInfo("მარტივი", Black)` = `სწრაფი თამაში - მარტივი - შენი ფერი: შავი`; `QuickColorLabel(White)` = `ფერი: თეთრი`; `QuickDifficultyLabel("საშუალო")` = `სირთულე: საშუალო`.
+- `GameText.StockfishNotFound(@"C:\nope\stockfish.exe")` = `Stockfish ვერ მოიძებნა: C:\nope\stockfish.exe. ორი მოთამაშის რეჟიმი.`; `AiError("Engine crashed.")` = `AI-ის შეცდომა: Engine crashed. ორი მოთამაშის რეჟიმი.`; `WithDebugFen("თეთრის სვლაა")` = `თეთრის სვლაა  [DEBUG FEN]`.
+
+#### Chess.Game — Stage 3
+**ველების ტიპები (სახელები უცვლელია; `using TMPro;`):** `MainMenuController.warningText`, `colorLabel`, `difficultyLabel`; `RegionButton.label`; `CampaignMapController.statusText`; `BattlePanel.infoText`, `leaveLabel`, `titleText`, `messageText`, `retryLabel`, `backLabel` — `Text` → `TMP_Text`. `Button`, `Image`, `GameObject` ველები უცვლელია. ქცევა უცვლელია.
+
+| Component (ფაილი) | სად დევს | ცვლილება | Inspector fields / public API |
+|---|---|---|---|
+| `StatusHud` (`StatusHud.cs`) | `ChessGame` | OnGUI წაიშალა. ტექსტები — `HudCanvas`-ის TMP ობიექტებში. `Awake`: null ველი → `Debug.LogError("[StatusHud] '<field>' is not assigned.", this)`; `errorText` დამალულია. `Show`: `statusText.text = status ?? ""`; `errorText.text = error ?? ""`, `errorText.gameObject` აქტიურია მხოლოდ არა-ცარიელ error-ზე (null ველზე NRE არა). დახმარების ხაზს (`GameText.HelpLine`) Editor წერს `HelpText`-ში | `statusText`, `errorText` (TMP_Text). API უცვლელი: `Show(string status, string error)` |
+| `PromotionPrompt` (`PromotionPrompt.cs`) | `ChessGame` | OnGUI წაიშალა. `Awake`: ღილაკებზე `onClick.AddListener` (Queen/Rook/Bishop/Knight → არჩევა, cancel → გაუქმება), `panel.SetActive(false)`, null ველი → `Debug.LogError` სახელით; `OnDestroy`: `RemoveListener`. `Open`: `titleText.text = GameText.PromotionTitle(side)`, `panel` აქტიური, `IsOpen = true`; თუ `panel == null` → `Debug.LogError` და მაშინვე `onCancelled` (ფიგურა ჩუმად არ აირჩევა). `Close`: `panel` inactive, `EventSystem.current?.SetSelectedGameObject(null)`, დანარჩენი როგორც ახლა (`IsOpen = false` callback-მდე, `LastClosedFrame`). Esc = Cancel (`Keyboard.current`, უცვლელი) | `panel` (GameObject), `titleText` (TMP_Text), `queenButton`, `rookButton`, `bishopButton`, `knightButton`, `cancelButton` (Button). API უცვლელი: `bool IsOpen`, `int LastClosedFrame`, `Open(Side side, Action<PieceType> onChosen, Action onCancelled)` |
+| `DifficultyText` (`UI/DifficultyText.cs`, static) | — | `DifficultyPreset` → ტექსტი (Campaign AI-ს არ იცნობს) | `public static string Name(DifficultyPreset preset)` → `TextTable.Active.Get(DifficultyEasy/Medium/Hard/Master)`; undefined → `ArgumentOutOfRangeException` |
+| `CameraRig` | `Main Camera` | + event; ველები/ნაგულისხმევები უცვლელი | + `public event Action<CameraView> ViewChanged` — `SetView`-ში მხოლოდ მაშინ, როცა ხედი რეალურად იცვლება (მათ შორის `Toggle`, `NotifyHumanMoveMade`) |
+| `PiecesView` | `ChessGame` | + დამალული უჯრა | + `public void SetHiddenSquare(Square? square)` — იმ უჯრის ფიგურის root `SetActive(false)` (renderer-ები და collider-ები; raycast უკან მდებარე უჯრას ხვდება), დანარჩენი აქტიურია; null → ყველა ჩანს. მნიშვნელობა ინახება და `Sync`-ის შემდეგაც მოქმედებს |
+
+**GameController — Stage 3 (ნაკადი, Inspector და log-ები უცვლელია; იცვლება მხოლოდ ტექსტის წყარო და მეფის ხილვადობა):**
+- სტატუსი: `GameText.Status(_state.Status, _state.SideToMove, _state.IsCheck, _thinking)`; Editor debug FEN → `GameText.WithDebugFen(status)` (მხოლოდ `UpdateHud`-ში, როგორც ახლა).
+- შეცდომა: `StockfishNotFoundException` → `GameText.StockfishNotFound(notFound.Path)`; სხვა → `GameText.AiError(ex.Message)`.
+- Campaign: `ShowInGame(CampaignText.BattleInfo(region), Get(BackToMap))`; უცნობი რეგიონი → `ShowInGame(Get(BattleInfoUnknown), Get(BackToMap))`; შედეგი → `ShowResult(..., Get(Retry), Get(BackToMap))`.
+- QuickGame: `ShowInGame(GameText.QuickGameInfo(DifficultyText.Name(GameSession.QuickDifficulty), humanSide), Get(BackToMenu))`; შედეგი → `ShowResult(BattleRules.GetTitle(outcome), <status>, true, Get(PlayAgain), Get(BackToMenu))`. (`Get` = `TextTable.Active.Get`.)
+- მეფე სარდლის ხედში: `OnEnable`-ში `cameraRig.ViewChanged += OnCameraViewChanged` (`OnDisable`-ში `-=`); `UpdateKingVisibility()`: თუ `piecesView`/`_state` null → არაფერი; სხვა შემთხვევაში `piecesView.SetHiddenSquare(cameraRig != null && cameraRig.CurrentView == CameraRig.CameraView.Commander ? _state.Position.FindKing(humanSide) : (Square?)null)`. იძახება `Refresh`-ში (`Sync` + `SetCommander`-ის შემდეგ) და `ViewChanged`-ზე. hot-seat-ში იმალება `humanSide`-ის მეფე (კამერა მასთანაა).
+- Game-ში ახალი static მდგომარეობა არ არის (`TextTable`-ის static-ები read-only-ია, reset არ სჭირდება).
+
+**MainMenuController:** `colorLabel.text = GameText.QuickColorLabel(quickSide)`; `difficultyLabel.text = GameText.QuickDifficultyLabel(DifficultyText.Name(quickDifficulty))`; warning-ის წესი უცვლელია (`CampaignText`-ის property-ებით).
+
+#### Editor — Stage 3
+**`Assets/Editor/GeorgianFontSetup.cs`** (`public static class GeorgianFontSetup`, log prefix `[GeorgianFont] `):
+```csharp
+public const string FontPath = "Assets/Fonts/NotoSansGeorgian-Regular.ttf";
+public const string AssetPath = "Assets/Fonts/NotoSansGeorgian SDF.asset";
+public const string FallbackPath = "Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset";
+[MenuItem("Tools/Setup Georgian Font")] public static void Run();   // Ensure(out _) + logs; Play mode → LogError, return
+public static TMP_FontAsset Ensure(out bool charactersMissing);    // null only on errors 1-3 below
+```
+1. TMP Essentials: `Resources.Load<TMP_Settings>("TMP Settings") == null` ან `Shader.Find("TextMeshPro/Mobile/Distance Field") == null` → `LogError("[GeorgianFont] TMP Essential Resources are not imported. Use Window > TextMeshPro > Import TMP Essential Resources, then run the command again.")` → null.
+2. არსებული asset (`AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(AssetPath)`), რომელსაც აქვს `atlasTextures[0]` და `material` → **ხელახლა გამოიყენება, არ იცვლება** → `Log("[GeorgianFont] Using existing " + AssetPath + ".")` → ნაბიჯი 5. თუ არსებობს, მაგრამ atlas/material აკლია → `LogWarning("[GeorgianFont] Existing font asset is incomplete and was recreated: " + AssetPath)` → `AssetDatabase.DeleteAsset` → ნაბიჯი 3.
+3. TTF: `AssetDatabase.LoadAssetAtPath<Font>(FontPath) == null` → `LogError("[GeorgianFont] Font file not found: Assets/Fonts/NotoSansGeorgian-Regular.ttf. Download Noto Sans Georgian (PROGRESS.md, USER task 44).")` → null.
+4. შექმნა: `TMP_FontAsset.CreateFontAsset(font, 64, 6, GlyphRenderMode.SDFAA, 1024, 1024, AtlasPopulationMode.Dynamic, false)` (null → `LogError("[GeorgianFont] Could not create the font asset from " + FontPath + ".")` → null); `name = "NotoSansGeorgian SDF"`; `AssetDatabase.CreateAsset(asset, AssetPath)`; atlas texture (`name = "NotoSansGeorgian SDF Atlas"`) და material (`name = "NotoSansGeorgian SDF Material"`) → `AssetDatabase.AddObjectToAsset(..., asset)` (sub-asset-ები, თორემ asset მათ კარგავს); `asset.TryAddCharacters(TextTable.AtlasCharacters, out string notAdded)` — თუ `notAdded` არა-ცარიელია → `LogWarning("[GeorgianFont] Not added to the atlas: " + <U+XXXX list>)`; შემდეგ `asset.atlasPopulationMode = AtlasPopulationMode.Static` (atlas Play-ის დროს აღარ იცვლება → git-ში ცვლილება არ ჩნდება); fallback: `FallbackPath`-ის asset → `asset.fallbackFontAssetTable = [LiberationSans SDF]` (თუ არ არის → `LogWarning("[GeorgianFont] Fallback LiberationSans SDF not found.")`); `EditorUtility.SetDirty(asset)`; `AssetDatabase.SaveAssets()`; `Log("[GeorgianFont] Created " + AssetPath + ": " + added + " of 143 atlas characters.")`. Bold — TMP synthetic bold (მეორე TTF არ გამოიყენება).
+5. დაფარვის შემოწმება: ყველა `TextTable.Active.Get(id)` ყოველი `TextId`-ისთვის, `\n`-ის გარეშე → `asset.HasCharacters(text, out uint[] missing, true)` → `missing` არა-ცარიელი → `LogError("[GeorgianFont] UI characters missing from the font and its fallback: " + <U+XXXX list>)`, `charactersMissing = true`; შემდეგ `asset.HasCharacters(text, out List<char> fromFallback)` → არა-ცარიელი → `Log("[GeorgianFont] UI characters taken from fallback LiberationSans SDF: " + <chars>)`; ბოლოს (თუ არაფერი აკლია) `Log("[GeorgianFont] All UI text characters are covered.")`.
+6. იდემპოტენტურია: მეორე გაშვება asset-ს არ ქმნის და არ ცვლის (GUID რჩება → სცენების reference-ები არ წყდება).
+
+**`Assets/Editor/EditorUi.cs`** (`internal static class EditorUi`) — `CampaignScenesSetup`-იდან გადატანილი და TMP-ზე გადაყვანილი საერთო კოდი: `readonly struct Placement` + `Center`/`Top`/`Bottom`/`TopLeft`/`TopRight`/`BottomLeft`/`Anchored`; ფერები (`Background`, `PanelColor`, `MapColor`, `ButtonColor`, `WarningColor`, `DisabledColor`, `LockedColor`, `ErrorColor` `#FFD933`, `HelpColor` `#D9D9D9`) და `Hex`; `NewCanvas(name, sortingOrder)` (Overlay, Scale With Screen Size 1920×1080, **`ScreenMatchMode.Expand`**, `GraphicRaycaster`); `NewRect`; `NewPanel(name, parent, size)`; `MakeText(name, parent, font, text, fontSize, placement, TextAlignmentOptions, color, bool bold = false, float autoSizeMin = 0)` → `TextMeshProUGUI` (`textWrappingMode = TextWrappingModes.Normal`, `raycastTarget = false`, `autoSizeMin > 0` → `enableAutoSizing`, `fontSizeMin = autoSizeMin`, `fontSizeMax = fontSize`); `MakeButton(name, parent, font, label, placement, fontSize, out TMP_Text labelText)` (Stage 2-ის ფერები/ColorTint, label stretch, auto-size 20..fontSize); `EnsureEventSystem(List<string> created)` (Stage 2-ის ლოგიკა: ერთი EventSystem + `InputSystemUIInputModule` + `AssignDefaultActions()`, `StandaloneInputModule` იშლება); `DeleteRoots(name, List<string> updated)`. `enableWordWrapping` არ გამოიყენება (obsolete = შეცდომა).
+
+**`ChessSceneSetup` (Tools → Setup Chess Scene) — Stage 3 დამატებები** (Stage 1-ის ნაბიჯები, ველები და ნაგულისხმევები უცვლელია; `battlePanel`-ს არ ეხება):
+1. URP shader-ის შემოწმების შემდეგ, სცენის გახსნამდე: `GeorgianFontSetup.Ensure(out bool missing)`; null → `Debug.LogError(Tag + "Georgian font is not ready, nothing was changed.")` და გასვლა (არაფერი იცვლება). `missing` → შედეგი „WITH ERRORS“.
+2. MainScene-ში `EditorUi.EnsureEventSystem` (ერთი EventSystem; იგივე, რასაც Setup Campaign Scenes აკეთებს — ორივე ბრძანება იდემპოტენტურია და ერთმანეთს არ ეჯახება).
+3. root `HudCanvas` — ყოველ გაშვებაზე იშლება და თავიდან იქმნება (`NewCanvas("HudCanvas", 20)`); შიგნით `HudPanel` და `PromotionPanel` (განლაგება — „UI სტილი (Stage 3)“); `HelpText.text = GameText.HelpLine`; ღილაკების label-ები: `GameText.PieceName(Queen/Rook/Bishop/Knight)`, `Get(Cancel)`.
+4. `StatusHud` (`statusText`, `errorText`) და `PromotionPrompt` (`panel`, `titleText`, `queenButton`, `rookButton`, `bishopButton`, `knightButton`, `cancelButton`) — `SerializedObject`-ით (ვერ ნაპოვნი → LogError, „WITH ERRORS“). კომპონენტები `ChessGame`-ზე რჩება.
+5. შემაჯამებელ log-ში `HudCanvas` ჩანს Created-ში. მეორე გაშვება: ერთი `HudCanvas`, ერთი `EventSystem`.
+
+**`CampaignScenesSetup` (Tools → Setup Campaign Scenes) — Stage 3 ცვლილებები** (ნაბიჯები 1–10, სცენები, ობიექტების სახელები, ველების მიბმა და Build Settings უცვლელია; `HudCanvas`-ს, `StatusHud`-ს, `PromotionPrompt`-ს არ ეხება):
+1. ნაბიჯი 1-ის შემდეგ: `GeorgianFontSetup.Ensure(out bool missing)`; null → `Debug.LogError(Tag + "Georgian font is not ready, nothing was changed.")` და გასვლა; `missing` → „WITH ERRORS“. `LegacyRuntime.ttf` და `UnityEngine.UI.Text` აღარ გამოიყენება — ყველა ტექსტი `EditorUi.MakeText`/`MakeButton`-ით (TMP, ქართული font asset).
+2. ყველა Canvas: `ScreenMatchMode.Expand`.
+3. `MainPanel`-ს ემატება `VerticalLayoutGroup` (spacing 20, childAlignment UpperCenter, childControlWidth/Height false, childForceExpandWidth/Height false); ღილაკები 400×80 (პოზიციას layout მართავს) → დამალული `Continue` ცარიელ ადგილს აღარ ტოვებს.
+4. ბრძოლის `BattleCanvas` და რეგიონის label-ები — ახალი ზომები „UI სტილი (Stage 3)“-დან.
+5. სტატიკური ტექსტები (Editor წერს, `Get` = `TextTable.Active.Get`): MainMenu — `TitleText` ← `MenuTitle`, `NewCampaignButton` ← `MenuNewCampaign`, `ContinueButton` ← `MenuContinue`, `QuickGameButton` ← `MenuQuickGame`, `QuitButton` ← `MenuQuit`, `ConfirmText` ← `ConfirmNewCampaign`, `ConfirmYesButton` ← `ConfirmYes`, `ConfirmNoButton` ← `Cancel`, `QuickGameTitleText` ← `QuickGameTitle`, `ColorLabel` ← `GameText.QuickColorLabel(White)`, `DifficultyLabel` ← `GameText.QuickDifficultyLabel(Get(DifficultyMedium))`, `StartQuickGameButton` ← `QuickStart`, `BackFromQuickGameButton` ← `Back`; CampaignMap — `TitleText` ← `MapTitle`, `Region_<id>` ← `region.Name`, `BackButton` ← `BackToMenu`; MainScene — `LeaveLabel` ← `BackToMap`, `RetryLabel` ← `Retry`, `BackLabel` ← `BackToMap`. დინამიკურ ტექსტებს (warning, status, info, შედეგი, ფერი/სირთულე) runtime კოდი წერს.
+
+#### UI სტილი (Stage 3)
+- **Font:** ყველა ტექსტი `NotoSansGeorgian SDF` (Static atlas 1024×1024, sampling 64, padding 6, SDFAA; სიმბოლოები = `TextTable.AtlasCharacters`; fallback `LiberationSans SDF`). Bold = TMP synthetic bold. ფერები Stage 2-ისაა; HUD: სტატუსი `#FFFFFF`, შეცდომა `#FFD933`, დახმარება `#D9D9D9`.
+- **CanvasScaler (ყველა Canvas, მათ შორის `HudCanvas`):** Scale With Screen Size, reference 1920×1080, **Expand** — reference-ის 1920×1080 განლაგება ყოველთვის მთლიანად ჩანს; კიდეებზე მიბმული ელემენტები ცენტრიდან მხოლოდ შორდება, ამიტომ თუ reference-ზე არაფერი გადაიფარება, არცერთ aspect-ზე არ გადაიფარება. ყველა ზომა ქვემოთ reference პიქსელებშია (x — მარცხენა კიდიდან, y — ზედა კიდიდან).
+- **Font size / auto-size (max = font size):** სათაური 64 (auto 40–64); პანელის სათაური 40 (auto 28–40); ღილაკი 32 (auto 20–32); რეგიონის label Bold 28 (auto 18–28, Wrap, 8px inset); info/status/warning/message 28 (auto 20–28); HUD: სტატუსი 30 Bold, შეცდომა 24, დახმარება 22 (auto-size-ის გარეშე, Wrap); გარდაქმნის სათაური 32 Bold (auto 24–32), ღილაკები 30 (auto 20–30). alignment: ღილაკები/სათაურები Center, `InfoText` Top, HUD-ის ტექსტები TopLeft.
+- **MainMenu:** Stage 2-ის პოზიციები; `MainPanel` 400×380 center (0, -40) + `VerticalLayoutGroup` (ზემოთ). 
+- **CampaignMap:** Stage 2-ის პოზიციები (`MapArea` x 210–1710, y 260–920; `TitleText` y 25–115; `StatusText` x 460–1460, y 935–1025; `BackButton` x 40–440, y 960–1040) — reference-ზე არ გადაიფარება, Expand-ით არც სხვა aspect-ზე.
+- **MainScene — `BattleCanvas` (sortingOrder 10, Setup Campaign Scenes):** `InfoText` Top (0, -24) 1100×70 → x 410–1510, y 24–94; `LeaveButton` ზედა-მარჯვნივ (-24, -24) **320×70** → x 1576–1896, y 24–94; `ResultPanel` center **760×400** → x 580–1340, y 340–740: `TitleText` (0, 140) 700×70, `MessageText` (0, 30) 700×140, `RetryButton` (-170, -130) 320×70, `BackButton` (170, -130) 320×70.
+- **MainScene — `HudCanvas` (sortingOrder 20, Setup Chess Scene):** `HudPanel` anchor/pivot ზედა-მარცხენა, (24, -110), **680×220** → x 24–704, y 110–330 (ზედა ზოლის ქვეშ — `InfoText`-ს და `LeaveButton`-ს ვერ ფარავს; `ResultPanel`-ზე მაღლაა). `HudPanel`-ზე `VerticalLayoutGroup` (spacing 6, UpperLeft, childControlWidth/Height true, childForceExpandWidth true, childForceExpandHeight false) → `StatusText`, `ErrorText` (დამალვისას ადგილს არ იკავებს), `HelpText`. `PromotionPanel` (Image `#2A2A33` α0.95) center **480×560** → x 720–1200, y 260–820, inactive: `TitleText` (0, 220) 440×60, `QueenButton` (0, 130), `RookButton` (0, 50), `BishopButton` (0, -30), `KnightButton` (0, -110), `CancelButton` (0, -200) — ღილაკები 400×70. `HudPanel` და `PromotionPanel` x-ით არ კვეთს ერთმანეთს; `PromotionPanel` და `ResultPanel` ერთდროულად არასდროს ჩანს.
+- **სარდლის ხედი:** საკუთარი მეფე დამალულია (`PiecesView.SetHiddenSquare`); `CameraRig`-ის ველები და ნაგულისხმევები უცვლელია.
+
 ## Testing Strategy
 - **Core (კრიტიკული ლოგიკა):** xUnit unit-ტესტები და perft (`Tests/ChessCore.Tests/Core`).
   - startpos d1–4: 20, 400, 8902, 197281;
@@ -757,6 +1018,8 @@ public static class GameSession
 - **Campaign (Stage 2, კრიტიკული ლოგიკა — პროგრესი და შენახვა):** xUnit `Tests/ChessCore.Tests/Campaign/*.cs`: რეგიონების ცხრილი, მდგომარეობის წესი, `RecordBattle`-ის ყველა სტრიქონი ზუსტი ტექსტით, `GetOutcome` ცხრილი, serializer round-trip (ყველა 32 ქვესიმრავლე) და დაზიანებული შეყვანის Theory (მათ შორის ღრმა ჩადგმულობა StackOverflow-ის გარეშე), `CampaignSaveStore` დროებით საქაღალდეში (თითო ტესტს თავისი `Path.GetTempPath()/chess3d-tests/<guid>`, ბოლოს იშლება). `BuildTargetTests` ამოწმებს `Chess.Campaign`-ის netstandard2.1-ს და რომ ის მხოლოდ `Chess.Core`-ს (და `netstandard`-ს) მიმართავს.
 - **AI (Stage 2):** `FromElo`-ს ზოლების საზღვრები და preset-ებთან ტოლობა; `BuildDifficultyCommands`/`BuildGo` `FromElo`-ს შედეგზე. არსებული ტესტები უცვლელად გადის.
 - **Game/Editor (Stage 2):** `dotnet build Tests/GameCompileCheck` და `Tests/EditorCompileCheck` (0 შეცდომა, 0 warning) + USER task-ები (Play-mode).
+- **Stage 3 — ტექსტები (Campaign, xUnit):** `TextTableTests` — ყოველ `TextId`-ს ორივე ცხრილში აქვს არა-ცარიელი ტექსტი; ორივე ცხრილის ყოველი ტექსტი ზუსტად API Contract-ის ცხრილით (73 × 2); `{n}` placeholder-ების სიმრავლე ორ ცხრილში ერთნაირია; სიმბოლოები მხოლოდ `IsSupportedChar` (ASCII + მხედრული + `\n`); `AtlasCharacters` = 143 სიმბოლო სწორი რიგით; `Active` == `Georgian`. `GameTextTests` — სტატუსის ყველა შემთხვევა (მატი/პატი/ფრე-ები/შახი/AI ფიქრობს, რიგის წესით), ფერი, ფიგურები, გარდაქმნის სათაური, Quick Game, შეცდომები, debug FEN. `CampaignTextTests`/`CampaignProgressTests`/`BattleRulesTests`/`CampaignRegionsTests` — იგივე შემთხვევები, ქართული ზუსტი ტექსტებით (ძველი ინგლისური მოლოდინები შეიცვალა contract-ის ახალი ტექსტებით — შემოწმება არ წაშლილა) + ყველა აწყობილი შედეგის (5 რეგიონი × 3 მდგომარეობა, MapStatus 0..5, RecordBattle-ის ყველა შეტყობინება) სიმბოლოების შემოწმება. `CampaignSaveSerializerTests`/`CampaignSaveStoreTests` უცვლელია (schema v1, id-ები).
+- **Stage 3 — Game/Editor:** compile check-ები (0/0, Game — `UNITY_EDITOR`-ითაც) + grep-ები (`PROGRESS.md` → G1–G4: legacy Input, ქართული ასოები მხოლოდ `TextTable.Georgian.cs`-ში, ძველი ინგლისური UI სტრიქონები Game/Editor-ში არ არის, legacy `Text`/IMGUI არ არის). font-ის დაფარვას ამოწმებს **Tools → Setup Georgian Font**-ის log (`All UI text characters are covered.`). ვიზუალი, TMP-ის რენდერი, განლაგება სხვადასხვა aspect-ზე, გარდაქმნის ფანჯარა და მეფის დამალვა — USER task-ები 45, 46 (Play-mode). Static atlas: Play-ის შემდეგ `git status` font asset-ს შეცვლილად არ აჩვენებს.
 
 ## Realistic Scale
 ერთი მოთამაშე, ერთი პარტია ერთდროულად, ერთი Stockfish პროცესი. წარმადობის მოთხოვნა: perft ტესტები ჯამში დაახლოებით 30 წამამდე, AI-ის სვლა 1–2 წამამდე.
@@ -766,6 +1029,7 @@ public static class GameSession
 - გარე პროცესის გაშვება: მხოლოდ `ProcessUciTransport`, `UseShellExecute = false`, არგუმენტების და shell-ის გარეშე. გზა მოდის inspector-იდან ან StreamingAssets-იდან და არა მომხმარებლის runtime input-იდან. Play-ის დასრულებისას პროცესი აუცილებლად კვდება (`OnDestroy` → Dispose → Kill), რომ ობოლი `stockfish.exe` არ დარჩეს.
 - Stockfish GPLv3-ია. binary git-ში არ ინახება. build-ის გავრცელებამდე საჭიროა ლიცენზიის გადაწყვეტილება (Backlog).
 - Stage 2 შენახვა: `campaign.json` შეიცავს მხოლოდ რეგიონების id-ებს (პერსონალური მონაცემები არ არის). ფაილი გარე შეყვანად ითვლება: reader არ იყენებს reflection-ს/ტიპების აღდგენას, ზღუდავს ჩადგმულობას (64) და ყოველ შეცდომას `CampaignSaveFormatException`-ად აქცევს; ფაილის გზა ფიქსირებულია (`persistentDataPath`), მომხმარებლის შეყვანიდან არ მოდის.
+- Stage 3: Noto Sans Georgian — SIL Open Font License 1.1: ფონტის თამაშთან ერთად გავრცელება დასაშვებია, თუ ლიცენზიის ტექსტი თან ახლავს (`Assets/Fonts/OFL.txt`); ფონტი ცალკე არ იყიდება. TMP Essentials (LiberationSans) — Unity-ის პაკეტის ნაწილი. ახალი ქსელური/პერსონალური მონაცემი არ ემატება; ფონტს USER ჩამოტვირთავს მხოლოდ Google Fonts-იდან.
 
 ## Constraints
 - მომხმარებელი Unity-ში დამწყებია, ამიტომ Editor-ის ყველა ნაბიჯი USER task-ია, ქართული ინსტრუქციით.
@@ -850,7 +1114,7 @@ public static class GameSession
 - Decision: მომხმარებლის ან engine-ის არასწორი სვლა აბრუნებს `false`-ს (`TryMakeMove`). არასწორი FEN აგდებს `FormatException`-ს. AI-ის შეცდომა = `ChessAIException` (+ `StockfishNotFoundException`).
 - Reason: არასწორი click თამაშში ჩვეულებრივი მოვლენაა და exception-ს არ იმსახურებს. FEN პროგრამისტის ან კონფიგურაციის შეცდომაა.
 
-### 2026-10-25 — Game ფენა: თხელი სკრიპტები, ერთი GameObject, IMGUI
+### 2026-10-25 — Game ფენა: თხელი სკრიპტები, ერთი GameObject, IMGUI (IMGUI-ის ნაწილი ჩანაცვლდა 2026-10-26 — იხ. „Stage 3: HUD და გარდაქმნა uGUI-ზე“)
 - Decision:
   - ყველა თამაშის კომპონენტი `ChessGame` GameObject-ზეა, `CameraRig` — `Main Camera`-ზე;
   - ველი და 64 tile იქმნება კოდით (`BoardView.Awake`); ფიგურები `PiecesView.Sync`-ით სრულად იქმნება თავიდან ყოველი სვლის შემდეგ, ანიმაციის გარეშე;
@@ -862,11 +1126,11 @@ public static class GameSession
   - 32 primitive-ის თავიდან შექმნა იაფია.
 - How to change: ფაზა 2-ში uGUI/TextMeshPro და ანიმაციები.
 
-### 2026-10-25 — HUD-ის ტექსტი MVP-ში ინგლისურად
+### 2026-10-25 — HUD-ის ტექსტი MVP-ში ინგლისურად (ჩანაცვლდა 2026-10-26 — იხ. „Stage 3: სტრიქონების ცხრილი“)
 - Decision: სტატუსის სტრიქონები ინგლისურად.
 - Reason: IMGUI-ის ნაგულისხმევ font-ს ქართული glyph-ები შეიძლება არ ჰქონდეს. ქართული UI სწორ font-თან (TextMeshPro font asset) ერთად ფაზა 2-ში.
 
-### 2026-10-25 — გარდაქმნა: OnGUI არჩევანი
+### 2026-10-25 — გარდაქმნა: OnGUI არჩევანი (OnGUI ჩანაცვლდა 2026-10-26 uGUI-ით; არჩევანის წესი უცვლელია)
 - Decision: Core უჭერს მხარს Q/R/B/N-ს. UI აჩვენებს 4 ღილაკს და Cancel-ს (Esc). ავტომატური დედოფალი არ არის.
 - Reason: უმარტივესი სრული ვარიანტი. კლავიშები Q/R/B/N არ გამოიყენება, რადგან R უკვე restart-ია.
 
@@ -962,7 +1226,7 @@ public static class GameSession
 - Reason: სცენებს შორის 3–4 მნიშვნელობა გადადის — MonoBehaviour სინგლტონი ზედმეტია. პროექტში domain reload Play-ზე გათიშულია (`m_EnterPlayModeOptions: 1`), ამიტომ reset-ის გარეშე MainScene-ის პირდაპირი Play წინა სესიის კამპანიის რეჟიმს გააგრძელებდა.
 - How to change: თუ სესიას Update/coroutine დასჭირდება → DontDestroyOnLoad კომპონენტი.
 
-### 2026-10-25 — UI: uGUI + legacy Text, ციკლური ღილაკები
+### 2026-10-25 — UI: uGUI + legacy Text, ციკლური ღილაკები (legacy Text და IMGUI ჩანაცვლდა 2026-10-26 — იხ. „Stage 3: TextMeshPro“; uGUI, ციკლური ღილაკები და კოდით listener-ები რჩება)
 - Decision: Canvas + `UnityEngine.UI.Text` (`LegacyRuntime.ttf`), ღილაკების `onClick` კოდით (`AddListener`), Quick Game-ის არჩევანი ციკლური ღილაკებით (Dropdown/Toggle-ის გარეშე). EventSystem + `InputSystemUIInputModule` (`AssignDefaultActions`). MainScene-ის HUD და PromotionPrompt რჩება IMGUI.
 - Reason: მომხმარებელმა uGUI მოითხოვა. TextMeshPro-ს სჭირდება TMP Essential Resources-ის იმპორტი (დამატებითი USER ნაბიჯი და Assets-ში ფაილები), ქართული font ისედაც Stage 3-შია. `Text` ugui 2.6.0-ში obsolete არ არის (შემოწმდა). persistent listener-ები Editor სკრიპტში idempotency-ს ართულებს.
 - How to change: Stage 3 — TMP + ქართული font asset; ტექსტები `CampaignText`-სა და კომპონენტებშია თავმოყრილი.
@@ -1009,11 +1273,69 @@ public static class GameSession
 - Reason: მომხმარებლის მოთხოვნა USER task 28-ის შემდეგ (კამპანიის მოგება 800 Elo-ზე ხელით ვერ მოწმდება; სათაური რუკის უკან იმალებოდა; ტექსტი ძალიან პატარა იყო). startFen-ის ყველა რეჟიმზე გავრცელება build-ში დატოვების რისკს ქმნიდა.
 - How to change: `GameController` (debug ველი), `CampaignScenesSetup` (განლაგება) → ხელახლა Tools → Setup Campaign Scenes.
 
+### 2026-10-26 — Stage 3 = ქართული ინტერფეისი; Tier და Stage 1–2 უცვლელია
+- Decision: Stage 3 = ქართული UI ტექსტი + TMP + Noto Sans Georgian + HUD/გარდაქმნა uGUI-ზე + 4 ვიზუალური წვრილმანი (მომხმარებლის მოთხოვნა). Tier 1 რჩება. gameplay, კამპანიის წესები, schema v1, AI და სცენების ნაკადი არ იცვლება.
+- Reason: მომხმარებლის მოთხოვნა „Stage 1–2 უცვლელია“; ყველა ცვლილება ტექსტის წყაროზე, რენდერზე და განლაგებაზეა.
+
+### 2026-10-26 — Stage 3: სტრიქონების ცხრილი `Chess.Campaign`-ში (`TextId` + `TextTable` + `GameText`)
+- Decision: ყველა UI ტექსტი ერთ ცხრილშია: `enum TextId` (73) + `TextTable` (partial; `Georgian` — აქტიური, `English` — Stage 1–2-ის არსებული ტექსტები) + `GameText` (HUD/გარდაქმნა/Quick Game-ის აწყობა Core-ის ტიპებით). `TextTable.Active` = Georgian, read-only — ენის გლობალური mutable static არ არის (xUnit-ის პარალელური ტესტები სტაბილურია). Game/Editor-ში UI literal-ები აღარ არის; `DifficultyPreset` → ტექსტი — Game-ის `DifficultyText`.
+- Reason: Campaign სუფთა C#-ია და `dotnet test`-ით იტესტება (Game — ვერა); Core-მა UI არ უნდა იცოდეს; Campaign უკვე Core-ზეა დამოკიდებული. ინგლისური ცხრილი უკვე არსებულ ტექსტებს ინახავს (თითქმის უფასოა) და ტესტით ამტკიცებს, რომ სტრუქტურა მეორე ენას მართლა იტევს (გასაღებები + placeholder-ები). `TextId` + ცხრილი (და არა თითო ენაზე ცალკე მეთოდები) — ახალი ენა = ერთი ფაილი.
+- Alternatives considered: Unity Localization package; ScriptableObject/JSON ცხრილი; ტექსტები Core-ში; მხოლოდ ქართული (ინგლისურის გარეშე); `static Language Current { get; set; }`.
+- Why rejected: package — ზედმეტი სირთულე და Editor-ზე დამოკიდებული, dotnet-ით არ იტესტება; ScriptableObject/JSON — Unity-ზე ან ფაილის კითხვაზე დამოკიდებული, ტესტები რთულდება; Core-ს UI არ ეკუთვნის; ინგლისურის წაშლა მომავალ ენას ძვირს ხდის; mutable static ტესტებს flaky-ს ხდის და runtime გადართვა არ მოთხოვნილა.
+- How to change: ენის არჩევა → `Active`-ის არჩევა ერთ ადგილას (მაგ. GameSession-ის პარამეტრი) + მენიუს ღილაკი; ახალი ენა → `TextTable.<Lang>.cs` + ტესტები.
+
+### 2026-10-26 — Stage 3: რეგიონების სახელები/ეპოქები ქართულად, id-ები უცვლელი
+- Decision: `Region.Name`/`Era` = `TextTable.Active` (ქართლი, კახეთი, იმერეთი, სვანეთი, ხევსურეთი; საუკუნე რომაული ციფრით). `Region` კლასი, id-ები, Elo, რიგი და anchor-ები უცვლელია.
+- Reason: შენახვაში მხოლოდ id-ებია, ამიტომ არსებული `campaign.json` თავსებადია (schema v1, მიგრაციის გარეშე). რომაული ციფრები ASCII-ია — glyph-ის რისკი არ არის.
+- Assumption: ეპოქების ტექსტი ისევ placeholder-ია (კონტენტის გადაწყვეტილება — Backlog).
+
+### 2026-10-26 — Stage 3: სიმბოლოების უსაფრთხოება — მხოლოდ ASCII + მხედრული
+- Decision: UI ტექსტში დასაშვებია მხოლოდ `\n`, U+0020–U+007E და U+10D0–U+10FF; ტესტი ამოწმებს ცხრილის ყველა ტექსტს და ყველა აწყობილ შედეგს. `—`-ის ნაცვლად `-`, curly quotes, NBSP, მთავრული/ასომთავრული/ნუსხური და uppercase transform-ები არ გამოიყენება.
+- Reason: font atlas Static-ია და შეიცავს ზუსტად ამ 143 სიმბოლოს; ცხრილის გარეთ სიმბოლო □-ად გამოჩნდებოდა. ტესტი ამას dotnet-ით იჭერს, Unity-ის გარეშე.
+- Limit: runtime მონაცემი (Stockfish-ის გზა, exception-ის ტექსტი HUD-ში) შეიძლება შეიცავდეს სხვა სიმბოლოს (მაგ. კირილიცა Windows-ის მომხმარებლის სახელში) → □. მისაღებია (იშვიათი, ინფორმაციული ხაზი).
+
+### 2026-10-26 — Stage 3: TextMeshPro; TMP Essentials — USER-ის ერთი click
+- Decision: ყველა ტექსტი TMP (`TMP_Text`/`TextMeshProUGUI`), asmdef-ებში `Unity.TextMeshPro`, compile-check-ებში `Library/ScriptAssemblies/Unity.TextMeshPro.dll` (ახალი package არ არის — TMP `com.unity.ugui` 2.6.0-შია). TMP Essential Resources იმპორტირდება USER-ის მიერ (**Window → TextMeshPro → Import TMP Essential Resources → Import**), `Assets/TextMesh Pro/**` git-ში კომიტდება. Setup ბრძანებები Essentials-ის არარსებობისას მკაფიო შეცდომით ჩერდება, სანამ რამეს შეცვლიან.
+- Reason: TMP-ის shader-ები და `TMP Settings` მხოლოდ Essentials-ის `.unitypackage`-შია. ავტომატური იმპორტი (`AssetDatabase.ImportPackage` / `TMP_PackageResourceImporter`) deferred-ია — იმპორტი ბრძანების დასრულების შემდეგ სრულდება, ამიტომ font asset-ის შექმნა იმავე გაშვებაში ვერ მოხერხდებოდა (მეორე გაშვება ან callback სჭირდება) და ფანჯრებს აჩვენებს. ერთი menu click უფრო მარტივი და საიმედოა.
+- Supersedes: „UI: uGUI + legacy Text“ (TextMeshPro არ გამოიყენება) და „HUD-ის ტექსტი MVP-ში ინგლისურად“.
+- How to change: ავტომატიზაცია — `[InitializeOnLoad]` + `AssetDatabase.importPackageCompleted`, თუ USER ნაბიჯი პრობლემა გახდება.
+
+### 2026-10-26 — Stage 3: ფონტი Noto Sans Georgian Regular; Static font asset Editor ბრძანებით
+- Decision: USER დებს `Assets/Fonts/NotoSansGeorgian-Regular.ttf`-ს (Google Fonts zip-ის `static/` საქაღალდიდან, არა variable font) და `OFL.txt`-ს. **Tools → Setup Georgian Font** (და ავტომატურად ორივე Setup სცენის ბრძანება) ქმნის `Assets/Fonts/NotoSansGeorgian SDF.asset`-ს: 1024×1024, sampling 64, padding 6, SDFAA, multi-atlas off; სიმბოლოები `TextTable.AtlasCharacters` (`TryAddCharacters` Dynamic რეჟიმში), შემდეგ **Static**; atlas texture და material — sub-asset-ები (`AddObjectToAsset`); fallback — `LiberationSans SDF`. არსებული asset ხელახლა გამოიყენება და არ იცვლება (GUID რჩება). log აჩვენებს UI-ის ყველა სიმბოლოს დაფარვას.
+- Reason: ხელით Font Asset Creator დამწყებისთვის შეცდომების წყაროა (მომხმარებლის მოთხოვნა: „Editor სკრიპტით, ხელით არა“). Dynamic atlas Play-ის დროს იცვლება და git-ში ყოველ ჯერზე „შეცვლილი“ ჩანს; Static — არა. 143 სიმბოლო sampling 64-ზე 1024² atlas-ში თავისუფლად ეტევა (TMP-ის ნაგულისხმევი 90/1024 95 სიმბოლოს იტევს). variable font-ის წონის ღერძს TMP სტატიკურად მაინც ერთ წონად ხატავს — static Regular უფრო პროგნოზირებადია. Bold — TMP synthetic bold (`_WeightBold`), მეორე TTF და მეორე atlas არ არის საჭირო.
+- Risk: Google-ის Noto Sans Georgian-ში ლათინური ასოები/ციფრები შეიძლება არ იყოს (წყაროები ერთმანეთს ეწინააღმდეგება) → fallback `LiberationSans SDF` (Essentials, Static ASCII) ფარავს; Setup-ის log აჩვენებს, რომელი სიმბოლოები მოვიდა fallback-იდან. თუ `TryAddCharacters` atlas-ის გავსების გამო რამეს ვერ დაამატებს → warning + ერთადერთი ცვლილება 2048×2048.
+- How to change: `GeorgianFontSetup` პარამეტრები → წაშალე `NotoSansGeorgian SDF.asset` და გაუშვი Setup ბრძანებები თავიდან (სცენები ხელახლა მიებმება).
+
+### 2026-10-26 — Stage 3: HUD და გარდაქმნა uGUI-ზე (`HudCanvas`, Setup Chess Scene)
+- Decision: `StatusHud` და `PromotionPrompt` `ChessGame`-ზე რჩება, public API უცვლელია; მათი UI არის ცალკე root `HudCanvas` (sortingOrder 20), რომელსაც ქმნის/თავიდან ქმნის **Tools → Setup Chess Scene** და ის აბამს ახალ ველებს. **Setup Campaign Scenes** მას არ ეხება (ის `BattleCanvas`-ის მფლობელია). ორივე ბრძანება ერთსა და იმავე `EditorUi.EnsureEventSystem`-ს იყენებს.
+- Reason: MainScene პირდაპირ (Mode None) HUD-ს და გარდაქმნას საჭიროებს `BattleCanvas`-ის გარეშეც; ორი ბრძანება ერთსა და იმავე reference-ებზე არ „ეჩხუბება“ (თითო Canvas — თითო მფლობელი). runtime-ში UI-ის კოდით აწყობა (Awake) დამატებით font reference-ს და დამალულ ობიექტებს მოითხოვდა.
+- Click-ის გაჟონვა: `SquarePicker` ირჩევს mouse **press**-ზე, uGUI ღილაკი კი **release**-ზე; press-ის დროს გარდაქმნის ფანჯარა ღიაა (`IsPromotionOpen` → click იგნორირდება), ხოლო release-ის კადრში ფანჯარა იხურება (`LastClosedFrame`). ე.ი. გარდაქმნის ღილაკი დაფაზე არ „აჭერს“ — `SquarePicker`-ის UI ფილტრი ამ ეტაპზე საჭირო არ არის (Backlog-ის პუნქტი რჩება სხვა ღილაკებისთვის, რომელთა ზიანი არ არის).
+- Supersedes: IMGUI HUD/PromotionPrompt (Stage 1 Decision Log).
+
+### 2026-10-26 — Stage 3: განლაგება — CanvasScaler Expand, MainPanel VerticalLayoutGroup, ბრძოლის ზოლები
+- Decision: ყველა Canvas: Scale With Screen Size 1920×1080, `Expand` (Stage 2: match 0.5). MainMenu `MainPanel` — `VerticalLayoutGroup`. ბრძოლა: ზედა ზოლი (y 24–94) `InfoText` 1100 + `LeaveButton` 320; HUD (`HudPanel` 680×220) ზედა ზოლის ქვეშ მარცხნივ (y 110–330); `ResultPanel` 760×400 ცენტრში. ზუსტი რიცხვები — „UI სტილი (Stage 3)“.
+- Reason: `Back to menu` რუკას ფარავდა ფართო Game view-ზე: match 0.5-ით canvas-ის სიმაღლე 1080-ზე ნაკლები ხდება (მაგ. 1600×700 → ≈952) და ქვედა კიდეზე მიბმული ღილაკი/სტატუსი `MapArea`-ში შედის. `Expand`-ით canvas ყოველთვის ≥ 1920×1080-ია, ე.ი. reference-ის განლაგება (გამოთვლით, გადაფარვის გარეშე) ნებისმიერ aspect-ზე ნარჩუნდება — ერთი პარამეტრი anchor-ების გადაწყობის ნაცვლად. HUD (OnGUI, მთელი ეკრანის სიგანე) `InfoText`-ს ფარავდა — ახლა ცალკე ზოლშია. ფიქსირებულ პოზიციებზე დამალული `Continue` 100px-იან ხვრელს ტოვებდა.
+- Trade-off: არა-16:9 ეკრანზე UI ოდნავ პატარაა (reference მთლიანად უნდა ჩაეტიოს).
+
+### 2026-10-26 — Stage 3: სარდლის ხედში საკუთარი მეფე იმალება
+- Decision: `CameraRig.ViewChanged` + `PiecesView.SetHiddenSquare`: სარდლის ხედში ადამიანის მეფის ობიექტი inactive-ია (renderer და collider), ტაქტიკურში ჩანს. `CameraRig`-ის offset-ები და ნაგულისხმევები უცვლელია.
+- Reason: კონცეფციით სარდლის ხედი „მეფის თვალით“ ხედვაა; კამერა მეფის 0.6-ით უკან და 1.4 სიმაღლეზეა, ამიტომ მეფე (1.05) ქვედა-ცენტრალურ ნაწილს და მის წინ e2/e3-ს ფარავს. collider-იც ითიშება, თორემ უხილავი მეფე უკან მდებარე უჯრებზე click-ს „დაიჭერდა“. offset-ების შეცვლა სცენაში სერიალიზებულ მნიშვნელობებსაც შეცვლიდა და ხედს მაინც ნაწილობრივ დაფარავდა.
+- Trade-off: სარდლის ხედში საკუთარ მეფეს ვერ აირჩევ (ის „შენ“ ხარ) — მეფის სვლა/როქი ტაქტიკურ ხედში (TAB). თუ მომხმარებელს არ მოეწონება: ალტერნატივა — `commanderEyeHeight`/`commanderBackOffset`-ის გაზრდა (Setup Chess Scene-ით) და მეფე ხილული.
+- How to change: `GameController.UpdateKingVisibility`.
+
+### 2026-10-26 — Stage 3: საერთო Editor helper `EditorUi`
+- Decision: `CampaignScenesSetup`-ის UI builder-ები (Placement, Canvas, Text, Button, EventSystem) გადადის `Assets/Editor/EditorUi.cs`-ში და TMP-ზე გადადის; მას იყენებს ორივე Setup ბრძანება.
+- Reason: Stage 3-ში TMP UI-ს ორი ბრძანება აწყობს (`HudCanvas` და დანარჩენი) — დუბლირებული ~150 ხაზი ფერების/ზომების შეუსაბამობის წყარო იქნებოდა. `SerializedObject`-ის helper-ები თითო ბრძანებაში რჩება (refactor-ის გარეშე).
+
+### 2026-10-26 — Stage 3: owner-ები, დიზაინი, E2E
+- Decision: ყველა agent task-ის owner = `task-executor`; designer/DESIGN.md და browser-tester/Playwright არ გამოიყენება (მომხმარებლის მითითება). UI-ის ზომები, ფერები და პოზიციები API Contract-შია („UI სტილი (Stage 3)“). USER task-ები: ფონტის ჩამოტვირთვა + TMP Essentials (44) და Play-mode შემოწმება (45, 46).
+- Reason: Unity C# არ არის web UI; აგენტებს Unity Editor-ის გაშვება არ შეუძლიათ.
+
 ## Open Questions
 - ვარაუდი: პლატფორმა მხოლოდ Windows PC (x86-64). Stockfish-ის binary მხოლოდ Windows-ისთვის.
 - ვარაუდი: ადამიანი ნაგულისხმევად თეთრია (`humanSide` inspector-ში იცვლება); ნაგულისხმევი სირთულე = Medium.
 - ვარაუდი: პარტიის შენახვა, undo, საათი და PGN MVP-ში არ არის.
-- ვარაუდი: HUD-ის ტექსტი MVP-ში ინგლისურადაა (font-ის რისკი); ქართული UI ფაზა 2-ში.
+- ~~ვარაუდი: HUD-ის ტექსტი MVP-ში ინგლისურადაა (font-ის რისკი); ქართული UI ფაზა 2-ში.~~ (Stage 3: UI ქართულია)
 - ვარაუდი: Easy ≈ 800 Elo მიახლოებითია და გაზომილი არ არის; ბალანსის ტესტი ფაზა 3-ში.
 - ვარაუდი: ფრე 50 სვლაზე და სამჯერად გამეორებაზე ავტომატურია (claim-ის გარეშე).
 - ვარაუდი: hot-seat რეჟიმში კამერა არ ტრიალდება მოთამაშის მიხედვით.
@@ -1026,5 +1348,10 @@ public static class GameSession
 - ვარაუდი (Stage 2): New Campaign-ს დადასტურება სჭირდება; ბრძოლის შუაში გასვლა შედეგს არ წერს.
 - ვარაუდი (Stage 2): ერთი save slot; დაზიანებული ფაილი `campaign.corrupt.json`-ად ინახება (მხოლოდ ბოლო).
 - ვარაუდი (Stage 2): Quick Game-ის ნაგულისხმევი = White + Medium; Quick Game არაფერს ინახავს.
+- ვარაუდი (Stage 3): ქართული ტექსტები (API Contract-ის ცხრილი) გუნდის შედგენილია; ტერმინები: ლაზიერი, ეტლი, კუ, მხედარი, პაიკი, შახი, მატი, პატი, ფრე. მომხმარებელს შეუძლია ნებისმიერი ტექსტის შეცვლა — მხოლოდ ცხრილში (`TextTable.Georgian.cs` + ტესტები).
+- ვარაუდი (Stage 3): ინგლისური ცხრილი ინახება, მაგრამ თამაშში ენის არჩევა არ არის.
+- ვარაუდი (Stage 3): ფონტი — `NotoSansGeorgian-Regular.ttf` (static); Bold = synthetic. თუ ლათინური ასოები ფონტში არ არის — fallback `LiberationSans SDF`.
+- ვარაუდი (Stage 3): სარდლის ხედში საკუთარი მეფე იმალება; მეფის სვლა ტაქტიკურ ხედში (TAB).
+- ვარაუდი (Stage 3): HUD ზედა ზოლის ქვეშ, მარცხნივაა (Stage 1–2-ში ზედა-მარცხენა კუთხეში იყო).
 
 ## Accepted Risks

@@ -4,12 +4,12 @@
 
 ## Stack
 - Unity 6000.6.7f1, URP 17.6.0, Input System 1.20.1 (მხოლოდ ახალი Input System)
-- C# 9 / netstandard2.1: `Chess.Core` (წესები), `Chess.AI` (Stockfish UCI), `Chess.Campaign` (რეგიონები, პროგრესი, JSON შენახვა); `Chess.Game` = Unity MonoBehaviour-ები + uGUI (legacy `Text`, TMP არა)
+- C# 9 / netstandard2.1: `Chess.Core` (წესები), `Chess.AI` (Stockfish UCI), `Chess.Campaign` (რეგიონები, პროგრესი, JSON შენახვა); `Chess.Game` = Unity MonoBehaviour-ები + uGUI + TextMeshPro (`TMP_Text`, Stage 3-დან; legacy `Text` და OnGUI აღარ გამოიყენება); UI ტექსტები მხოლოდ `Chess.Campaign.TextTable`-იდან
 - ტესტები: xUnit 2.x, net10.0 (`Tests/`, Assets-ის გარეთ); Stockfish (UCI, ცალკე პროცესი, binary git-ში არ ინახება)
 
 ## Commands
 - dev: Unity Hub-ში გახსენი პროექტი → `Assets/Scenes/MainMenu` → Play (USER); `MainScene` პირდაპირაც (Stage 1-ის ქცევა)
-- scene setup (USER, Editor): Tools → Setup Chess Scene, შემდეგ Tools → Setup Campaign Scenes (Stage 2-დან)
+- scene setup (USER, Editor): Tools → Setup Georgian Font (Stage 3-დან; საჭიროა `Assets/Fonts/NotoSansGeorgian-Regular.ttf` და TMP Essential Resources), შემდეგ Tools → Setup Chess Scene, შემდეგ Tools → Setup Campaign Scenes (Stage 2-დან)
 - lint: — (none)
 - typecheck: `dotnet build Tests/ChessCore.Tests`
 - test: `dotnet test Tests/ChessCore.Tests`
