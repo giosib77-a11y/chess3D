@@ -1,9 +1,86 @@
 # Progress
 
 ## Current Stage
-Stage 3 — ქართული ინტერფეისი
+Stage 3 — ქართული ინტერფეისი — **Done** (2026-10-26). შემდეგი stage — მომხმარებლის გადაწყვეტილება (Backlog).
 
 ## Tasks
+<!-- Stage 3 — Done (2026-10-26). Stage 3-ის task-ები (35–52) → ## Stage 3 — Done (ფაილის ბოლოს). ახალი stage-ის task-ები აქ ჩაიწერება მისი დაგეგმვისას (მომხმარებლის გადაწყვეტილება). -->
+
+## Shared files
+- (ახალი stage-ის დაგეგმვისას.) Stage 3-ის შენიშვნა — ## Stage 3 — Done → „Stage 3-ის Shared files შენიშვნა (არქივი)“.
+
+## Backlog (needs user decision)
+### ფაზა 2 — Art & Sound (კონცეფციით ~1.5 თვე)
+- ქართული ისტორიული 3D მოდელები primitive-ების ნაცვლად (მეფე, ლაზიერი/მთავარსარდალი, ეტლი/კოშკი, მხედარი/აბჯროსანი ცხენოსანი, ოფიცერი/ეპისკოპოსი, პაიკი/მებრძოლი).
+- კამპანიის რუკის ნამდვილი art (Stage 2-ში სქემატური ღილაკებია); რეგიონების ეპოქების საბოლოო ტექსტი.
+- ხმოვანი ბრძანებები („ლაზიერი c5-ზე, შეტევაზე!“), ჯარისკაცების პასუხები, აუდიო მენეჯერი კოორდინატების მიხედვით.
+- კუთხური დიალექტები (ხევსურული, კახური, სვანური).
+- გარემოები: კახეთი (ალაზნის ველი, ქვევრები, გალავანი), სვანეთი (თოვლი, კოშკები); ველის ტიპები (ქვიშა, ბალახი, თოვლი).
+### ფაზა 3 — Polish & FX (კონცეფციით ~1 თვე)
+- მოკვლის კინემატოგრაფიული სცენები (Fatal Captures, 2–3 წამი).
+- განათება და post-processing.
+- ბალანსის ტესტირება, სირთულის Elo-ს გაზომვა (მათ შორის `AIDifficulty.FromElo`-ს ზოლები და რეგიონების Elo).
+- სარდლის ხედში ხელები/აბჯარი.
+### გადადებული (Stage 1-დან)
+- Mac/Linux Stockfish და პლატფორმის ავტომატური არჩევა; build-ის/installer-ის მომზადება; Stockfish-ის build-ში გავრცელება + GPLv3 compliance.
+- სვლის ანიმაცია, მოჭრილი ფიგურების ჩვენება, ბოლო სვლის და შახის (წითელი) განათება.
+- Undo, PGN export/import, საათები/დროის კონტროლი, დანებება, ფრეს შეთავაზება, claim-ის რეჟიმი (50/3-ჯერადი), 75 სვლის / 5-ჯერადი წესები.
+- კამერის orbit/zoom მარჯვენა ღილაკით; hot-seat-ში კამერის მობრუნება მოთამაშის მიხედვით.
+- Stockfish full-strength preset.
+- Unity Test Framework / Play-mode ავტომატური ტესტები.
+- nit (finish-check, security): `StockfishAI.GetBestMoveAsync` engine-ს უგზავნის შემოსულ `fen`-ს და არა `state.ToFen()`-ს (ნორმალიზებული); `ProcessUciTransport.SendLine` არ უარყოფს `\r`/`\n`-ს. რეალური ზიანი არ არის (Game ყოველთვის `ToFen()`-ს აგზავნის).
+- nit (finish-check, security): `StockfishAI`/`ProcessUciTransport` — `Path.GetFullPath` ერთხელ, რომ `File.Exists` და გაშვება ერთსა და იმავე ფაილს ეხებოდეს (მხოლოდ inspector-ის override-ზე).
+- nit (finish-check): `StockfishAI` timeout-ები ყოველ ხაზზეა და არა მთელ ლოდინზე (engine, რომელიც მუდმივად `info`-ს ბეჭდავს, timeout-ს ვერ მიიღებს; preset-ებს არ ეხება) — deadline ერთხელ.
+- nit (finish-check): `StockfishAI` — `GetBestMoveAsync`-ის ct shared init-ის დროს არ მოწმდება (გაუქმება init-ის დასრულებამდე ჩერდება); Game-ს არ ეხება.
+- nit (finish-check): `StockfishAITests.GetBestMove_Cancel_DiscardsStaleBestmove...` იყენებს SearchTimeout 500 ms-ს — დატვირთვისას შეიძლება flaky იყოს; 30 s.
+- nit (fix round 1 re-review): `GameController.StopAi` არ იძახებს `UpdateHud()`/`UpdateInteractable()`-ს — inspector-ში კომპონენტის disable/enable AI-ის ფიქრისას ტოვებს „AI thinking...“-ს და დაბლოკილ input-ს R-მდე (მხოლოდ Editor-ის debug სცენარი).
+- nit (fix round 1 re-review): domain reload-ის შემდეგ AI ჩუმად ქრება (hot-seat) — HUD-ზე შენიშვნა არ ჩანს (მაგ. `Scripts reloaded. Human vs human mode.`).
+- nit: README.md არ არსებობს — გაშვების ინსტრუქცია ახლა CLAUDE.md-ის Commands-სა და PROGRESS.md-ის USER task-ებშია.
+- nit: `EnsureNonEmptyCompile` target-ის მოშორება `Tests/ChessCore.Build` და `Tests/ChessAI.Build` csproj-ებიდან, როცა Core-სა და AI-ში რეალური `.cs` ფაილებია (ცარიელი Compile set-ის დროს SDK `TargetFrameworkAttribute`-ს არ აგენერირებს).
+### Stage 2-ის გარეთ დარჩენილი (გადაწყვეტილება საჭიროა)
+- `SquarePicker` არ ამოწმებს, UI-ზე ხომ არ არის მაუსი (`EventSystem.IsPointerOverGameObject`) — `Back to map`-ზე დაჭერა დაფაზეც „დააჭერს“ (სცენა მაშინვე იცვლება, ზიანი არ არის). (Stage 3: გარდაქმნის ფანჯარას არ ეხება — `SquarePicker` press-ზე ირჩევს, ღილაკი release-ზე, ფანჯრის ღიაობისას click იგნორირდება; იხ. PROJECT.md Decision Log 2026-10-26.)
+- ფერის არჩევა კამპანიაში; რამდენიმე save slot; კამპანიის დასრულების ეკრანი.
+- nit (finish-check Stage 2, ორივე reviewer): `CampaignSaveStore.Load` — თუ ფაილი გაშვებისას სხვა პროცესს უჭირავს, წაკითხვაც და backup-ის გადატანაც ჩავარდება (ჩუმად), გაფრთხილება მაინც წერს „It was kept as campaign.corrupt.json“, ხოლო შემდეგი `New Campaign` (დადასტურების გარეშე, რადგან `Campaign == null`) ვალიდურ ფაილს გადააწერს. გამოსწორება: `TryBackUpCorruptFile` → bool; ჩავარდნისას სხვა გაფრთხილება / ჩაწერის დაბლოკვა. ძალიან იშვიათია.
+- nit (finish-check Stage 2): `CampaignMapController.Start` — `regionButtons == null`-ზე ბრუნდება `backButton`-ის მიბმამდე (მხოლოდ არასწორად აწყობილ სცენაზე).
+- nit (finish-check Stage 2, შესამოწმებელი): `InputSystemUIInputModule.AssignDefaultActions()` Editor-ში ქმნის არამუდმივ actions asset-ს — სცენის ფაილში reference შეიძლება null იყოს; runtime-ზე `OnEnable` აღადგენს. USER task 28-ის შემდეგ სცენის ფაილი გადასახედია.
+- nit (fix round 1 re-review): `Save_TargetLocked_ThrowsAndKeepsOldSave` ძველ კოდზეც გადიოდა; `Save`-ის ტოტი „tmp რჩება, როცა target აღარ არსებობს“ პირდაპირ ტესტით არ მოწმდება (იდეა: `campaign.json` სახელის საქაღალდე → `File.Move` ვარდება → tmp რჩება). 64 KB-ის ზუსტი ზღვარი (65536 / 65537) არ ტესტირდება.
+- nit (fix round 1 re-review): პირველი ჩაწერისას ნაწილობრივ ჩაწერილი tmp (მაგ. disk full) შემდეგ გაშვებაზე აღდგება და „damaged“ გაფრთხილებას აჩვენებს `NoSave`-ის ნაცვლად (უვნებელია; შესაძლო `tempWritten` flag).
+### ვიზუალურად შესამოწმებელი (Stage 3, USER task 51-ში გამოტოვებული)
+- ფრეს / გრძელი სტატუსი ზედა-მარცხნივ ერთ ხაზზე: `ფრე - მასალის ნაკლებობა  [DEBUG FEN]` (Debug Campaign Start Fen `7k/8/8/8/8/8/1q6/K7 w - - 0 1`, a1 → b2) — `HudPanel` 960 სიგანე (T50).
+- გარდაქმნის ფანჯრის ახალი პოზიცია (center (0, -90), y 350–910): ჩანს მთლიანად და მარცხენა სტატუსს/დახმარებას არ ფარავს (Start Fen `8/3P3k/8/8/8/8/8/K7 w - - 0 1`, TAB, d7 → d8).
+- 4:3 Aspect: ბრძოლის ზედა ზოლი, სტატუსი, შედეგის პანელი (840 სიგანე, ღილაკები 380) და რუკის სტატუსი/`მენიუში დაბრუნება` ეტევა და ერთმანეთს არ ფარავს.
+- (ინსტრუქცია: PROGRESS.md → `## Stage 3 — Done` → task 51, ნაბიჯები 5–7.)
+### Stage 3-ის გარეთ დარჩენილი (გადაწყვეტილება საჭიროა)
+- ენის არჩევა მენიუში (ქართული / English) — `TextTable.English` უკვე არსებობს; საჭიროა `Active`-ის არჩევა და შენახვა.
+- ქართული Bold ფაილი (`NotoSansGeorgian-Bold.ttf`) synthetic bold-ის ნაცვლად, თუ სათაურები საკმარისად მკვეთრი არ იქნება.
+
+## Blockers
+- (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
+- (მოგვარდა) USER task-ები 10, 12, 14, 16 მომხმარებელმა დაადასტურა 2026-10-25.
+- (მოგვარდა `de73a20`-ში) Game სკრიპტების `.meta` ფაილები.
+- (მოგვარდა `a16b924`-ში) `Assets/Scenes/MainScene.unity` და `Assets/Materials/**` დაკომიტებულია.
+
+## Run State
+- Stage: Stage 3 — ქართული ინტერფეისი
+- Finish-check this stage: done (2026-10-26: code-reviewer + security-auditor → 2 should-fix = task 47, 48; security nit (rich text) შედის 47-ში)
+- Fix rounds this stage: 1/2
+- Failed attempts: —
+- Stage start commit: f09c5fa
+- Stage closed: 2026-10-26 (Done; მომხმარებლის შენიშვნების task-ები 49–52 finish-check-ის შემდეგ, ცალკე reviewer-ის გარეშე)
+
+## Last Session
+- Date: 2026-10-26
+- Status: **Stage 3 — ქართული ინტერფეისი: Done** (მომხმარებელმა დახურა 2026-10-26). ყველა task (35–52) `[x]`, 0 ღია critical/should-fix. USER task 51 დადასტურდა (Setup ბრძანებები, რუკის ტექსტი, ღილაკები, დახმარების ხაზი); ფრეს სტატუსი ერთ ხაზზე, გარდაქმნის ფანჯრის ახალი პოზიცია და 4:3 დეტალურად არ შემოწმებულა → Backlog „ვიზუალურად შესამოწმებელი“. T52: კამერა Eye Height 7 / Back Offset 4 / Pitch 40 (მომხმარებლის შესწორება — T50-ში 4/7 შებრუნებით იყო; MainScene-ში 7/4/40 უკვე დაკომიტებული). Verification (ორკესტრატორი): `dotnet build Tests/ChessCore.Tests` 0/0, `dotnet test` 585/585, `GameCompileCheck` 0/0, `EditorCompileCheck` 0/0. STOCKFISH_PATH integration არ გაშვებულა. Stage 3-ის task-ები → `## Stage 3 — Done`. Next: შემდეგი stage — მომხმარებლის გადაწყვეტილება (Backlog); ბრენჩი `team/stage3-georgian-ui` → merge main-ში (USER).
+- Previous status (2026-10-26, T49–T50): **ელოდებოდა USER task 51-ს** (Setup ბრძანებების ხელახლა გაშვება + ვიზუალური შემოწმება). USER task-ები 45 და 46 მომხმარებელმა დაადასტურა (Unity-ის ფაილები `fe74d71`). მათი 5 შენიშვნა → T49 (რუკის სტატუსი `გათავისუფლებულია: N / 5. ...`, `3d70d4a`) და T50 (კამერა 7/4/40; ღილაკის label NoWrap + 24/4px padding; `LeaveButton` 400, `ResultPanel` 840 + ღილაკები 380, Quick Game ღილაკები 440, `InfoText` 1000; `HudPanel` 960; `HelpText` 28; `PromotionPanel` 90px ქვემოთ — `b8f77e8`). ზომები გაზომილია ფონტის asset-ის glyph advance-ებით (PROJECT.md Decision Log). Verification (ორკესტრატორი): `dotnet build Tests/ChessCore.Tests` 0/0, `dotnet test` 585/585, `GameCompileCheck` 0/0, `EditorCompileCheck` 0/0, G1/G2/G4 → 0. ცალკე reviewer არ გაშვებულა (მცირე, მომხმარებლის მიერ მითითებული ცვლილებები; diff ორკესტრატორმა გადახედა). Next: USER task 51 → შენიშვნები → `/auto continue`.
+- Previous status (2026-10-26, ადრე): **ელოდებოდა USER task-ებს 45, 46** (Unity-ში შემოწმება). agent task-ები 35–43 და finish-check-ის 47–48 `[x]`, USER 44 `[x]` (მომხმარებელი, `6d97068`). გეგმის ცვლილება მომხმარებლის მოთხოვნით: სარდლის ხედში მეფე არ იმალება — კამერა 3.0 / 1.6 / 30° (`66a313d`). finish-check: code-reviewer + security-auditor → 2 should-fix (TMP escape-ები `C:\nope\...`-ში; გარდაქმნის ფანჯარა იმავე press-ს იჭერდა) + 1 security nit (rich text) → fix round 1 (T47, T48) → re-review: ორივე resolved, ახალი მიგნება არ არის. Verification (tester): `dotnet build Tests/ChessCore.Tests` 0/0, `dotnet test` 585/585, `GameCompileCheck` 0/0 (UNITY_EDITOR-ითაც), `EditorCompileCheck` 0/0, G1/G2/G4 → სუფთა. STOCKFISH_PATH integration არ გაშვებულა. ბრენჩი `team/stage3-georgian-ui`. Next: USER task 45 → 46; შენიშვნები → `/auto continue`.
+- Previous status: **Stage 2 — Campaign: Done.** ყველა task (20–34) `[x]`, 0 ღია critical/should-fix. USER task-ები 28 და 29 მომხმარებელმა დაადასტურა 2026-10-26: რუკა (სათაური, ტექსტი), მოგება Kartli/Kakheti, Imereti UCI_Elo 1400, წაგება + Retry, ფრე, Stockfish not found → შედეგი არ ითვლება, Quick Game debug FEN-ს არ იყენებს, შენახვა Play-ებს შორის (მათ შორის `File.Replace` Unity Mono-ზე), დაზიანებული ფაილი → `campaign.corrupt.json` + გაფრთხილება, MainScene ცალკე Stage 1-ივით, `stockfish.exe` არ რჩება, Console = 0 შეცდომა. ხელახლა გენერირებული სცენები დაკომიტდა (MainScene-ში `startFen`, `debugCampaignStartFen`, `stockfishPathOverride` ცარიელია; მასალებში შინაარსობრივი ცვლილება არ იყო).
+- Done (ისტორია): Stage 2 — Campaign, agent task-ები 20–27 და finish-check-ის 30–32 `[x]` (ბრენჩი `team/stage2-campaign`). finish-check: code-reviewer + security-auditor → 3 should-fix (შენახვის ჩავარდნისას ორივე ასლის დაკარგვა, `Continue` დამალვა, რეგიონის label-ის ჩამოჭრა) → გასწორდა fix round 1-ში, re-review: სამივე მოგვარებულია, ახალი critical/should-fix არ არის. USER task 28 გავიდა (სცენები და `.meta`-ები დაკომიტდა `bc04739`-ში). მომხმარებლის შენიშვნებით: T33 — Editor-only `debugCampaignStartFen` (`startFen` ახლა მხოლოდ Mode None-ში), T34 — რუკის სათაური MapArea-ს ზემოთ, რეგიონის label Bold 22–28, ღილაკი 400×190; task 29-ის ინსტრუქცია თავიდან დაიწერა (მოგება/წაგება/ფრე debug FEN-ით).
+- Verification: `dotnet test Tests/ChessCore.Tests` 411/411; `dotnet build Tests/ChessCore.Tests`, `Tests/GameCompileCheck`, `Tests/EditorCompileCheck` — 0 warning / 0 error; legacy Input grep → 0; Campaign-ში UnityEngine/record/init → 0. STOCKFISH_PATH integration არ გაშვებულა.
+- Known issues / blockers: არცერთი. ვიზუალური წვრილმანები და nit-ები Backlog-შია. T33/T34 ცალკე reviewer-ით არ შემოწმებულა (diff ორკესტრატორმა გადახედა; Play-mode-ში USER task 29-მა დაადასტურა).
+- Next: Stage 3-ის არჩევა მომხმარებლის გადაწყვეტილებაა (Backlog → ფაზა 2 Art & Sound / ფაზა 3 Polish & FX / ვიზუალური წვრილმანები).
+- 2026-10-26 (plan): Stage 3 — ქართული ინტერფეისი დაიგეგმა (`/auto plan:`), ბრენჩი `team/stage3-georgian-ui`. task-ები 35–46 (agent 35–43, USER 44–46). გაგრძელება: `/auto continue` (task 35-იდან; USER task 44 შეიძლება ახლავე).
+
+## Stage 3 — Done
 <!-- ფორმატი: - [ ] N. Title — owner: task-executor | USER — files: ... — depends: ... — done when: ...
      task-executor = სუფთა C# (Campaign), Unity სკრიპტები (Game) და Editor სკრიპტები; USER = ფონტის ჩამოტვირთვა/TMP Essentials (44) და Play-mode შემოწმება Unity Editor-ში (45, 46; ინსტრუქცია task-ის ქვეშაა).
      API-ს, ველების სახელების, ტექსტების, განლაგების და ქცევის ერთადერთი წყარო: PROJECT.md → ## API Contract → „Stage 3 — ქართული ინტერფეისი“ (+ Decision Log 2026-10-26).
@@ -144,7 +221,8 @@ Stage 3 — ქართული ინტერფეისი
   - სხვა არაფერი იცვლება: ობიექტების სახელები, ველების მიბმა, სხვა პოზიციები, ფერები, log-ები, `CameraRig`-ის სხვა ველები/API/ფორმულა.
   - `dotnet build Tests/GameCompileCheck` 0/0; `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet test Tests/ChessCore.Tests` გადის; G1–G4 Game/Editor-ში → 0. `git status` — მხოლოდ ეს 4 ფაილი.
   - საბოლოო შემოწმება: USER task 51.
-- [ ] 51. USER: Setup ბრძანებების ხელახლა გაშვება და 5 შენიშვნის ვიზუალური შემოწმება — owner: USER — files: Assets/Scenes/*.unity (ცვლის Setup ბრძანება) — depends: 49, 50 — done when: ყველა ნაბიჯი გადის; Console = 0 წითელი და 0 `was not found in the`
+- [x] 52. (მომხმარებლის შესწორება 2026-10-26) Game + Editor: სარდლის კამერა Eye Height **7**, Back Offset **4**, Pitch 40 (T50-ში 4/7 შებრუნებით ჩაიწერა) — owner: task-executor — files: Assets/Scripts/Game/CameraRig.cs, Assets/Editor/ChessSceneSetup.cs — depends: 50 — done when: `CameraRig` ნაგულისხმევები `commanderEyeHeight` 7, `commanderBackOffset` 4, `commanderPitch` 40; Setup Chess Scene იგივეს წერს; სხვა არაფერი იცვლება; `GameCompileCheck` 0/0, `EditorCompileCheck` 0/0, `dotnet test` გადის. (MainScene-ში 7/4/40 უკვე სერიალიზებულია.)
+- [x] 51. (მომხმარებელმა დაადასტურა 2026-10-26: Setup ბრძანებები Done, რუკის ტექსტი `გათავისუფლებულია: N / 5`, ღილაკები და დახმარების ხაზი კარგად ჩანს. ნაბიჯები 5–7-ის დეტალური შემოწმება — ფრეს სტატუსი ერთ ხაზზე, გარდაქმნის ფანჯრის ახალი პოზიცია, 4:3 — გამოტოვებულია → Backlog „ვიზუალურად შესამოწმებელი“) USER: Setup ბრძანებების ხელახლა გაშვება და 5 შენიშვნის ვიზუალური შემოწმება — owner: USER — files: Assets/Scenes/*.unity (ცვლის Setup ბრძანება) — depends: 49, 50 — done when: ყველა ნაბიჯი გადის; Console = 0 წითელი და 0 `was not found in the`
     1. Unity → დაელოდე კომპილაციას → Console → **Clear**. **Tools → Setup Chess Scene** → `[ChessSceneSetup] Done.` (`WITH ERRORS`-ის გარეშე). შემდეგ **Tools → Setup Campaign Scenes** → `[CampaignScenesSetup] Done.`
     2. **კამერა:** Project → `Assets/Scenes/MainScene` (ორჯერ) → Hierarchy → `Main Camera` → **Camera Rig**: Commander Back Offset = **7**, Commander Eye Height = **4**, Commander Pitch = **40**. გახსენი `Assets/Scenes/MainMenu`.
     3. **Play** → `ახალი კამპანია`-ს **არ** დააჭირო. `სწრაფი თამაში` → ოთხივე ღილაკის ტექსტი ღილაკის შიგნითაა, ერთ ხაზზე; `სირთულე`-ს რამდენჯერმე დააჭირე (`საშუალო`, `რთული`, `ოსტატი`, `მარტივი`) — ყოველთვის ეტევა. `დაწყება`.
@@ -154,75 +232,11 @@ Stage 3 — ქართული ინტერფეისი
     7. **გარდაქმნის ფანჯარა (ახალი პოზიცია):** MainScene → **Debug Campaign Start Fen** გაასუფთავე; **Start Fen** = `8/3P3k/8/8/8/8/8/K7 w - - 0 1` → **Ctrl+S** → MainScene-ში **Play** → TAB → d7 → d8 → ფანჯარა ჩანს ცენტრიდან ოდნავ ქვემოთ და მარცხენა სტატუსს/დახმარებას არ ფარავს; `ლაზიერი` → d8-ზე ლაზიერი. გააჩერე Play. **Start Fen** გაასუფთავე → **Ctrl+S**.
     8. Console: 0 წითელი, არცერთი `was not found in the`. უთხარი გუნდს, რომ დაკომიტდეს `Assets/Scenes/*.unity` (და ახალი `.meta`, თუ გაჩნდა). თუ რამე არ ეტევა — screenshot.
 
-## Shared files
+### Stage 3-ის Shared files შენიშვნა (არქივი)
 <!-- ფაილები, რომლებიც რამდენიმე task-ის files-ში შეიძლება იყოს (shared). წესი: მხოლოდ დამატება (ახალი dependency, ტიპი, route), სხვისი ჩანაწერის შეცვლა ან წაშლა არა; ერთ საერთო ფაილზე ორი task ერთდროულად არ მუშაობს. -->
 - Stage 3-ში არცერთი: ყოველ ფაილს ერთი task ეკუთვნის. `TextId.cs` / `TextTable*.cs` / `GameText.cs` — მხოლოდ 35 (ახალი ტექსტი სჭირდება? → ჯერ API Contract-ის ცხრილის განახლება და ცალკე task); asmdef-ები და compile-check csproj-ები — მხოლოდ 37; `GameController.cs` — მხოლოდ 40; `ChessSceneSetup.cs` — მხოლოდ 42; `CampaignScenesSetup.cs` — მხოლოდ 43. ახალი NuGet/Unity package არცერთ task-ს არ სჭირდება.
 - რიგი (რეკომენდებული — თანმიმდევრული, რადგან `GameCompileCheck`/`EditorCompileCheck` მთელ Game/Editor საქაღალდეს აკომპილირებს და პარალელური ნახევრად დასრულებული ცვლილება სხვის build-ს ჩააგდებს): 35 → 36 → 37 → 38 → 39 → 40 → 41 → 42 → 43 → USER 45 → USER 46. task 37 შეიძლება 35/36-ის პარალელურად. USER 44 — შესრულებულია (`6d97068`).
 - აგენტი არ ცვლის: `Assets/Scenes/*.unity`, `ProjectSettings/**`, `Assets/Fonts/**`, `Assets/TextMesh Pro/**`, `.meta` ფაილებს — მათ ქმნის/ცვლის USER ან USER-ის მიერ გაშვებული Editor ბრძანება (44, 45, 46).
-
-## Backlog (needs user decision)
-### ფაზა 2 — Art & Sound (კონცეფციით ~1.5 თვე)
-- ქართული ისტორიული 3D მოდელები primitive-ების ნაცვლად (მეფე, ლაზიერი/მთავარსარდალი, ეტლი/კოშკი, მხედარი/აბჯროსანი ცხენოსანი, ოფიცერი/ეპისკოპოსი, პაიკი/მებრძოლი).
-- კამპანიის რუკის ნამდვილი art (Stage 2-ში სქემატური ღილაკებია); რეგიონების ეპოქების საბოლოო ტექსტი.
-- ხმოვანი ბრძანებები („ლაზიერი c5-ზე, შეტევაზე!“), ჯარისკაცების პასუხები, აუდიო მენეჯერი კოორდინატების მიხედვით.
-- კუთხური დიალექტები (ხევსურული, კახური, სვანური).
-- გარემოები: კახეთი (ალაზნის ველი, ქვევრები, გალავანი), სვანეთი (თოვლი, კოშკები); ველის ტიპები (ქვიშა, ბალახი, თოვლი).
-### ფაზა 3 — Polish & FX (კონცეფციით ~1 თვე)
-- მოკვლის კინემატოგრაფიული სცენები (Fatal Captures, 2–3 წამი).
-- განათება და post-processing.
-- ბალანსის ტესტირება, სირთულის Elo-ს გაზომვა (მათ შორის `AIDifficulty.FromElo`-ს ზოლები და რეგიონების Elo).
-- სარდლის ხედში ხელები/აბჯარი.
-### გადადებული (Stage 1-დან)
-- Mac/Linux Stockfish და პლატფორმის ავტომატური არჩევა; build-ის/installer-ის მომზადება; Stockfish-ის build-ში გავრცელება + GPLv3 compliance.
-- სვლის ანიმაცია, მოჭრილი ფიგურების ჩვენება, ბოლო სვლის და შახის (წითელი) განათება.
-- Undo, PGN export/import, საათები/დროის კონტროლი, დანებება, ფრეს შეთავაზება, claim-ის რეჟიმი (50/3-ჯერადი), 75 სვლის / 5-ჯერადი წესები.
-- კამერის orbit/zoom მარჯვენა ღილაკით; hot-seat-ში კამერის მობრუნება მოთამაშის მიხედვით.
-- Stockfish full-strength preset.
-- Unity Test Framework / Play-mode ავტომატური ტესტები.
-- nit (finish-check, security): `StockfishAI.GetBestMoveAsync` engine-ს უგზავნის შემოსულ `fen`-ს და არა `state.ToFen()`-ს (ნორმალიზებული); `ProcessUciTransport.SendLine` არ უარყოფს `\r`/`\n`-ს. რეალური ზიანი არ არის (Game ყოველთვის `ToFen()`-ს აგზავნის).
-- nit (finish-check, security): `StockfishAI`/`ProcessUciTransport` — `Path.GetFullPath` ერთხელ, რომ `File.Exists` და გაშვება ერთსა და იმავე ფაილს ეხებოდეს (მხოლოდ inspector-ის override-ზე).
-- nit (finish-check): `StockfishAI` timeout-ები ყოველ ხაზზეა და არა მთელ ლოდინზე (engine, რომელიც მუდმივად `info`-ს ბეჭდავს, timeout-ს ვერ მიიღებს; preset-ებს არ ეხება) — deadline ერთხელ.
-- nit (finish-check): `StockfishAI` — `GetBestMoveAsync`-ის ct shared init-ის დროს არ მოწმდება (გაუქმება init-ის დასრულებამდე ჩერდება); Game-ს არ ეხება.
-- nit (finish-check): `StockfishAITests.GetBestMove_Cancel_DiscardsStaleBestmove...` იყენებს SearchTimeout 500 ms-ს — დატვირთვისას შეიძლება flaky იყოს; 30 s.
-- nit (fix round 1 re-review): `GameController.StopAi` არ იძახებს `UpdateHud()`/`UpdateInteractable()`-ს — inspector-ში კომპონენტის disable/enable AI-ის ფიქრისას ტოვებს „AI thinking...“-ს და დაბლოკილ input-ს R-მდე (მხოლოდ Editor-ის debug სცენარი).
-- nit (fix round 1 re-review): domain reload-ის შემდეგ AI ჩუმად ქრება (hot-seat) — HUD-ზე შენიშვნა არ ჩანს (მაგ. `Scripts reloaded. Human vs human mode.`).
-- nit: README.md არ არსებობს — გაშვების ინსტრუქცია ახლა CLAUDE.md-ის Commands-სა და PROGRESS.md-ის USER task-ებშია.
-- nit: `EnsureNonEmptyCompile` target-ის მოშორება `Tests/ChessCore.Build` და `Tests/ChessAI.Build` csproj-ებიდან, როცა Core-სა და AI-ში რეალური `.cs` ფაილებია (ცარიელი Compile set-ის დროს SDK `TargetFrameworkAttribute`-ს არ აგენერირებს).
-### Stage 2-ის გარეთ დარჩენილი (გადაწყვეტილება საჭიროა)
-- `SquarePicker` არ ამოწმებს, UI-ზე ხომ არ არის მაუსი (`EventSystem.IsPointerOverGameObject`) — `Back to map`-ზე დაჭერა დაფაზეც „დააჭერს“ (სცენა მაშინვე იცვლება, ზიანი არ არის). (Stage 3: გარდაქმნის ფანჯარას არ ეხება — `SquarePicker` press-ზე ირჩევს, ღილაკი release-ზე, ფანჯრის ღიაობისას click იგნორირდება; იხ. PROJECT.md Decision Log 2026-10-26.)
-- ფერის არჩევა კამპანიაში; რამდენიმე save slot; კამპანიის დასრულების ეკრანი.
-- nit (finish-check Stage 2, ორივე reviewer): `CampaignSaveStore.Load` — თუ ფაილი გაშვებისას სხვა პროცესს უჭირავს, წაკითხვაც და backup-ის გადატანაც ჩავარდება (ჩუმად), გაფრთხილება მაინც წერს „It was kept as campaign.corrupt.json“, ხოლო შემდეგი `New Campaign` (დადასტურების გარეშე, რადგან `Campaign == null`) ვალიდურ ფაილს გადააწერს. გამოსწორება: `TryBackUpCorruptFile` → bool; ჩავარდნისას სხვა გაფრთხილება / ჩაწერის დაბლოკვა. ძალიან იშვიათია.
-- nit (finish-check Stage 2): `CampaignMapController.Start` — `regionButtons == null`-ზე ბრუნდება `backButton`-ის მიბმამდე (მხოლოდ არასწორად აწყობილ სცენაზე).
-- nit (finish-check Stage 2, შესამოწმებელი): `InputSystemUIInputModule.AssignDefaultActions()` Editor-ში ქმნის არამუდმივ actions asset-ს — სცენის ფაილში reference შეიძლება null იყოს; runtime-ზე `OnEnable` აღადგენს. USER task 28-ის შემდეგ სცენის ფაილი გადასახედია.
-- nit (fix round 1 re-review): `Save_TargetLocked_ThrowsAndKeepsOldSave` ძველ კოდზეც გადიოდა; `Save`-ის ტოტი „tmp რჩება, როცა target აღარ არსებობს“ პირდაპირ ტესტით არ მოწმდება (იდეა: `campaign.json` სახელის საქაღალდე → `File.Move` ვარდება → tmp რჩება). 64 KB-ის ზუსტი ზღვარი (65536 / 65537) არ ტესტირდება.
-- nit (fix round 1 re-review): პირველი ჩაწერისას ნაწილობრივ ჩაწერილი tmp (მაგ. disk full) შემდეგ გაშვებაზე აღდგება და „damaged“ გაფრთხილებას აჩვენებს `NoSave`-ის ნაცვლად (უვნებელია; შესაძლო `tempWritten` flag).
-### Stage 3-ის გარეთ დარჩენილი (გადაწყვეტილება საჭიროა)
-- ენის არჩევა მენიუში (ქართული / English) — `TextTable.English` უკვე არსებობს; საჭიროა `Active`-ის არჩევა და შენახვა.
-- ქართული Bold ფაილი (`NotoSansGeorgian-Bold.ttf`) synthetic bold-ის ნაცვლად, თუ სათაურები საკმარისად მკვეთრი არ იქნება.
-
-## Blockers
-- (მოგვარდა `0387781`-ში) dotnet build/test-ის ნებართვები `.claude/settings.json`-ში.
-- (მოგვარდა) USER task-ები 10, 12, 14, 16 მომხმარებელმა დაადასტურა 2026-10-25.
-- (მოგვარდა `de73a20`-ში) Game სკრიპტების `.meta` ფაილები.
-- (მოგვარდა `a16b924`-ში) `Assets/Scenes/MainScene.unity` და `Assets/Materials/**` დაკომიტებულია.
-
-## Run State
-- Stage: Stage 3 — ქართული ინტერფეისი
-- Finish-check this stage: done (2026-10-26: code-reviewer + security-auditor → 2 should-fix = task 47, 48; security nit (rich text) შედის 47-ში)
-- Fix rounds this stage: 1/2
-- Failed attempts: —
-- Stage start commit: f09c5fa
-
-## Last Session
-- Date: 2026-10-26
-- Status: **Stage 3 — ქართული ინტერფეისი: Not done — ელოდება USER task 51-ს** (Setup ბრძანებების ხელახლა გაშვება + ვიზუალური შემოწმება). USER task-ები 45 და 46 მომხმარებელმა დაადასტურა (Unity-ის ფაილები `fe74d71`). მათი 5 შენიშვნა → T49 (რუკის სტატუსი `გათავისუფლებულია: N / 5. ...`, `3d70d4a`) და T50 (კამერა 7/4/40; ღილაკის label NoWrap + 24/4px padding; `LeaveButton` 400, `ResultPanel` 840 + ღილაკები 380, Quick Game ღილაკები 440, `InfoText` 1000; `HudPanel` 960; `HelpText` 28; `PromotionPanel` 90px ქვემოთ — `b8f77e8`). ზომები გაზომილია ფონტის asset-ის glyph advance-ებით (PROJECT.md Decision Log). Verification (ორკესტრატორი): `dotnet build Tests/ChessCore.Tests` 0/0, `dotnet test` 585/585, `GameCompileCheck` 0/0, `EditorCompileCheck` 0/0, G1/G2/G4 → 0. ცალკე reviewer არ გაშვებულა (მცირე, მომხმარებლის მიერ მითითებული ცვლილებები; diff ორკესტრატორმა გადახედა). Next: USER task 51 → შენიშვნები → `/auto continue`.
-- Previous status (2026-10-26, ადრე): **ელოდებოდა USER task-ებს 45, 46** (Unity-ში შემოწმება). agent task-ები 35–43 და finish-check-ის 47–48 `[x]`, USER 44 `[x]` (მომხმარებელი, `6d97068`). გეგმის ცვლილება მომხმარებლის მოთხოვნით: სარდლის ხედში მეფე არ იმალება — კამერა 3.0 / 1.6 / 30° (`66a313d`). finish-check: code-reviewer + security-auditor → 2 should-fix (TMP escape-ები `C:\nope\...`-ში; გარდაქმნის ფანჯარა იმავე press-ს იჭერდა) + 1 security nit (rich text) → fix round 1 (T47, T48) → re-review: ორივე resolved, ახალი მიგნება არ არის. Verification (tester): `dotnet build Tests/ChessCore.Tests` 0/0, `dotnet test` 585/585, `GameCompileCheck` 0/0 (UNITY_EDITOR-ითაც), `EditorCompileCheck` 0/0, G1/G2/G4 → სუფთა. STOCKFISH_PATH integration არ გაშვებულა. ბრენჩი `team/stage3-georgian-ui`. Next: USER task 45 → 46; შენიშვნები → `/auto continue`.
-- Previous status: **Stage 2 — Campaign: Done.** ყველა task (20–34) `[x]`, 0 ღია critical/should-fix. USER task-ები 28 და 29 მომხმარებელმა დაადასტურა 2026-10-26: რუკა (სათაური, ტექსტი), მოგება Kartli/Kakheti, Imereti UCI_Elo 1400, წაგება + Retry, ფრე, Stockfish not found → შედეგი არ ითვლება, Quick Game debug FEN-ს არ იყენებს, შენახვა Play-ებს შორის (მათ შორის `File.Replace` Unity Mono-ზე), დაზიანებული ფაილი → `campaign.corrupt.json` + გაფრთხილება, MainScene ცალკე Stage 1-ივით, `stockfish.exe` არ რჩება, Console = 0 შეცდომა. ხელახლა გენერირებული სცენები დაკომიტდა (MainScene-ში `startFen`, `debugCampaignStartFen`, `stockfishPathOverride` ცარიელია; მასალებში შინაარსობრივი ცვლილება არ იყო).
-- Done (ისტორია): Stage 2 — Campaign, agent task-ები 20–27 და finish-check-ის 30–32 `[x]` (ბრენჩი `team/stage2-campaign`). finish-check: code-reviewer + security-auditor → 3 should-fix (შენახვის ჩავარდნისას ორივე ასლის დაკარგვა, `Continue` დამალვა, რეგიონის label-ის ჩამოჭრა) → გასწორდა fix round 1-ში, re-review: სამივე მოგვარებულია, ახალი critical/should-fix არ არის. USER task 28 გავიდა (სცენები და `.meta`-ები დაკომიტდა `bc04739`-ში). მომხმარებლის შენიშვნებით: T33 — Editor-only `debugCampaignStartFen` (`startFen` ახლა მხოლოდ Mode None-ში), T34 — რუკის სათაური MapArea-ს ზემოთ, რეგიონის label Bold 22–28, ღილაკი 400×190; task 29-ის ინსტრუქცია თავიდან დაიწერა (მოგება/წაგება/ფრე debug FEN-ით).
-- Verification: `dotnet test Tests/ChessCore.Tests` 411/411; `dotnet build Tests/ChessCore.Tests`, `Tests/GameCompileCheck`, `Tests/EditorCompileCheck` — 0 warning / 0 error; legacy Input grep → 0; Campaign-ში UnityEngine/record/init → 0. STOCKFISH_PATH integration არ გაშვებულა.
-- Known issues / blockers: არცერთი. ვიზუალური წვრილმანები და nit-ები Backlog-შია. T33/T34 ცალკე reviewer-ით არ შემოწმებულა (diff ორკესტრატორმა გადახედა; Play-mode-ში USER task 29-მა დაადასტურა).
-- Next: Stage 3-ის არჩევა მომხმარებლის გადაწყვეტილებაა (Backlog → ფაზა 2 Art & Sound / ფაზა 3 Polish & FX / ვიზუალური წვრილმანები).
-- 2026-10-26 (plan): Stage 3 — ქართული ინტერფეისი დაიგეგმა (`/auto plan:`), ბრენჩი `team/stage3-georgian-ui`. task-ები 35–46 (agent 35–43, USER 44–46). გაგრძელება: `/auto continue` (task 35-იდან; USER task 44 შეიძლება ახლავე).
 
 ## Stage 2 — Done
 <!-- ფორმატი: - [ ] N. Title — owner: task-executor | USER — files: ... — depends: ... — done when: ...
