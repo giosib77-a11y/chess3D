@@ -54,7 +54,7 @@ Stage 3 — ქართული ინტერფეისი
   - მთელ `Assets/Scripts/Game`-ში: G1, G3, G4 → 0; G2 → 0 (Game-ში ქართული ასო არ არის).
   - საბოლოო შემოწმება: USER task 46.
 
-- [ ] 41. Editor: `EditorUi` (საერთო TMP builder-ები) და **Tools → Setup Georgian Font** — owner: task-executor — files: Assets/Editor/EditorUi.cs, Assets/Editor/GeorgianFontSetup.cs — depends: 35, 37 — done when:
+- [x] 41. Editor: `EditorUi` (საერთო TMP builder-ები) და **Tools → Setup Georgian Font** — owner: task-executor — files: Assets/Editor/EditorUi.cs, Assets/Editor/GeorgianFontSetup.cs — depends: 35, 37 — done when:
   - ზუსტად API Contract → Stage 3 → „Editor — Stage 3“: `GeorgianFontSetup` (const-ები, MenuItem, `Ensure(out bool charactersMissing)`, ნაბიჯები 1–6, log-ების ზუსტი ტექსტები, Dynamic → `TryAddCharacters(TextTable.AtlasCharacters)` → Static, atlas და material `AddObjectToAsset`-ით, fallback `LiberationSans SDF`, არსებული asset არ იცვლება) და `EditorUi` (Placement-ები, ფერები, `NewCanvas` Expand-ით, `MakeText`/`MakeButton` TMP-ით და auto-size-ით, `EnsureEventSystem`, `DeleteRoots`; `enableWordWrapping` არ გამოიყენება).
   - `ChessSceneSetup.cs` და `CampaignScenesSetup.cs` ამ task-ში არ იცვლება (ისინი ჯერ ძველ helper-ებს იყენებს; task 42/43).
   - `dotnet build Tests/EditorCompileCheck` → 0 შეცდომა, 0 warning; `dotnet build Tests/GameCompileCheck` 0/0; `dotnet test` გადის. ამ 2 ფაილში G2, G3, G4 → 0 (log-ები ინგლისურად).
