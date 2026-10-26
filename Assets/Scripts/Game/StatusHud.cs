@@ -1,51 +1,35 @@
+using TMPro;
 using UnityEngine;
 
 namespace Chess.Game
 {
-    /// <summary>Top-left OnGUI text: status line, optional error line, help line.</summary>
+    /// <summary>Status and error lines shown in TMP objects of the HUD canvas.</summary>
     public class StatusHud : MonoBehaviour
     {
-        private const string HelpText = "Click: select/move  TAB: view  R: restart";
+        [SerializeField] private TMP_Text statusText;
+        [SerializeField] private TMP_Text errorText;
 
-        private string _status = "";
-        private string _error = "";
-        private GUIStyle _statusStyle;
-        private GUIStyle _errorStyle;
-        private GUIStyle _helpStyle;
+        private void Awake()
+        {
+            if (statusText == null)
+                Debug.LogError("[StatusHud] 'statusText' is not assigned.", this);
+            if (errorText == null)
+                Debug.LogError("[StatusHud] 'errorText' is not assigned.", this);
+            else
+                errorText.gameObject.SetActive(false);
+        }
 
         public void Show(string status, string error)
         {
-            _status = status ?? "";
-            _error = error ?? "";
-        }
+            if (statusText != null)
+                statusText.text = status ?? "";
 
-        private void OnGUI()
-        {
-            // GUI.skin is only valid inside OnGUI, so styles are built lazily here.
-            if (_statusStyle == null)
+            if (errorText != null)
             {
-                _statusStyle = CreateStyle(20, Color.white);
-                _errorStyle = CreateStyle(18, new Color(1f, 0.85f, 0.2f));
-                _helpStyle = CreateStyle(16, new Color(0.85f, 0.85f, 0.85f));
+                string value = error ?? "";
+                errorText.text = value;
+                errorText.gameObject.SetActive(value.Length > 0);
             }
-
-            float width = Screen.width - 20f;
-            float y = 10f;
-            GUI.Label(new Rect(10f, y, width, 28f), _status, _statusStyle);
-            y += 28f;
-            if (!string.IsNullOrEmpty(_error))
-            {
-                GUI.Label(new Rect(10f, y, width, 26f), _error, _errorStyle);
-                y += 26f;
-            }
-            GUI.Label(new Rect(10f, y, width, 24f), HelpText, _helpStyle);
-        }
-
-        private static GUIStyle CreateStyle(int fontSize, Color color)
-        {
-            var style = new GUIStyle(GUI.skin.label) { fontSize = fontSize, fontStyle = FontStyle.Bold };
-            style.normal.textColor = color;
-            return style;
         }
     }
 }

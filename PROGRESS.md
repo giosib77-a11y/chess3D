@@ -41,7 +41,7 @@ Stage 3 — ქართული ინტერფეისი
   - ამ 5 ფაილში: G1, G2, G3, G4 → 0; UI სტრიქონის literal არ არის (მხოლოდ log-ები).
   - საბოლოო შემოწმება: USER task 45.
 
-- [ ] 39. Game: `StatusHud` და `PromotionPrompt` — OnGUI → uGUI/TMP — owner: task-executor — files: Assets/Scripts/Game/StatusHud.cs, Assets/Scripts/Game/PromotionPrompt.cs — depends: 35, 37 — done when:
+- [x] 39. Game: `StatusHud` და `PromotionPrompt` — OnGUI → uGUI/TMP — owner: task-executor — files: Assets/Scripts/Game/StatusHud.cs, Assets/Scripts/Game/PromotionPrompt.cs — depends: 35, 37 — done when:
   - ზუსტად API Contract → Stage 3 → Chess.Game ცხრილის `StatusHud` და `PromotionPrompt` სტრიქონები: ახალი Inspector ველები (`statusText`, `errorText`; `panel`, `titleText`, `queenButton`, `rookButton`, `bishopButton`, `knightButton`, `cancelButton`), public API უცვლელი (`Show`, `IsOpen`, `LastClosedFrame`, `Open`), Esc = Cancel, `IsOpen = false` callback-მდე, `panel == null`-ზე `Open` → LogError + `onCancelled` (ფიგურა ჩუმად არ ირჩევა), `Close`-ში `EventSystem.current?.SetSelectedGameObject(null)`, listener-ები `Awake`/`OnDestroy`-ში, null ველზე NRE არა.
   - `SelectionController.cs` არ შეცვლილა (press/release-ის წესი — PROJECT.md Decision Log „HUD და გარდაქმნა uGUI-ზე“).
   - `dotnet build Tests/GameCompileCheck` 0/0; `dotnet build Tests/EditorCompileCheck` 0/0; `dotnet test` გადის. `OnGUI|\bGUI\.|GUIStyle|GUILayout` მთელ `Assets/Scripts/Game`-ში → 0; ამ ორ ფაილში G1, G2, G3, G4 → 0.

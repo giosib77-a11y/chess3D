@@ -1,19 +1,25 @@
 using System;
+using Chess.Campaign;
 using Chess.Core;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace Chess.Game
 {
-    /// <summary>Small OnGUI window for choosing the promotion piece; Esc cancels.</summary>
+    /// <summary>uGUI panel for choosing the promotion piece; Esc cancels.</summary>
     public class PromotionPrompt : MonoBehaviour
     {
-        private static readonly PieceType[] Choices =
-        {
-            PieceType.Queen, PieceType.Rook, PieceType.Bishop, PieceType.Knight
-        };
+        [SerializeField] private GameObject panel;
+        [SerializeField] private TMP_Text titleText;
+        [SerializeField] private Button queenButton;
+        [SerializeField] private Button rookButton;
+        [SerializeField] private Button bishopButton;
+        [SerializeField] private Button knightButton;
+        [SerializeField] private Button cancelButton;
 
-        private Side _side;
         private Action<PieceType> _onChosen;
         private Action _onCancelled;
 
@@ -22,11 +28,57 @@ namespace Chess.Game
         /// <summary>Frame in which the prompt was last closed; lets callers ignore the click that closed it.</summary>
         public int LastClosedFrame { get; private set; } = -1;
 
+        private void Awake()
+        {
+            if (panel == null) Debug.LogError("[PromotionPrompt] 'panel' is not assigned.", this);
+            if (titleText == null) Debug.LogError("[PromotionPrompt] 'titleText' is not assigned.", this);
+            Hook(queenButton, "queenButton", OnQueen);
+            Hook(rookButton, "rookButton", OnRook);
+            Hook(bishopButton, "bishopButton", OnBishop);
+            Hook(knightButton, "knightButton", OnKnight);
+            Hook(cancelButton, "cancelButton", Cancel);
+
+            if (panel != null)
+                panel.SetActive(false);
+        }
+
+        private void OnDestroy()
+        {
+            Unhook(queenButton, OnQueen);
+            Unhook(rookButton, OnRook);
+            Unhook(bishopButton, OnBishop);
+            Unhook(knightButton, OnKnight);
+            Unhook(cancelButton, Cancel);
+        }
+
+        private void Hook(Button button, string field, UnityEngine.Events.UnityAction action)
+        {
+            if (button == null)
+                Debug.LogError("[PromotionPrompt] '" + field + "' is not assigned.", this);
+            else
+                button.onClick.AddListener(action);
+        }
+
+        private static void Unhook(Button button, UnityEngine.Events.UnityAction action)
+        {
+            if (button != null)
+                button.onClick.RemoveListener(action);
+        }
+
         public void Open(Side side, Action<PieceType> onChosen, Action onCancelled)
         {
-            _side = side;
+            if (panel == null)
+            {
+                Debug.LogError("[PromotionPrompt] Cannot open: 'panel' is not assigned.", this);
+                onCancelled?.Invoke();
+                return;
+            }
+
             _onChosen = onChosen;
             _onCancelled = onCancelled;
+            if (titleText != null)
+                titleText.text = GameText.PromotionTitle(side);
+            panel.SetActive(true);
             IsOpen = true;
         }
 
@@ -36,32 +88,15 @@ namespace Chess.Game
                 Cancel();
         }
 
-        private void OnGUI()
-        {
-            if (!IsOpen)
-                return;
-
-            const float width = 220f;
-            const float height = 230f;
-            Rect rect = new Rect((Screen.width - width) / 2f, (Screen.height - height) / 2f, width, height);
-            GUI.Box(rect, "Promote pawn (" + _side + ")");
-
-            float y = rect.y + 30f;
-            foreach (PieceType type in Choices)
-            {
-                if (GUI.Button(new Rect(rect.x + 10f, y, width - 20f, 30f), type.ToString()))
-                {
-                    Choose(type);
-                    return;
-                }
-                y += 36f;
-            }
-            if (GUI.Button(new Rect(rect.x + 10f, y, width - 20f, 30f), "Cancel"))
-                Cancel();
-        }
+        private void OnQueen() { Choose(PieceType.Queen); }
+        private void OnRook() { Choose(PieceType.Rook); }
+        private void OnBishop() { Choose(PieceType.Bishop); }
+        private void OnKnight() { Choose(PieceType.Knight); }
 
         private void Choose(PieceType type)
         {
+            if (!IsOpen)
+                return;
             Action<PieceType> callback = _onChosen;
             Close();
             callback?.Invoke(type);
@@ -69,6 +104,8 @@ namespace Chess.Game
 
         private void Cancel()
         {
+            if (!IsOpen)
+                return;
             Action callback = _onCancelled;
             Close();
             callback?.Invoke();
@@ -81,6 +118,11 @@ namespace Chess.Game
             LastClosedFrame = Time.frameCount;
             _onChosen = null;
             _onCancelled = null;
+            if (panel != null)
+                panel.SetActive(false);
+            EventSystem es = EventSystem.current;
+            if (es != null)
+                es.SetSelectedGameObject(null);
         }
     }
 }
