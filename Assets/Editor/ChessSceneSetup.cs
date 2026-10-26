@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using Chess.AI;
+using Chess.Campaign;
 using Chess.Core;
 using Chess.Game;
+using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Chess.Editor
 {
@@ -43,9 +46,16 @@ namespace Chess.Editor
                 return;
             }
 
+            TMP_FontAsset font = GeorgianFontSetup.Ensure(out bool fontCharactersMissing);
+            if (font == null)
+            {
+                Debug.LogError(Tag + "Georgian font is not ready, nothing was changed.");
+                return;
+            }
+
             Created.Clear();
             Updated.Clear();
-            failed = false;
+            failed = fontCharactersMissing;
 
             Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
@@ -69,6 +79,17 @@ namespace Chess.Editor
             SelectionController selection = EnsureComponent<SelectionController>(root, "SelectionController");
             StatusHud hud = EnsureComponent<StatusHud>(root, "StatusHud");
             GameController game = EnsureComponent<GameController>(root, "GameController");
+
+            using (var so = new SerializedObject(rig))
+            {
+                SetFloatProp(so, "commanderEyeHeight", 3.0f);
+                SetFloatProp(so, "commanderBackOffset", 1.6f);
+                SetFloatProp(so, "commanderPitch", 30f);
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            EditorUi.EnsureEventSystem(Created);
+            BuildHudCanvas(font, hud, prompt);
 
             using (var so = new SerializedObject(board))
             {
@@ -117,6 +138,9 @@ namespace Chess.Editor
             EditorUtility.SetDirty(picker);
             EditorUtility.SetDirty(selection);
             EditorUtility.SetDirty(game);
+            EditorUtility.SetDirty(rig);
+            EditorUtility.SetDirty(hud);
+            EditorUtility.SetDirty(prompt);
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -127,6 +151,67 @@ namespace Chess.Editor
                 + "Updated: " + (Updated.Count == 0 ? "-" : string.Join(", ", Updated)) + ";\n"
                 + "Removed missing scripts: " + removed;
             Debug.Log(msg);
+        }
+
+        private static void BuildHudCanvas(TMP_FontAsset font, StatusHud hud, PromotionPrompt prompt)
+        {
+            EditorUi.DeleteRoots("HudCanvas", Updated);
+            GameObject canvas = EditorUi.NewCanvas("HudCanvas", 20);
+            Created.Add("HudCanvas");
+
+            // HUD: no raycast-blocking graphic, so board clicks pass through.
+            GameObject hudPanel = EditorUi.NewRect("HudPanel", canvas.transform,
+                EditorUi.TopLeft(new Vector2(24f, -110f), new Vector2(680f, 220f)));
+            var layout = hudPanel.AddComponent<VerticalLayoutGroup>();
+            layout.spacing = 6f;
+            layout.childAlignment = TextAnchor.UpperLeft;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+
+            var line = new Vector2(680f, 40f);
+            TextMeshProUGUI status = EditorUi.MakeText("StatusText", hudPanel.transform, font, "", 30f,
+                EditorUi.TopLeft(Vector2.zero, line), TextAlignmentOptions.TopLeft, Color.white, true);
+            TextMeshProUGUI error = EditorUi.MakeText("ErrorText", hudPanel.transform, font, "", 24f,
+                EditorUi.TopLeft(Vector2.zero, line), TextAlignmentOptions.TopLeft, EditorUi.ErrorColor);
+            error.gameObject.SetActive(false);
+            EditorUi.MakeText("HelpText", hudPanel.transform, font, GameText.HelpLine, 22f,
+                EditorUi.TopLeft(Vector2.zero, line), TextAlignmentOptions.TopLeft, EditorUi.HelpColor);
+
+            GameObject promo = EditorUi.NewPanel("PromotionPanel", canvas.transform, new Vector2(480f, 560f));
+            TextMeshProUGUI title = EditorUi.MakeText("TitleText", promo.transform, font, GameText.PromotionTitle(Side.White), 32f,
+                EditorUi.Center(new Vector2(0f, 220f), new Vector2(440f, 60f)), TextAlignmentOptions.Center, Color.white, true, 24f);
+            Button queen = PromoButton(promo, font, "QueenButton", GameText.PieceName(PieceType.Queen), 130f);
+            Button rook = PromoButton(promo, font, "RookButton", GameText.PieceName(PieceType.Rook), 50f);
+            Button bishop = PromoButton(promo, font, "BishopButton", GameText.PieceName(PieceType.Bishop), -30f);
+            Button knight = PromoButton(promo, font, "KnightButton", GameText.PieceName(PieceType.Knight), -110f);
+            Button cancel = PromoButton(promo, font, "CancelButton", TextTable.Active.Get(TextId.Cancel), -200f);
+            promo.SetActive(false);
+
+            using (var so = new SerializedObject(hud))
+            {
+                SetRef(so, "statusText", status);
+                SetRef(so, "errorText", error);
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
+            using (var so = new SerializedObject(prompt))
+            {
+                SetRef(so, "panel", promo);
+                SetRef(so, "titleText", title);
+                SetRef(so, "queenButton", queen);
+                SetRef(so, "rookButton", rook);
+                SetRef(so, "bishopButton", bishop);
+                SetRef(so, "knightButton", knight);
+                SetRef(so, "cancelButton", cancel);
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        private static Button PromoButton(GameObject parent, TMP_FontAsset font, string name, string label, float y)
+        {
+            return EditorUi.MakeButton(name, parent.transform, font, label,
+                EditorUi.Center(new Vector2(0f, y), new Vector2(400f, 70f)), 30f, out TMP_Text _);
         }
 
         private static void EnsureFolder()
@@ -265,6 +350,12 @@ namespace Chess.Editor
         {
             SerializedProperty p = Find(so, name);
             if (p != null) p.boolValue = value;
+        }
+
+        private static void SetFloatProp(SerializedObject so, string name, float value)
+        {
+            SerializedProperty p = Find(so, name);
+            if (p != null) p.floatValue = value;
         }
 
         private static void SetString(SerializedObject so, string name, string value)

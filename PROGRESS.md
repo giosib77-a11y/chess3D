@@ -60,7 +60,7 @@ Stage 3 — ქართული ინტერფეისი
   - `dotnet build Tests/EditorCompileCheck` → 0 შეცდომა, 0 warning; `dotnet build Tests/GameCompileCheck` 0/0; `dotnet test` გადის. ამ 2 ფაილში G2, G3, G4 → 0 (log-ები ინგლისურად).
   - საბოლოო შემოწმება: USER task 45 (ნაბიჯები 2–4).
 
-- [ ] 42. Editor: Setup Chess Scene → `HudCanvas` (HUD + გარდაქმნის ფანჯარა), EventSystem და სარდლის კამერის მნიშვნელობები — owner: task-executor — files: Assets/Editor/ChessSceneSetup.cs — depends: 39, 40, 41 — done when:
+- [x] 42. Editor: Setup Chess Scene → `HudCanvas` (HUD + გარდაქმნის ფანჯარა), EventSystem და სარდლის კამერის მნიშვნელობები — owner: task-executor — files: Assets/Editor/ChessSceneSetup.cs — depends: 39, 40, 41 — done when:
   - ზუსტად API Contract → Stage 3 → „ChessSceneSetup — Stage 3 დამატებები“ (ნაბიჯები 1–6) და „UI სტილი (Stage 3)“ → `HudCanvas`: font-ის შემოწმება სცენის გახსნამდე (null → LogError, არაფერი იცვლება), `EditorUi.EnsureEventSystem`, `HudCanvas` წაშლა+შექმნა, `HudPanel` (VerticalLayoutGroup; `StatusText`, `ErrorText`, `HelpText` = `GameText.HelpLine`), `PromotionPanel` (inactive; `TitleText` + 5 ღილაკი, label-ები `GameText.PieceName` / `Cancel`), `StatusHud`/`PromotionPrompt` ველების მიბმა `SerializedObject`-ით (ვერ ნაპოვნი → LogError + WITH ERRORS).
   - ნაბიჯი 6: `Main Camera`-ს `CameraRig`-ზე `SerializedObject`-ით `commanderEyeHeight` = 3.0, `commanderBackOffset` = 1.6, `commanderPitch` = 30 (ვერ ნაპოვნი → LogError + WITH ERRORS); `CameraRig`-ის სხვა ველებს არ ეხება.
   - Stage 1-ის ნაბიჯები, მასალები, `GameController`-ის ველები და ნაგულისხმევები უცვლელია; `battlePanel`-ს და `BattleCanvas`-ს არ ეხება.
