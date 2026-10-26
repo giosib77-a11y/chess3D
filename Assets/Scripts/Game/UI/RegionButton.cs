@@ -1,5 +1,6 @@
 using System;
 using Chess.Campaign;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ namespace Chess.Game
 
         [SerializeField] private string regionId;
         [SerializeField] private Button button;
-        [SerializeField] private Text label;
+        [SerializeField] private TMP_Text label;
         [SerializeField] private Image background;
 
         public string RegionId => regionId;

@@ -1,5 +1,6 @@
 using System;
 using Chess.Campaign;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +10,7 @@ namespace Chess.Game
     public sealed class CampaignMapController : MonoBehaviour
     {
         [SerializeField] private RegionButton[] regionButtons;
-        [SerializeField] private Text statusText;
+        [SerializeField] private TMP_Text statusText;
         [SerializeField] private Button backButton;
 
         private void Start()

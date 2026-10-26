@@ -1,6 +1,7 @@
 using Chess.AI;
 using Chess.Campaign;
 using Chess.Core;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -25,9 +26,9 @@ namespace Chess.Game
         [SerializeField] private Button startQuickGameButton;
         [SerializeField] private Button backFromQuickGameButton;
 
-        [SerializeField] private Text warningText;
-        [SerializeField] private Text colorLabel;
-        [SerializeField] private Text difficultyLabel;
+        [SerializeField] private TMP_Text warningText;
+        [SerializeField] private TMP_Text colorLabel;
+        [SerializeField] private TMP_Text difficultyLabel;
 
         private Side quickSide = Side.White;
         private DifficultyPreset quickDifficulty = DifficultyPreset.Medium;
@@ -112,11 +113,11 @@ namespace Chess.Game
         {
             if (colorLabel != null)
             {
-                colorLabel.text = quickSide == Side.White ? "Color: White" : "Color: Black";
+                colorLabel.text = GameText.QuickColorLabel(quickSide);
             }
             if (difficultyLabel != null)
             {
-                difficultyLabel.text = "Difficulty: " + quickDifficulty;
+                difficultyLabel.text = GameText.QuickDifficultyLabel(DifficultyText.Name(quickDifficulty));
             }
         }
 

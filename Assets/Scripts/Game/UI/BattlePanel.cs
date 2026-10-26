@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,16 +8,16 @@ namespace Chess.Game
     /// <summary>Battle HUD: info line, leave button and the result panel. Pure view: GameController drives it.</summary>
     public sealed class BattlePanel : MonoBehaviour
     {
-        [SerializeField] private Text infoText;
+        [SerializeField] private TMP_Text infoText;
         [SerializeField] private Button leaveButton;
-        [SerializeField] private Text leaveLabel;
+        [SerializeField] private TMP_Text leaveLabel;
         [SerializeField] private GameObject resultRoot;
-        [SerializeField] private Text titleText;
-        [SerializeField] private Text messageText;
+        [SerializeField] private TMP_Text titleText;
+        [SerializeField] private TMP_Text messageText;
         [SerializeField] private Button retryButton;
-        [SerializeField] private Text retryLabel;
+        [SerializeField] private TMP_Text retryLabel;
         [SerializeField] private Button backButton;
-        [SerializeField] private Text backLabel;
+        [SerializeField] private TMP_Text backLabel;
 
         private bool _inGame; // ShowInGame was called and HideAll has not been
 
